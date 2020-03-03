@@ -4,6 +4,7 @@
 
 ## 高德地图SDK https://lbs.amap.com
 Vendor/AMap/
+*.framework
 
 ## User settings
 xcuserdata/
