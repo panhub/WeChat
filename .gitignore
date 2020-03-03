@@ -2,6 +2,9 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+## 高德地图SDK https://lbs.amap.com
+*.framework
+
 ## User settings
 xcuserdata/
 
