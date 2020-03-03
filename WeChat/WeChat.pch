@@ -1,0 +1,18 @@
+//
+//  WeChat.pch
+//  MNChat
+//
+//  Created by Vincent on 2019/2/20.
+//  Copyright © 2019年 小斯. All rights reserved.
+//
+
+#ifndef WeChat_pch
+#define WeChat_pch
+
+#ifdef __OBJC__
+#import "MNKit.h"
+#import "YYKit.h"
+#import "WeChat.h"
+#endif
+
+#endif /* WeChat_pch */

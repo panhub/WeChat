@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  MNChat
+
+  Created by Vincent on 2019/11/25.
+  Copyright © 2019 Vincent. All rights reserved.
+*/
+"account" = "賬號";
+"password" = "密碼";
+"login" = "登錄";
