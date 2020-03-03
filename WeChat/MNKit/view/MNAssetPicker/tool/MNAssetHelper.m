@@ -76,7 +76,7 @@ static MNAssetHelper *_helper;
                 collection.title = @"相机胶卷";
                 collection.localizedTitle = obj.localizedTitle;
                 collection.identifier = obj.localIdentifier;
-                collection.dataArray = [MNAssetHelper fetchAssetsInAssetCollection:obj options:options configuration:configuration];
+                collection.assets = [MNAssetHelper fetchAssetsInAssetCollection:obj options:options configuration:configuration];
                 [collections addObject:collection];
                 *stop = YES;
             }
@@ -94,7 +94,7 @@ static MNAssetHelper *_helper;
             if (dataArray.count <= 0 && !configuration.showEmptyAlbum) return;
             MNAssetCollection *collection = [MNAssetCollection new];
             collection.identifier = obj.localIdentifier;
-            collection.dataArray = dataArray;
+            collection.assets = dataArray;
             collection.localizedTitle = obj.localizedTitle;
             collection.title = [NSString replacingBlankCharacter:obj.localizedTitle withCharacter:@"未命名相簿"];
             [collections addObject:collection];
@@ -193,16 +193,16 @@ static MNAssetHelper *_helper;
     } else {
         dispatch_async(dispatch_get_high_queue(), ^{
             CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-            CGFloat radio = renderSize.width/renderSize.height;
-            if (radio > 1.f) {
-                renderSize = CGSizeMultiplyToWidth(renderSize, model.renderSize.width);
+            if (renderSize.width/renderSize.height > 1.f) {
+                renderSize = CGSizeMultiplyToWidth(renderSize, CGSizeMax(model.renderSize));
             } else {
-                renderSize = CGSizeMultiplyToHeight(renderSize, model.renderSize.height);
+                renderSize = CGSizeMultiplyToHeight(renderSize, CGSizeMax(model.renderSize));
             }
+            if (model.type == MNAssetTypeVideo) renderSize = CGSizeMultiplyByRatio(renderSize, 2.f);
             self.imageOptions.networkAccessAllowed = NO;
             self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
             model.requestId = [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
-                model.requestId = 0;
+                model.requestId = INT_MIN;
                 BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && result);
                 if (succeed) {
                     result = [result resizingOrientation];
@@ -234,12 +234,12 @@ static MNAssetHelper *_helper;
         return;
     }
     CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-    CGFloat radio = renderSize.width/renderSize.height;
-    if (radio > 1.f) {
-        renderSize = CGSizeMultiplyToWidth(renderSize, model.renderSize.width);
+    if (renderSize.width/renderSize.height > 1.f) {
+        renderSize = CGSizeMultiplyToWidth(renderSize, CGSizeMax(model.renderSize));
     } else {
-        renderSize = CGSizeMultiplyToHeight(renderSize, model.renderSize.height);
+        renderSize = CGSizeMultiplyToHeight(renderSize, CGSizeMax(model.renderSize));
     }
+    if (model.type == MNAssetTypeVideo) renderSize = CGSizeMultiplyByRatio(renderSize, 2.f);
     self.imageOptions.networkAccessAllowed = NO;
     self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
@@ -255,14 +255,14 @@ static MNAssetHelper *_helper;
 }
 
 - (void)requestCollectionThumbnail:(MNAssetCollection *)collection completion:(void(^)(MNAssetCollection *))completion {
-    if (collection.dataArray.count <= 0 || collection.thumbnail) {
+    if (collection.assets.count <= 0 || collection.thumbnail) {
         if (completion) completion(collection);
         return;
     }
-    MNAsset *model = collection.dataArray.firstObject;
+    MNAsset *model = collection.assets.firstObject;
     if ([model isCapturingModel]) {
-        if (collection.dataArray.count <= 1) return;
-        model = collection.dataArray[1];
+        if (collection.assets.count <= 1) return;
+        model = collection.assets[1];
     }
     if (model.thumbnail) {
         collection.thumbnail = model.thumbnail;
@@ -271,8 +271,7 @@ static MNAssetHelper *_helper;
     }
     dispatch_async(dispatch_get_high_queue(), ^{
         CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-        CGFloat radio = renderSize.width/renderSize.height;
-        if (radio > 1.f) {
+        if (renderSize.width/renderSize.height > 1.f) {
             renderSize = CGSizeMultiplyToWidth(renderSize, 200.f);
         } else {
             renderSize = CGSizeMultiplyToHeight(renderSize, 200.f);
@@ -293,7 +292,7 @@ static MNAssetHelper *_helper;
 }
 
 + (void)cancelThumbnailRequestWithAsset:(MNAsset *)asset {
-    if (asset.requestId == 0) return;
+    if (asset.requestId == INT_MIN) return;
     [[PHImageManager defaultManager] cancelImageRequest:asset.requestId];
 }
 
@@ -331,9 +330,9 @@ static MNAssetHelper *_helper;
     /// configuration有值时表示此时挑选完成, 一般会退出, 不需要显示下载
     if (model.source == MNAssetSourceCloud) {
         if (configuration) {
-            [model changeState:MNAssetStateDownloading];
+            [model changeStatus:MNAssetStatusDownloading];
         } else {
-            model.state = MNAssetStateDownloading;
+            model.status = MNAssetStatusDownloading;
         }
     }
     if (model.type == MNAssetTypeVideo) {
@@ -343,19 +342,19 @@ static MNAssetHelper *_helper;
         options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
         options.progressHandler = ^(double progress, NSError * _Nullable error, BOOL * _Nonnull stop, NSDictionary * _Nullable info) {
             model.progress = progress;
-            if (error) model.state = MNAssetStateFailed;
+            if (error) model.status = MNAssetStatusFailed;
         };
         model.downloadId = [[PHImageManager defaultManager] requestAVAssetForVideo:model.asset options:options resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
             if (asset && [asset isKindOfClass:AVURLAsset.class]) {
                 AVURLAsset *avasset = (AVURLAsset *)asset;
                 model.content = avasset.URL.path;
-                model.state = MNAssetStateNormal;
+                model.status = MNAssetStatusCompleted;
                 model.source = MNAssetSourceResource;
             } else {
-                model.state = MNAssetStateFailed;
+                model.status = MNAssetStatusFailed;
                 model.source = MNAssetSourceCloud;
             }
-            model.downloadId = 0;
+            model.downloadId = INT_MIN;
             if (completion) completion(model);
         }];
     } else if (model.type == MNAssetTypeLivePhoto) {
@@ -376,18 +375,18 @@ static MNAssetHelper *_helper;
             options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
             options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
                 model.progress = progress;
-                if (error) model.state = MNAssetStateFailed;
+                if (error) model.status = MNAssetStatusFailed;
             };
             model.downloadId = [[PHImageManager defaultManager] requestLivePhotoForAsset:model.asset targetSize:targetSize contentMode:PHImageContentModeAspectFit options:options resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
                 if (livePhoto) {
                     model.content = livePhoto;
-                    model.state = MNAssetStateNormal;
+                    model.status = MNAssetStatusCompleted;
                     model.source = MNAssetSourceResource;
                 } else {
-                    model.state = MNAssetStateFailed;
+                    model.status = MNAssetStatusFailed;
                     model.source = MNAssetSourceCloud;
                 }
-                model.downloadId = 0;
+                model.downloadId = INT_MIN;
                 if (completion) completion(model);
             }];
         }
@@ -397,7 +396,7 @@ static MNAssetHelper *_helper;
         options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
         options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
             model.progress = progress;
-            if (error) model.state = MNAssetStateFailed;
+            if (error) model.status = MNAssetStatusFailed;
         };
         model.downloadId = [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
             UIImage *image = model.type == MNAssetTypePhoto ? [UIImage imageWithData:imageData] : [UIImage animatedImageWithData:imageData];
@@ -409,13 +408,13 @@ static MNAssetHelper *_helper;
                     }
                 }
                 model.content = image;
-                model.state = MNAssetStateNormal;
+                model.status = MNAssetStatusCompleted;
                 model.source = MNAssetSourceResource;
             } else {
-                model.state = MNAssetStateFailed;
+                model.status = MNAssetStatusFailed;
                 model.source = MNAssetSourceCloud;
             }
-            model.downloadId = 0;
+            model.downloadId = INT_MIN;
             if (completion) completion(model);
         }];
     }
@@ -443,12 +442,12 @@ static MNAssetHelper *_helper;
                 if (thumbnail) model.thumbnail = thumbnail;
                 model.content = avasset.URL.path;
                 model.source = MNAssetSourceResource;
-                model.state = MNAssetStateNormal;
+                model.status = MNAssetStatusCompleted;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (completion) completion(model);
                 });
             } else {
-                model.state = MNAssetStateFailed;
+                model.status = MNAssetStatusFailed;
                 model.source = MNAssetSourceCloud;
             }
         }];
@@ -466,13 +465,13 @@ static MNAssetHelper *_helper;
             [[PHImageManager defaultManager] requestLivePhotoForAsset:model.asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeAspectFit options:options resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
                 if (livePhoto) {
                     model.content = livePhoto;
-                    model.state = MNAssetStateNormal;
+                    model.status = MNAssetStatusCompleted;
                     model.source = MNAssetSourceResource;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (completion) completion(model);
                     });
                 } else {
-                    model.state = MNAssetStateFailed;
+                    model.status = MNAssetStatusFailed;
                     model.source = MNAssetSourceCloud;
                 }
             }];
@@ -491,13 +490,13 @@ static MNAssetHelper *_helper;
             if (image) {
                 if (image.isAnimatedImage == NO) image = [image resizingOrientation];
                 model.content = image;
-                model.state = MNAssetStateNormal;
+                model.status = MNAssetStatusCompleted;
                 model.source = MNAssetSourceResource;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (completion) completion(model);
                 });
             } else {
-                model.state = MNAssetStateFailed;
+                model.status = MNAssetStatusFailed;
                 model.source = MNAssetSourceCloud;
             }
         }];
@@ -505,8 +504,7 @@ static MNAssetHelper *_helper;
 }
 
 + (void)cancelContentRequestWithAsset:(MNAsset *)asset {
-    if (asset.downloadId == 0) return;
-    asset.state = MNAssetStateNormal;
+    if (asset.downloadId == INT_MIN) return;
     if (asset.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
             [PHLivePhoto cancelLivePhotoRequestWithRequestID:asset.downloadId];
@@ -550,7 +548,7 @@ static MNAssetHelper *_helper;
 #pragma mark - Write
 + (void)writeImages:(NSArray <UIImage *>*)images toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *error))completion {
     if (images.count <= 0) {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"数据错误"}]);
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片文件不存在"}]);
         return;
     }
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
@@ -585,7 +583,7 @@ static MNAssetHelper *_helper;
 + (void)writeVideos:(NSArray <NSURL *>*)URLs toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *))completion {
     if (URLs.count <= 0) {
         if (completion) {
-            completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"数据错误"}]);
+            completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"视频文件不存在"}]);
         }
         return;
     }
@@ -631,7 +629,7 @@ static MNAssetHelper *_helper;
             if (completion) completion(identifier, error);
         }];
     } else {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"数据错误"}]);
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"资源文件不存在"}]);
     }
 }
 
@@ -657,7 +655,7 @@ static MNAssetHelper *_helper;
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 + (void)writeLivePhotoWithImage:(NSURL *)imageURL video:(NSURL *)videoURL completion:(void(^)(BOOL success, NSError *error))completion {
     if (![NSFileManager.defaultManager fileExistsAtPath:imageURL.path isDirectory:nil] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path isDirectory:nil]) {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"数据错误"}]);
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"LivePhoto文件不存在"}]);
         return;
     }
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {

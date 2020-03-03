@@ -20,7 +20,7 @@
 }
 
 - (void)addAsset:(MNAsset *)asset {
-    NSMutableArray *dataArray = self.dataArray.mutableCopy;
+    NSMutableArray *dataArray = self.assets.mutableCopy;
     if (dataArray.count) {
         MNAsset *model = [dataArray lastObject];
         if (model.isCapturingModel) {
@@ -31,17 +31,17 @@
     } else {
         [dataArray addObject:asset];
     }
-    self.dataArray = dataArray.copy;
+    self.assets = dataArray.copy;
     MNAsset *model = [dataArray firstObject];
     if (model.isCapturingModel) {
-        self.thumbnail = self.dataArray[1].thumbnail;
+        self.thumbnail = self.assets[1].thumbnail;
     } else {
         self.thumbnail = model.thumbnail;
     }
 }
 
 - (void)insertAssetAtFront:(MNAsset *)asset {
-    NSMutableArray *dataArray = self.dataArray.mutableCopy;
+    NSMutableArray *dataArray = self.assets.mutableCopy;
     if (dataArray.count) {
         MNAsset *model = [dataArray firstObject];
         if (model.isCapturingModel) {
@@ -52,17 +52,17 @@
     } else {
         [dataArray insertObject:asset atIndex:0];
     }
-    self.dataArray = dataArray.copy;
+    self.assets = dataArray.copy;
     MNAsset *model = [dataArray firstObject];
     if (model.isCapturingModel) {
-        self.thumbnail = self.dataArray[1].thumbnail;
+        self.thumbnail = self.assets[1].thumbnail;
     } else {
         self.thumbnail = model.thumbnail;
     }
 }
 
 - (void)didReceiveMemoryWarningNotification:(NSNotification *)notification {
-    [self.dataArray setValue:nil forKey:@"content"];
+    [self.assets setValue:nil forKey:@"content"];
 }
 
 - (void)dealloc {

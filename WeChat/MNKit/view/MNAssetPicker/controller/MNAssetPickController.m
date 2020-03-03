@@ -27,12 +27,12 @@
 #else
 @interface MNAssetPickController ()<MNAssetCellDelegate, MNImageCropDelegate, MNAlbumViewDelegate, MNAssetToolDelegate, MNCapturingControllerDelegate, MNAssetBrowseDelegate, MNAssetTouchDelegate, MNAssetPreviewDelegate, MNImageCropDelegate, PHPhotoLibraryChangeObserver>
 #endif
-@property (nonatomic, strong) MNAssetCollection *album;
+@property (nonatomic, strong) MNAssetCollection *collection;
 @property (nonatomic, strong) MNAlbumView *albumView;
 @property (nonatomic, strong) MNAssetToolBar *assetToolBar;
 @property (nonatomic, strong) MNAlbumSelectControl *albumToolBar;
 @property (nonatomic, strong) MNAssetPickConfiguration *configuration;
-@property (nonatomic, strong) NSArray <MNAssetCollection *>*assets;
+@property (nonatomic, strong) NSArray <MNAssetCollection *>*collections;
 @property (nonatomic, strong) NSMutableArray <MNAsset *>*selectedArray;
 @end
 
@@ -127,11 +127,11 @@
 - (void)reloadData {
     [self.contentView showDialog:MNLoadDialogStyleActivity message:@"加载中"];
     [MNAssetHelper fetchAssetCollectionsWithConfiguration:self.configuration completion:^(NSArray<MNAssetCollection *>*dataArray) {
-        self.assets = dataArray;
+        self.collections = dataArray;
         self.albumToolBar.hidden = dataArray.count <= 0;
         self.albumToolBar.selectEnabled = dataArray.count > 1;
         self.collectionView.hidden = dataArray.count <= 0;
-        if (dataArray.count) self.album = dataArray.firstObject;
+        if (dataArray.count) self.collection = dataArray.firstObject;
         if (self.albumView) self.albumView.dataArray = dataArray;
         [self.contentView closeDialog];
     }];
@@ -139,7 +139,7 @@
 
 #pragma mark - UICollectionViewDelegate & UICollectionViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.album.dataArray.count;
+    return self.collection.assets.count;
 }
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -152,13 +152,13 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(MNAssetCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    cell.asset = self.album.dataArray[indexPath.item];
+    cell.asset = self.collection.assets[indexPath.item];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.item >= self.album.dataArray.count) return;
-    MNAsset *model = self.album.dataArray[indexPath.item];
-    if (!model.isEnabled || model.state == MNAssetStateDownloading) return;
+    if (indexPath.item >= self.collection.assets.count) return;
+    MNAsset *model = self.collection.assets[indexPath.item];
+    if (!model.isEnabled || model.status == MNAssetStatusDownloading) return;
     if (model.isCapturingModel) {
         /// 拍照/拍摄
         MNCapturingController *vc = [MNCapturingController new];
@@ -175,11 +175,11 @@
             vc.allowsSelect = NO;
             [self.navigationController pushViewController:vc animated:YES];
         } else {
-            [self didFinishSelectAssets:@[model]];
+            [self didFinishPickingAssets:@[model]];
         }
     } else if (self.configuration.allowsPreviewing) {
         /// 预览
-        NSArray <MNAsset *>*assets = [self.album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isCapturingModel == NO"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isCapturingModel == NO"]];
         if (assets.count <= 0) return;
         MNAssetBrowser *browser = [MNAssetBrowser new];
         browser.assets = assets;
@@ -216,19 +216,40 @@
 }
 
 #pragma mark - 选择内容完成
-- (void)didFinishSelectAssets:(NSArray <MNAsset *>*)assets {
+- (void)didFinishPickingAssets:(NSArray <MNAsset *>*)assets {
     [self.navigationController.view showDialog:MNLoadDialogStyleActivity message:@"请稍后"];
     dispatch_async(dispatch_get_high_queue(), ^{
         [MNAssetHelper requestContentWithAssets:assets configuration:self.configuration completion:^(NSArray<MNAsset *>* models) {
+            // 判断是否有下载失败项<通常为下载iCloud文件失败>
+            NSArray <MNAsset *>*failAssets = [models filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.status != %@", @(MNAssetStatusCompleted)]];
+            NSMutableArray <MNAsset *>*succAssets = models.mutableCopy;
+            if (failAssets.count) [succAssets removeObjectsInArray:failAssets];
             dispatch_async_main(^{
                 [self.navigationController.view closeDialogWithCompletionHandler:^{
-                    if ([self.configuration.delegate respondsToSelector:@selector(assetPicker:didFinishPickingAssets:)]) {
-                        [self.configuration.delegate assetPicker:kTransform(MNAssetPicker *, self.navigationController) didFinishPickingAssets:models.copy];
+                    if (failAssets.count <= 0) {
+                        // 获取资源成功
+                        [self enterPickingAssets:succAssets];
+                    } else if (succAssets.count <= 0 || succAssets.count < self.configuration.minPickingCount) {
+                        // 仅有一个资源且获取失败或者成功的数量小于最小限制
+                        [[MNAlertView alertViewWithTitle:nil message:@"请求iCloud内容失败\n请切换网络重试!" handler:nil ensureButtonTitle:@"关闭" otherButtonTitles:nil] show];
+                    } else {
+                        // 有获取失败项
+                        [[MNAlertView alertViewWithTitle:@"提示" message:@"请求iCloud内容失败\n是否继续?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
+                            if (buttonIndex == alertView.ensureButtonIndex) {
+                                [self enterPickingAssets:succAssets];
+                            }
+                        } ensureButtonTitle:@"确定" otherButtonTitles:@"取消", nil] show];
                     }
                 }];
             });
         }];
     });
+}
+
+- (void)enterPickingAssets:(NSArray <MNAsset *>*)assets {
+    if ([self.configuration.delegate respondsToSelector:@selector(assetPicker:didFinishPickingAssets:)]) {
+        [self.configuration.delegate assetPicker:kTransform(MNAssetPicker *, self.navigationController) didFinishPickingAssets:assets.copy];
+    }
 }
 
 #pragma mark - MNAssetBrowseDelegate
@@ -268,20 +289,20 @@
     /// 判断是否超过限制
     if (self.selectedArray.count >= self.configuration.maxPickingCount) {
         /// 达到最大限制, 不可再选
-        NSArray <MNAsset *>*assets = [self.album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == YES"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == YES"]];
         [assets setValue:@(NO) forKey:@"enabled"];
     } else {
         /// 可以继续再选择
-        NSArray <MNAsset *>*assets = [self.album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == NO"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == NO"]];
         [assets setValue:@(YES) forKey:@"enabled"];
         /// 再进行类型限制
         if (self.selectedArray.count > 0 && !self.configuration.allowsMixPicking) {
             MNAssetType type = self.selectedArray.firstObject.type;
             if (type == MNAssetTypeVideo) {
-                NSArray <MNAsset *>*assets = [self.album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             } else {
-                NSArray <MNAsset *>*assets = [self.album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             }
         }
@@ -300,7 +321,7 @@
 
 #pragma mark - MNAlbumViewDelegate
 - (void)albumView:(MNAlbumView *)albumView didSelectAlbum:(MNAssetCollection *)album {
-    if (album && album != self.album) self.album = album;
+    if (album && album != self.collection) self.collection = album;
     self.albumToolBar.selected = NO;
     [albumView dismiss];
 }
@@ -317,9 +338,9 @@
         if (buttonIndex != alertView.ensureButtonIndex) return;
         toolBar.count = 0;
         [self.selectedArray removeAllObjects];
-        [self.assets enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj.dataArray setValue:@(NO) forKey:@"selected"];
-            [obj.dataArray setValue:@(YES) forKey:@"enabled"];
+        [self.collections enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj.assets setValue:@(NO) forKey:@"selected"];
+            [obj.assets setValue:@(YES) forKey:@"enabled"];
         }];
         [self.collectionView reloadData];
         if (self.albumToolBar.selected) [self.albumView reloadData];
@@ -330,11 +351,11 @@
     /// 判断是否允许退出
     NSUInteger minCount = self.configuration.minPickingCount;
     if (minCount > 0 && self.selectedArray.count < minCount) {
-        [[MNAlertView alertViewWithTitle:nil message:[NSString stringWithFormat:@"请至少挑选%@张图片或视频", @(minCount).stringValue] handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] show];
+        [[MNAlertView alertViewWithTitle:nil message:[NSString stringWithFormat:@"至少挑选%@项资源", @(minCount).stringValue] handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] show];
         return;
     }
     /// 确认选择
-    [self didFinishSelectAssets:self.selectedArray.copy];
+    [self didFinishPickingAssets:self.selectedArray.copy];
 }
 
 #pragma mark - MNCapturingControllerDelegate
@@ -349,12 +370,12 @@
     }
     MNAsset *model = [MNAsset assetWithContent:content renderSize:self.configuration.renderSize];
     if (self.configuration.sortAscending) {
-        [self.album addAsset:model];
+        [self.collection addAsset:model];
     } else {
-        [self.album insertAssetAtFront:model];
+        [self.collection insertAssetAtFront:model];
     }
-    self.album = self.album;
-    if (self.configuration.allowsWritToAlbum) [MNAssetHelper writeContent:@[content] toAlbum:self.album.localizedTitle completion:nil];
+    self.collection = self.collection;
+    if (self.configuration.allowsWritToAlbum) [MNAssetHelper writeContent:@[content] toAlbum:self.collection.localizedTitle completion:nil];
     [capturingController.navigationController popViewControllerAnimated:YES];
 }
 
@@ -364,12 +385,12 @@
 }
 
 - (void)imageCropController:(MNImageCropController *)controller didCroppingImage:(UIImage *)image {
-    [self didFinishSelectAssets:@[[MNAsset assetWithContent:image]]];
+    [self didFinishPickingAssets:@[[MNAsset assetWithContent:image]]];
 }
 
 #pragma mark - MNAssetPreviewDelegate
 - (void)previewControllerDoneButtonClicked:(MNAssetPreviewController *)previewController {
-    [self didFinishSelectAssets:previewController.assets];
+    [self didFinishPickingAssets:previewController.assets];
 }
 
 #pragma mark - MNAssetTouchDelegate
@@ -378,7 +399,7 @@
     if (asset.type == MNAssetTypePhoto && self.configuration.allowsEditing) {
         [self cropImageAsset:asset];
     } else {
-        [self didFinishSelectAssets:@[asset]];
+        [self didFinishPickingAssets:@[asset]];
     }
 }
 
@@ -387,11 +408,11 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 - (UIViewController *)previewingContext:(id <UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    if (self.album.dataArray.count <= 0) return nil;
+    if (self.collection.assets.count <= 0) return nil;
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     if (!indexPath) return nil;
-    MNAsset *model = self.album.dataArray[indexPath.item];
-    if (model.isCapturingModel || !model.thumbnail || model.state == MNAssetStateDownloading) return nil;
+    MNAsset *model = self.collection.assets[indexPath.item];
+    if (model.isCapturingModel || !model.thumbnail || model.status == MNAssetStatusDownloading) return nil;
     UIPreviewAction *action = [UIPreviewAction actionWithTitle:@"取消" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction *action, UIViewController *previewViewController) {
         NSLog(@"===取消===");
     }];
@@ -411,7 +432,7 @@
 #endif
 
 #pragma mark - PHPhotoLibraryChangeObserver
-- (void)photoLibraryDidChange:(PHChange *)changeInstance {
+- (void)photoLibraryDidChange:(PHChange *)changeInfo {
     NSLog(@"相册内容变动");
 }
 
@@ -451,7 +472,7 @@
 
 #pragma mark - 选择相册
 - (void)albumToolBarClicked:(MNAlbumSelectControl *)toolBar {
-    if (self.assets.count <= 1) return;
+    if (self.collections.count <= 1) return;
     toolBar.selected = !toolBar.selected;
     if (toolBar.selected) {
         [self.albumView show];
@@ -461,31 +482,31 @@
 }
 
 #pragma mark - Setter
-- (void)setAlbum:(MNAssetCollection *)album {
+- (void)setCollection:(MNAssetCollection *)collection {
     /// 处理不可选
-    [album.dataArray setValue:@(YES) forKey:@"enabled"];
-    if (self.configuration.maxPickingCount > 1 && album.dataArray.count > 0) {
+    [collection.assets setValue:@(YES) forKey:@"enabled"];
+    if (self.configuration.maxPickingCount > 1 && collection.assets.count > 0) {
         if (self.selectedArray.count >= self.configuration.maxPickingCount) {
-            NSArray <MNAsset *>*assets = [album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO"]];
+            NSArray <MNAsset *>*assets = [collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO"]];
             [assets setValue:@(NO) forKey:@"enabled"];
         } else if (self.selectedArray.count > 0 && !self.configuration.allowsMixPicking) {
             MNAssetType type = self.selectedArray.firstObject.type;
             if (type == MNAssetTypeVideo) {
-                NSArray <MNAsset *>*assets = [album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
+                NSArray <MNAsset *>*assets = [collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             } else {
-                NSArray <MNAsset *>*assets = [album.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
+                NSArray <MNAsset *>*assets = [collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             }
         }
     }
     /// 更新数据
-    _album = album;
-    _albumToolBar.title = album.title;
+    _collection = collection;
+    _albumToolBar.title = collection.title;
     [self.collectionView reloadData];
-    self.collectionView.hidden = album.dataArray.count <= 0;
-    if (album.dataArray.count > 0 && self.configuration.sortAscending) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:album.dataArray.count - 1 inSection:0];
+    self.collectionView.hidden = collection.assets.count <= 0;
+    if (collection.assets.count > 0 && self.configuration.sortAscending) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:collection.assets.count - 1 inSection:0];
         [self.collectionView scrollToItemAtIndexPath:indexPath
                                     atScrollPosition:UICollectionViewScrollPositionTop
                                             animated:NO];

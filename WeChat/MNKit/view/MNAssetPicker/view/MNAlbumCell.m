@@ -39,8 +39,8 @@
     [self.titleLabel sizeToFit];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     
-    NSArray <MNAsset *>*assets = [model.dataArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == YES"]];
-    self.detailLabel.text = [NSString stringWithFormat:@"(%@/%@)", @(assets.count).stringValue, @(model.dataArray.count).stringValue];
+    NSArray <MNAsset *>*assets = [model.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == YES"]];
+    self.detailLabel.text = [NSString stringWithFormat:@"(%@/%@)", @(assets.count).stringValue, @(model.assets.count).stringValue];
     [self.detailLabel sizeToFit];
     self.detailLabel.textAlignment = NSTextAlignmentCenter;
     

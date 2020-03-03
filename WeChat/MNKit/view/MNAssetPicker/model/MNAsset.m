@@ -15,6 +15,16 @@
 @end
 
 @implementation MNAsset
+- (instancetype)init {
+    if (self = [super init]) {
+        self.requestId = INT_MIN;
+        self.downloadId = INT_MIN;
+        self.status = MNAssetStatusUnknown;
+        self.source = MNAssetSourceUnknown;
+    }
+    return self;
+}
+
 + (MNAsset *)capturingModel {
     MNAsset *model = [MNAsset new];
     model->_capturing = YES;
@@ -85,11 +95,11 @@
     });
 }
 
-- (void)setState:(MNAssetState)state {
-    _state = state;
+- (void)setStatus:(MNAssetStatus)status {
+    _status = status;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.stateChangeHandler) {
-            self.stateChangeHandler(self);
+        if (self.statusChangeHandler) {
+            self.statusChangeHandler(self);
         }
     });
 }
@@ -104,11 +114,11 @@
 }
 
 #pragma mark - Change
-- (void)changeState:(MNAssetState)state {
-    if (state == _state) return;
-    [self willChangeValueForKey:@"state"];
-    self->_state = state;
-    [self didChangeValueForKey:@"state"];
+- (void)changeStatus:(MNAssetStatus)status {
+    if (status == _status) return;
+    [self willChangeValueForKey:@"status"];
+    self->_status = status;
+    [self didChangeValueForKey:@"status"];
 }
 
 - (void)changeSource:(MNAssetSourceType)source {
@@ -135,7 +145,7 @@
 - (void)dealloc {
     self.sourceChangeHandler = nil;
     self.thumbnailChangeHandler = nil;
-    self.stateChangeHandler = nil;
+    self.statusChangeHandler = nil;
     self.progressChangeHandler = nil;
     [MNAssetHelper cancelThumbnailRequestWithAsset:self];
     [MNAssetHelper cancelContentRequestWithAsset:self];

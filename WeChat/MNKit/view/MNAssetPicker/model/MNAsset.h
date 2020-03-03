@@ -39,14 +39,16 @@ typedef NS_ENUM(NSInteger, MNAssetSourceType) {
 
 /**
  下载状态
- - MNAssetStateNormal: 未知
- - MNAssetStateDownloading: 下载中
- - MNAssetStateFailed: 失败
+ - MNAssetStatusUnknown: 未知<默认>
+ - MNAssetStatusCompleted: 成功获取资源
+ - MNAssetStatusDownloading: iCloud资源下载中
+ - MNAssetStatusFailed: iCloud资源下载失败
  */
-typedef NS_ENUM(NSInteger, MNAssetState) {
-    MNAssetStateNormal = 0,
-    MNAssetStateDownloading,
-    MNAssetStateFailed
+typedef NS_ENUM(NSInteger, MNAssetStatus) {
+    MNAssetStatusUnknown = 0,
+    MNAssetStatusCompleted,
+    MNAssetStatusDownloading,
+    MNAssetStatusFailed
 };
 
 @interface MNAsset : NSObject
@@ -61,7 +63,7 @@ typedef NS_ENUM(NSInteger, MNAssetState) {
 /**
  下载状态
  */
-@property (nonatomic) MNAssetState state;
+@property (nonatomic) MNAssetStatus status;
 /**
  图片: 调整后的图片
  视频: 路径
@@ -131,7 +133,7 @@ typedef NS_ENUM(NSInteger, MNAssetState) {
 /**
  下载状态发生变化回调
  */
-@property (nonatomic, copy) void (^stateChangeHandler) (MNAsset *m);
+@property (nonatomic, copy) void (^statusChangeHandler) (MNAsset *m);
 
 /**
  实例化拍照模型
@@ -156,9 +158,9 @@ typedef NS_ENUM(NSInteger, MNAssetState) {
 
 /**
  修改状态<避免触发setter>
- @param state 指定状态
+ @param status 指定状态
  */
-- (void)changeState:(MNAssetState)state;
+- (void)changeStatus:(MNAssetStatus)status;
 
 /**
  修改来源<避免触发setter>

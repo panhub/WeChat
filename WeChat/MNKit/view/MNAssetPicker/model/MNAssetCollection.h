@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MNAsset.h"
+@class PHFetchResult;
 
 @interface MNAssetCollection : NSObject
 /**
@@ -29,7 +30,7 @@
 /**
  相簿资源内容
  */
-@property (nonatomic, strong) NSArray <MNAsset *>*dataArray;
+@property (nonatomic, strong) NSArray <MNAsset *>*assets;
 
 - (void)addAsset:(MNAsset *)asset;
 

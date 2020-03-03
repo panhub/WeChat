@@ -84,9 +84,9 @@
     self.badgeButton.hidden = NO;
     self.imageView.image = model.thumbnail;
     self.holdView.hidden = model.isEnabled;
-    self.cloudView.highlighted = model.state == MNAssetStateFailed;
+    self.cloudView.highlighted = model.status == MNAssetStatusFailed;
     self.cloudView.hidden = model.source != MNAssetSourceCloud;
-    self.progressView.hidden = model.state != MNAssetStateDownloading;
+    self.progressView.hidden = model.status != MNAssetStatusDownloading;
     if (self.allowsSelect) {
         self.selectControl.index = model.selectIndex;
         self.selectControl.selected = model.selected;
@@ -124,9 +124,9 @@
         [weakself.progressView setProgress:m.progress animated:NO];
     };
     
-    model.stateChangeHandler = ^(MNAsset *m) {
-        weakself.cloudView.highlighted = m.state == MNAssetStateFailed;
-        weakself.progressView.hidden = m.state != MNAssetStateDownloading;
+    model.statusChangeHandler = ^(MNAsset *m) {
+        weakself.cloudView.highlighted = m.status == MNAssetStatusFailed;
+        weakself.progressView.hidden = m.status != MNAssetStatusDownloading;
     };
     
     [[MNAssetHelper helper] requestAssetThumbnail:model];
@@ -152,7 +152,7 @@
 
 - (void)didEndDisplaying {
     _asset.containerView = nil;
-    _asset.stateChangeHandler = nil;
+    _asset.statusChangeHandler = nil;
     _asset.sourceChangeHandler = nil;
     _asset.progressChangeHandler = nil;
     _asset.thumbnailChangeHandler = nil;

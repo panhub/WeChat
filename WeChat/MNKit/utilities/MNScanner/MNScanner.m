@@ -28,10 +28,9 @@
     self = [super init];
     if (!self) return nil;
     [self initialized];
-    #if TARGET_IPHONE_SIMULATOR
-    return self;
-    #endif
+    #if !TARGET_IPHONE_SIMULATOR
     [self startCapture];
+    #endif
     return self;
 }
 
