@@ -12,6 +12,8 @@
 #ifdef __OBJC__
 #import "MNKit.h"
 #import "YYKit.h"
+#import "Import.h"
+#import "Macro.h"
 #import "WeChat.h"
 #endif
 

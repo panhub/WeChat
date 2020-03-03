@@ -9,66 +9,8 @@
 #ifndef WeChat_h
 #define WeChat_h
 
-#import "WXUser.h"
-#import "WXPreference.h"
-#import "MNChatHelper.h"
-#import "MNTextField.h"
-#import "MNMobRequest.h"
-#import "WeAppDelegate.h"
-
-#import "SDAutoLayout.h"
-#import "SDImageCache.h"
-#import "UIButton+WebCache.h"
-#import "UIImageView+WebCache.h"
-#import "FLAnimatedImage.h"
-#import "SDCycleScrollView.h"
-
-#import <MAMapKit/MAMapKit.h>
-#import <AMapFoundationKit/AMapFoundationKit.h>
-#import <AMapLocationKit/AMapLocationKit.h>
-#import <AMapSearchKit/AMapSearchKit.h>
-
-#define AppleID @"1448104087"
-
-#define REVIEW_TIME     @"2019-11-30"
-
-/// Mob
-#define MobAppKey   @"2b056fb118960"
-#define MobAppSecret   @"5941c0a3c72df403e285166c29580e80"
-
-/// 高德
-#define AMapAppKey  @"6ef6af8f5510a1940068fb4900158960"
-
-/// 友盟
-#define UMengAppKey @"5d2d992f0cafb210530002d0"
-
-#define AppDelegate   ((WeAppDelegate *)[[UIApplication sharedApplication] delegate])
-
 /// 数据分隔符
 #define WXDataSeparatedSign  @"^***^"
-
-#pragma mark - 微信
-/// 微信视图背景色
-#define VIEW_COLOR   UIColorWithSingleRGB(241.f)
-/// 微信主题色
-#define THEME_COLOR  UIColorWithRGB(7.f, 192.f, 96.f)
-/// 微信阴影线颜色
-#define SEPARATOR_COLOR   UIColorWithRGBA(100.f, 100.f, 100.f, .2f)
-/// 微信消息背景色
-#define BADGE_COLOR  UIColorWithRGB(249.f, 81.f, 81.f)
-/// 微信字体颜色
-#define TEXT_COLOR   UIColorWithRGB(87.f, 106.f, 149.f)
-/// 微信金额字体
-#define SansFontRegular(fontSize)    [UIFont fontWithName:@"WeChat-Sans-Std-Regular" size:fontSize]
-#define SansFontBold(fontSize)    [UIFont fontWithName:@"WeChat-Sans-Std-Bold" size:fontSize]
-#define SansFontMedium(fontSize)    [UIFont fontWithName:@"WeChat-Sans-Std-Medium" size:fontSize]
-/// 微信用户默认地区
-#define WXUserDefaultLocation   @"中国 重庆"
-/// 微信资源
-#define WeChatBundle  [NSBundle bundleWithName:@"WeChat"]
-
-/// 苹果登录用户名Key
-#define AppleUserIdentifier    @"com.apple.user.identifier"
 
 /// 用户注册表
 #define WXUsersTableName  @"t_users"
@@ -223,19 +165,6 @@
 #define WXMomentCommentViewBackgroundColor UIColorWithSingleRGB(245.f)
 /// 朋友圈 评论or点赞view的选中的背景色
 #define WXMomentCommentViewSelectedBackgroundColor UIColorWithHex(@"#CED2DE")
-
-/// 微信朋友圈正文, 评论的宽度
-static inline CGFloat WXMomentContentWidth(void) {
-    return (SCREEN_MIN - WXMomentContentLeftOrRightMargin*2 - WXMomentAvatarWH - WXMomentTextLeftMargin);
-}
-/// 微信朋友圈配图宽度<九宫格>
-static inline CGFloat WXMomentPictureItemWidth(void) {
-    return (SCREEN_MIN <= 320.f ? WXMomentPictureItemWH2 : WXMomentPictureItemWH1);
-}
-/// 微信朋友圈单张配图最大宽度<方形or等比例>
-static inline CGFloat WXMomentSinglePictureMaxWidth(void) {
-    return (WXMomentPictureItemWidth() + WXMomentPictureItemInnerMargin)*2.f;
-}
 
 /// --------------------------end 朋友圈相关 end-------------------------- ///
 
@@ -428,20 +357,6 @@ static inline CGFloat WXMomentSinglePictureMaxWidth(void) {
 /// 微信通话消息字体
 #define WXCallMsgTextFont    [UIFont systemFontOfSize:17.f]
 
-
-/// 微信消息内容最大宽度
-static inline CGFloat WXMsgContentMaxWidth (void) {
-    return 250.f;
-}
-/// 微信消息内容最小高度
-static inline CGFloat WXMsgContentMinWidth (void) {
-    return 100.f;
-}
-/// 微信消息内容最大高度
-static inline CGFloat WXMsgContentMaxHeight (void) {
-    return 300.f;
-}
-
 /// --------------------------end 聊天相关 end-------------------------- ///
 
 /// --------------------------begin 金钱 begin-------------------------- ///
@@ -494,3 +409,31 @@ static inline CGFloat WXMsgContentMaxHeight (void) {
 /// --------------------------end    插件   end-------------------------- ///
 
 #endif /* WeChat_h */
+
+/// --------------------------end    内联函数   end-------------------------- ///
+
+/// 微信消息内容最大宽度
+static inline CGFloat WXMsgContentMaxWidth (void) {
+    return 250.f;
+}
+/// 微信消息内容最小高度
+static inline CGFloat WXMsgContentMinWidth (void) {
+    return 100.f;
+}
+/// 微信消息内容最大高度
+static inline CGFloat WXMsgContentMaxHeight (void) {
+    return 300.f;
+}
+
+/// 微信朋友圈正文, 评论的宽度
+static inline CGFloat WXMomentContentWidth(void) {
+    return (SCREEN_MIN - WXMomentContentLeftOrRightMargin*2 - WXMomentAvatarWH - WXMomentTextLeftMargin);
+}
+/// 微信朋友圈配图宽度<九宫格>
+static inline CGFloat WXMomentPictureItemWidth(void) {
+    return (SCREEN_MIN <= 320.f ? WXMomentPictureItemWH2 : WXMomentPictureItemWH1);
+}
+/// 微信朋友圈单张配图最大宽度<方形or等比例>
+static inline CGFloat WXMomentSinglePictureMaxWidth(void) {
+    return (WXMomentPictureItemWidth() + WXMomentPictureItemInnerMargin)*2.f;
+}

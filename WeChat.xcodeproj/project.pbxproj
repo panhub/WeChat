@@ -2465,6 +2465,8 @@
 		E89F23DD240DFD1A0060358E /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
 		E89F23DE240DFD1A0060358E /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
 		E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
+		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
+		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2607,6 +2609,8 @@
 		200DEF81221D7617006830B5 /* Macros */ = {
 			isa = PBXGroup;
 			children = (
+				E89F2413240E48A70060358E /* Import.h */,
+				E89F2414240E49120060358E /* Macro.h */,
 				20015044222EA56B004397AF /* WeChat.h */,
 			);
 			path = Macros;
