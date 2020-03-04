@@ -161,7 +161,7 @@
 		200FBF4C222157B8002B7763 /* UITableViewCell+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBB9222157B7002B7763 /* UITableViewCell+MNHelper.m */; };
 		200FBF4D222157B8002B7763 /* UIImage+MNGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBBE222157B7002B7763 /* UIImage+MNGradient.m */; };
 		200FBF4E222157B8002B7763 /* CALayer+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */; };
-		200FBF4F222157B8002B7763 /* CALayer+MNFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC5222157B7002B7763 /* CALayer+MNFrame.m */; };
+		200FBF4F222157B8002B7763 /* CALayer+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */; };
 		200FBF50222157B8002B7763 /* NSMutableDictionary+MNSafely.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC7222157B7002B7763 /* NSMutableDictionary+MNSafely.m */; };
 		200FBF51222157B8002B7763 /* NSDate+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBCB222157B7002B7763 /* NSDate+MNHelper.m */; };
 		200FBF53222157B8002B7763 /* NSInvocation+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBCE222157B7002B7763 /* NSInvocation+MNHelper.m */; };
@@ -1167,9 +1167,9 @@
 		200FBBBF222157B7002B7763 /* UICollectionView+MNHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionView+MNHelper.h"; sourceTree = "<group>"; };
 		200FBBC0222157B7002B7763 /* UIImage+MNBlurEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+MNBlurEffect.h"; sourceTree = "<group>"; };
 		200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNHelper.m"; sourceTree = "<group>"; };
-		200FBBC3222157B7002B7763 /* CALayer+MNFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MNFrame.h"; sourceTree = "<group>"; };
+		200FBBC3222157B7002B7763 /* CALayer+MNLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MNLayout.h"; sourceTree = "<group>"; };
 		200FBBC4222157B7002B7763 /* CALayer+MNHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MNHelper.h"; sourceTree = "<group>"; };
-		200FBBC5222157B7002B7763 /* CALayer+MNFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNFrame.m"; sourceTree = "<group>"; };
+		200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNLayout.m"; sourceTree = "<group>"; };
 		200FBBC7222157B7002B7763 /* NSMutableDictionary+MNSafely.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+MNSafely.m"; sourceTree = "<group>"; };
 		200FBBC8222157B7002B7763 /* NSBundle+MNHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+MNHelper.h"; sourceTree = "<group>"; };
 		200FBBC9222157B7002B7763 /* NSData+MNHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+MNHelper.h"; sourceTree = "<group>"; };
@@ -3617,8 +3617,8 @@
 		200FBBC1222157B7002B7763 /* CAHelper */ = {
 			isa = PBXGroup;
 			children = (
-				200FBBC3222157B7002B7763 /* CALayer+MNFrame.h */,
-				200FBBC5222157B7002B7763 /* CALayer+MNFrame.m */,
+				200FBBC3222157B7002B7763 /* CALayer+MNLayout.h */,
+				200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */,
 				200FBBC4222157B7002B7763 /* CALayer+MNHelper.h */,
 				200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */,
 				E25FD004234A28FE00B5D19F /* CALayer+MNAnimation.h */,
@@ -7014,7 +7014,7 @@
 				200FBEC5222157B8002B7763 /* MNURLRequest.m in Sources */,
 				200FBF17222157B8002B7763 /* MNSolubleTransitionAnimator.m in Sources */,
 				201DB08F22E8953C0063E88A /* WXBankCardFooterView.m in Sources */,
-				200FBF4F222157B8002B7763 /* CALayer+MNFrame.m in Sources */,
+				200FBF4F222157B8002B7763 /* CALayer+MNLayout.m in Sources */,
 				BFAF39BD23CA3F160018B82A /* MNMaskDialog.m in Sources */,
 				200FBF70222157B8002B7763 /* MNTabBarItem.m in Sources */,
 				20292A0022295DC6001D4CEB /* MNIAPHandle.m in Sources */,

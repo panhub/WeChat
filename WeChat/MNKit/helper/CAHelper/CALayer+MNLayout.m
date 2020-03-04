@@ -6,9 +6,9 @@
 //  Copyright © 2018年 小斯. All rights reserved.
 //
 
-#import "CALayer+MNFrame.h"
+#import "CALayer+MNLayout.h"
 
-@implementation CALayer (MNFrame)
+@implementation CALayer (MNLayout)
 - (CGPoint)origin_mn {
     return self.frame.origin;
 }

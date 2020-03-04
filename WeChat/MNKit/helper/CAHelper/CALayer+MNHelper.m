@@ -7,7 +7,7 @@
 //
 
 #import "CALayer+MNHelper.h"
-#import "CALayer+MNFrame.h"
+#import "CALayer+MNLayout.h"
 
 @implementation CALayer (MNHelper)
 #pragma mark - 设置锚点<不改变相对位置>

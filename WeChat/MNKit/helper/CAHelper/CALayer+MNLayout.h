@@ -8,7 +8,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-@interface CALayer (MNFrame)
+@interface CALayer (MNLayout)
 
 @property (nonatomic) CGFloat left_mn;
 @property (nonatomic) CGFloat right_mn;
