@@ -130,10 +130,10 @@
 
 #if __has_include(<Photos/PHLivePhoto.h>)
 /**
- 往相簿存储LivePhoto
- @param imageURL 图片路径
- @param videoURL 视频路径
- @param completion 结束回调
+  往相簿存储LivePhoto
+  @param imageURL 图片路径
+  @param videoURL 视频路径
+  @param completion 结束回调
  */
 + (void)writeLivePhotoWithImage:(NSURL *)imageURL video:(NSURL *)videoURL completion:(void(^)(BOOL success, NSError *error))completion;
 #endif
