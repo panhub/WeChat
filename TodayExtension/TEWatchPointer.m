@@ -7,7 +7,7 @@
 //
 
 #import "TEWatchPointer.h"
-#import "UIView+TEFrame.h"
+#import "UIView+MNLayout.h"
 
 @implementation TEWatchPointer
 

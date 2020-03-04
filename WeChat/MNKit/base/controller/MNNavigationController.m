@@ -7,7 +7,7 @@
 //
 
 #import "MNNavigationController.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIViewController+MNInterface.h"
 #import "MNBaseViewController.h"
 #import "MNTransitionAnimator.h"

@@ -7,7 +7,7 @@
 //
 
 #import "MNDragView.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIGestureRecognizer+MNHelper.h"
 
 const CGFloat MNDragViewMargin = 3.f;

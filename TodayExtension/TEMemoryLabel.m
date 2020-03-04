@@ -7,7 +7,7 @@
 //
 
 #import "TEMemoryLabel.h"
-#import "UIView+TEFrame.h"
+#import "UIView+MNLayout.h"
 #import <sys/sysctl.h>
 #import <mach/mach.h>
 #include <sys/param.h>

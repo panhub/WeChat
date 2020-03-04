@@ -19,7 +19,7 @@
 #define MidW(v)                (Width(v)/2.f)
 #define MidH(v)                 (Height(v)/2.f)
 
-@interface UIView (MNFrame)
+@interface UIView (MNLayout)
 
 @property (nonatomic) CGFloat left_mn;
 @property (nonatomic) CGFloat right_mn;

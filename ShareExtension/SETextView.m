@@ -7,7 +7,7 @@
 //
 
 #import "SETextView.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SETextView ()
 @property (nonatomic, strong) UILabel *placeholderLabel;

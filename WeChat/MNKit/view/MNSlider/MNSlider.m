@@ -7,7 +7,7 @@
 //
 
 #import "MNSlider.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIGestureRecognizer+MNHelper.h"
 
 @interface MNSlider () <UIGestureRecognizerDelegate>

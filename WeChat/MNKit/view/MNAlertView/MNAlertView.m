@@ -7,7 +7,7 @@
 //
 
 #import "MNAlertView.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "NSString+MNHelper.h"
 
 #define kAlertViewButtonHeight        45.5f

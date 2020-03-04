@@ -7,7 +7,7 @@
 //
 
 #import "MNTableViewCell.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "MNTableViewCellEditView.h"
 
 @interface MNTableViewCell () <MNTableViewCellEditViewDelegate>

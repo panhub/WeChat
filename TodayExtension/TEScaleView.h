@@ -7,7 +7,7 @@
 //  刻度view
 
 #import <UIKit/UIKit.h>
-#import "UIView+TEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface TEScaleView : UIView
 /**

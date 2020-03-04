@@ -7,7 +7,8 @@
 //
 
 #import "SENavigationBar.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
+#import "SEInline.h"
 
 #define SENavigationBarTitleFontSize    17.f
 

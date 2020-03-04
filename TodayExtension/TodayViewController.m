@@ -7,7 +7,7 @@
 //
 
 #import "TodayViewController.h"
-#import "UIView+TEFrame.h"
+#import "UIView+MNLayout.h"
 #import "TEWatchView.h"
 #import "TEMemoryLabel.h"
 #import "TEStreamLabel.h"

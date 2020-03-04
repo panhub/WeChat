@@ -7,7 +7,7 @@
 //
 
 #import "SEMainView.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 NSString * const SEShareWebpageUrlKey = @"com.ext.share.webpage.url";
 NSString * const SEShareWebpageTitleKey = @"com.ext.share.webpage.title";

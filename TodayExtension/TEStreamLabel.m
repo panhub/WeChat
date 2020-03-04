@@ -7,7 +7,7 @@
 //
 
 #import "TEStreamLabel.h"
-#import "UIView+TEFrame.h"
+#import "UIView+MNLayout.h"
 #import "Reachability.h"
 #import <sys/sysctl.h>
 #import <mach/mach.h>

@@ -9,7 +9,7 @@
 #import "SESessionView.h"
 #import "SESessionCell.h"
 #import "SESessionHeader.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SESessionView ()<UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, strong) UITableView *tableView;

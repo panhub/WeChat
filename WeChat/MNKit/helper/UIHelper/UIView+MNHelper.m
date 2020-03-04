@@ -7,7 +7,7 @@
 //
 
 #import "UIView+MNHelper.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "CALayer+MNHelper.h"
 #import "UIImage+MNHelper.h"
 #import "NSObject+MNSwizzle.h"

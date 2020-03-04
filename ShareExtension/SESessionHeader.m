@@ -7,7 +7,7 @@
 //
 
 #import "SESessionHeader.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @implementation SESessionHeader
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {

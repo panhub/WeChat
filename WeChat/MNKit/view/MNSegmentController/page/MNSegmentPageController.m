@@ -10,7 +10,7 @@
 #import "MNSegmentPageView.h"
 #import "UIScrollView+MNSegmentPage.h"
 #import "UIScrollView+MNHelper.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface MNSegmentPageController ()<UIScrollViewDelegate>
 @property (nonatomic, weak) MNSegmentPageView *scrollView;

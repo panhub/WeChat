@@ -9,7 +9,7 @@
 #import "MNSegmentView.h"
 #import "NSString+MNHelper.h"
 #import "MNSegmentCell.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface MNSegmentView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
 @property (nonatomic) BOOL scrollEnabled;

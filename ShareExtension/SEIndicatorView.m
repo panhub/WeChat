@@ -7,7 +7,7 @@
 //
 
 #import "SEIndicatorView.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SEIndicatorView ()
 

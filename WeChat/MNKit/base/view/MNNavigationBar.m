@@ -8,7 +8,7 @@
 
 #import "MNNavigationBar.h"
 #import "UIDevice+MNHelper.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIView+MNHelper.h"
 #import "UIGestureRecognizer+MNHelper.h"
 #import "MNConfiguration.h"

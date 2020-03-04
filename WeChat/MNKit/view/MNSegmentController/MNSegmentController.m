@@ -9,7 +9,7 @@
 #import "MNSegmentController.h"
 #import "MNSegmentPageController.h"
 #import "MNSegmentView.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIScrollView+MNSegmentPage.h"
 
 @interface MNSegmentController ()<MNSegmentPageDelegate,MNSegmentPageDataSource,MNSegmentViewDelegate, MNSegmentViewDataSource>

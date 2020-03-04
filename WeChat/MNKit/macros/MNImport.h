@@ -44,7 +44,7 @@
 #import "CAAnimation+MNHelper.h"
 #import "CATransition+MNHelper.h"
 
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIView+MNHelper.h"
 #import "UIView+MNLoadDialog.h"
 #import "UIDevice+MNHelper.h"

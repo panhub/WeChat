@@ -7,7 +7,7 @@
 //
 
 #import "SECompletedDialog.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SECompletedDialog ()
 @property (nonatomic, strong) UILabel *titleLabel;

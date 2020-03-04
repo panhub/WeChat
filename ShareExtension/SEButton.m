@@ -7,7 +7,8 @@
 //
 
 #import "SEButton.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
+#import "SEInline.h"
 
 @interface SEButton ()
 @property (nonatomic, strong) UILabel *titleLabel;

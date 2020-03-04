@@ -8,6 +8,7 @@
 
 #import "TEWatchView.h"
 #import "TEWatchPointer.h"
+#import "UIView+MNHelper.h"
 
 @interface TEWatchView ()
 @property (nonatomic, strong) TEWatchPointer *hourPointer;

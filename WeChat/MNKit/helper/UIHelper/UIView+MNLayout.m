@@ -6,9 +6,9 @@
 //  Copyright © 2017年 小斯. All rights reserved.
 //
 
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 
-@implementation UIView (MNFrame)
+@implementation UIView (MNLayout)
 - (CGPoint)origin_mn {
     return self.frame.origin;
 }

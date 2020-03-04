@@ -8,7 +8,7 @@
 
 #import "SESessionCell.h"
 #import "SESession.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SESessionCell ()
 @property (nonatomic, strong) UILabel *nameLabel;

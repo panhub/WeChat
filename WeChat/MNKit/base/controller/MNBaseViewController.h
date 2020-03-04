@@ -12,7 +12,7 @@
 #import "MNHTTPDataRequest.h"
 #import "UIDevice+MNHelper.h"
 #import "NSString+MNHelper.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "UIView+MNHelper.h"
 #import "MNConfiguration.h"
 #import "MNExtern.h"

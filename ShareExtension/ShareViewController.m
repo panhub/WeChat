@@ -13,7 +13,7 @@
 #import "SEMainView.h"
 #import "SESessionView.h"
 #import "SEMomentView.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import <WebKit/WebKit.h>
 
 @interface ShareViewController () <WKNavigationDelegate, SENavigationBarDelegate, SEMainViewDelegate, SESessionViewDelegate>

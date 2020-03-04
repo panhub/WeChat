@@ -9,7 +9,7 @@
 #import "MNEmptyView.h"
 #import "MNConfiguration.h"
 #import "UIImage+MNHelper.h"
-#import "UIView+MNFrame.h"
+#import "UIView+MNLayout.h"
 #import "NSString+MNHelper.h"
 #import "UIImageView+MNHelper.h"
 #import "MNExtern.h"

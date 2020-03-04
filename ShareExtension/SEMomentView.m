@@ -8,7 +8,7 @@
 
 #import "SEMomentView.h"
 #import "SETextView.h"
-#import "UIView+SEFrame.h"
+#import "UIView+MNLayout.h"
 
 @interface SEMomentView ()<UITextViewDelegate>
 @property (nonatomic, strong) UILabel *titleLabel;
