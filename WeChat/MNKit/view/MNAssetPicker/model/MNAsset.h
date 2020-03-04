@@ -160,30 +160,38 @@ typedef NS_ENUM(NSInteger, MNAssetStatus) {
  修改状态<避免触发setter>
  @param status 指定状态
  */
-- (void)changeStatus:(MNAssetStatus)status;
+- (void)updateStatus:(MNAssetStatus)status;
 
 /**
  修改来源<避免触发setter>
  @param source 来源
  */
-- (void)changeSource:(MNAssetSourceType)source;
+- (void)updateSource:(MNAssetSourceType)source;
 
 /**
  修改进度<避免触发setter>
  @param progress 进度值
  */
-- (void)changeProgress:(double)progress;
+- (void)updateProgress:(double)progress;
 
 /**
  修改缩略图<避免触发setter>
  @param thumbnail 缩略图
  */
-- (void)changeThumbnail:(UIImage *)thumbnail;
+- (void)updateThumbnail:(UIImage *)thumbnail;
 
 /**
  是否是拍摄模型
  @return 是否拍摄模型
  */
 - (BOOL)isCapturingModel;
+
+@end
+
+
+
+@interface PHAsset (MNHelper)
+
+@property (nonatomic, readonly) CGSize pixelSize;
 
 @end

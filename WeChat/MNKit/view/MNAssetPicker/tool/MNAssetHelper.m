@@ -114,6 +114,7 @@ static MNAssetHelper *_helper;
 + (NSMutableArray <MNAsset *>*)fetchAssetsInAssetCollection:(PHAssetCollection *)collection options:(PHFetchOptions *)options configuration:(MNAssetPickConfiguration *)configuration {
     NSMutableArray <MNAsset *>*dataArray = [NSMutableArray arrayWithCapacity:0];
     PHFetchResult<PHAsset *>*result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+    CGSize renderSize = CGSizeIsEmpty(configuration.renderSize) ? CGSizeMake(350.f, 350.f) : configuration.renderSize;
     [result enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         MNAssetType type = [self assetTypeWithPHAsset:asset];
         if (type == MNAssetTypeVideo) {
@@ -134,7 +135,7 @@ static MNAssetHelper *_helper;
         model.type = type;
         model.asset = asset;
         model.enabled = YES;
-        model.renderSize = configuration.renderSize;
+        model.renderSize = renderSize;
         if (type == MNAssetTypeVideo) {
             model.duration = [NSDate playTimeStringWithInterval:@(asset.duration)];
         }
@@ -192,16 +193,9 @@ static MNAssetHelper *_helper;
         }
     } else {
         dispatch_async(dispatch_get_high_queue(), ^{
-            CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-            if (renderSize.width/renderSize.height > 1.f) {
-                renderSize = CGSizeMultiplyToWidth(renderSize, CGSizeMax(model.renderSize));
-            } else {
-                renderSize = CGSizeMultiplyToHeight(renderSize, CGSizeMax(model.renderSize));
-            }
-            if (model.type == MNAssetTypeVideo) renderSize = CGSizeMultiplyByRatio(renderSize, 2.f);
             self.imageOptions.networkAccessAllowed = NO;
             self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
-            model.requestId = [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
+            model.requestId = [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:model.renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
                 model.requestId = INT_MIN;
                 BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && result);
                 if (succeed) {
@@ -233,16 +227,9 @@ static MNAssetHelper *_helper;
         if (completion) completion(model);
         return;
     }
-    CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-    if (renderSize.width/renderSize.height > 1.f) {
-        renderSize = CGSizeMultiplyToWidth(renderSize, CGSizeMax(model.renderSize));
-    } else {
-        renderSize = CGSizeMultiplyToHeight(renderSize, CGSizeMax(model.renderSize));
-    }
-    if (model.type == MNAssetTypeVideo) renderSize = CGSizeMultiplyByRatio(renderSize, 2.f);
     self.imageOptions.networkAccessAllowed = NO;
     self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
-    [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
+    [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:model.renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
         BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && result);
         if (succeed) {
             result = [result resizingOrientation];
@@ -270,15 +257,10 @@ static MNAssetHelper *_helper;
         return;
     }
     dispatch_async(dispatch_get_high_queue(), ^{
-        CGSize renderSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-        if (renderSize.width/renderSize.height > 1.f) {
-            renderSize = CGSizeMultiplyToWidth(renderSize, 200.f);
-        } else {
-            renderSize = CGSizeMultiplyToHeight(renderSize, 200.f);
-        }
         self.imageOptions.networkAccessAllowed = NO;
         self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
-        [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
+        CGSize targetSize =  CGSizeIsEmpty(model.renderSize) ?  CGSizeMake(200.f, 200.f) : model.renderSize;
+        [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:targetSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
             BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
             if (succeed && result) {
                 result = [result resizingOrientation];
@@ -293,6 +275,7 @@ static MNAssetHelper *_helper;
 
 + (void)cancelThumbnailRequestWithAsset:(MNAsset *)asset {
     if (asset.requestId == INT_MIN) return;
+    asset.requestId = INT_MIN;
     [[PHImageManager defaultManager] cancelImageRequest:asset.requestId];
 }
 
@@ -330,7 +313,7 @@ static MNAssetHelper *_helper;
     /// configuration有值时表示此时挑选完成, 一般会退出, 不需要显示下载
     if (model.source == MNAssetSourceCloud) {
         if (configuration) {
-            [model changeStatus:MNAssetStatusDownloading];
+            [model updateStatus:MNAssetStatusDownloading];
         } else {
             model.status = MNAssetStatusDownloading;
         }
@@ -359,11 +342,9 @@ static MNAssetHelper *_helper;
         }];
     } else if (model.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
-            CGSize targetSize = PHImageManagerMaximumSize;
+            CGSize targetSize = CGSizeIsEmpty(model.asset.pixelSize) ? PHImageManagerMaximumSize : model.asset.pixelSize;
             if (configuration.exportPixel > 0.f) {
-                CGSize targetSize = CGSizeMake(model.asset.pixelWidth, model.asset.pixelHeight);
-                CGFloat radio = targetSize.width/targetSize.height;
-                if (radio > 1.f) {
+                if (targetSize.width/targetSize.height > 1.f) {
                     targetSize = CGSizeMultiplyToWidth(targetSize, configuration.exportPixel);
                 } else {
                     targetSize = CGSizeMultiplyToHeight(targetSize, configuration.exportPixel);
@@ -453,6 +434,7 @@ static MNAssetHelper *_helper;
         }];
     } else if (model.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
+            CGSize targetSize = CGSizeIsEmpty(model.asset.pixelSize) ? PHImageManagerMaximumSize : model.asset.pixelSize;
             PHLivePhotoRequestOptions *options = [[PHLivePhotoRequestOptions alloc] init];
             options.networkAccessAllowed = YES;
             options.version = PHImageRequestOptionsVersionCurrent;
@@ -462,7 +444,7 @@ static MNAssetHelper *_helper;
                     if (progress) progress(pro, error, model);
                 });
             };
-            [[PHImageManager defaultManager] requestLivePhotoForAsset:model.asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeAspectFit options:options resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
+            [[PHImageManager defaultManager] requestLivePhotoForAsset:model.asset targetSize:targetSize contentMode:PHImageContentModeAspectFit options:options resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nullable info) {
                 if (livePhoto) {
                     model.content = livePhoto;
                     model.status = MNAssetStatusCompleted;
@@ -505,6 +487,7 @@ static MNAssetHelper *_helper;
 
 + (void)cancelContentRequestWithAsset:(MNAsset *)asset {
     if (asset.downloadId == INT_MIN) return;
+    asset.downloadId = INT_MIN;
     if (asset.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
             [PHLivePhoto cancelLivePhotoRequestWithRequestID:asset.downloadId];
@@ -548,7 +531,7 @@ static MNAssetHelper *_helper;
 #pragma mark - Write
 + (void)writeImages:(NSArray <UIImage *>*)images toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *error))completion {
     if (images.count <= 0) {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片文件不存在"}]);
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片不存在"}]);
         return;
     }
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
@@ -629,25 +612,8 @@ static MNAssetHelper *_helper;
             if (completion) completion(identifier, error);
         }];
     } else {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"资源文件不存在"}]);
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"文件类型不匹配"}]);
     }
-}
-
-+ (PHAssetCollectionChangeRequest  *)creationRequestForAssetCollectionWithTitle:(NSString *)title {
-    if (title.length <= 0) return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:[NSBundle displayName]];
-    /// 从用户相簿集合查找
-    __block PHAssetCollection *collection;
-    PHFetchResult<PHAssetCollection *>*fetchResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
-    [fetchResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.localizedTitle isEqualToString:title]) {
-            collection = obj;
-            *stop = YES;
-        }
-    }];
-    /// 创建相册变动请求
-    if (collection) return [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-    /// 根据title创建相簿
-    return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:title];
 }
 
 #if __has_include(<Photos/PHLivePhoto.h>)
@@ -672,5 +638,22 @@ static MNAssetHelper *_helper;
 }
 #pragma clang diagnostic pop
 #endif
+
++ (PHAssetCollectionChangeRequest  *)creationRequestForAssetCollectionWithTitle:(NSString *)title {
+    if (title.length <= 0) return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:[NSBundle displayName]];
+    /// 从用户相簿集合查找
+    __block PHAssetCollection *collection;
+    PHFetchResult<PHAssetCollection *>*fetchResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    [fetchResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.localizedTitle isEqualToString:title]) {
+            collection = obj;
+            *stop = YES;
+        }
+    }];
+    /// 创建相册变动请求
+    if (collection) return [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+    /// 根据title创建相簿
+    return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:title];
+}
 
 @end

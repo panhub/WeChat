@@ -228,15 +228,15 @@
                 [self.navigationController.view closeDialogWithCompletionHandler:^{
                     if (failAssets.count <= 0) {
                         // 获取资源成功
-                        [self enterPickingAssets:succAssets];
+                        [self finishPickingAssets:succAssets];
                     } else if (succAssets.count <= 0 || succAssets.count < self.configuration.minPickingCount) {
                         // 仅有一个资源且获取失败或者成功的数量小于最小限制
                         [[MNAlertView alertViewWithTitle:nil message:@"请求iCloud内容失败\n请切换网络重试!" handler:nil ensureButtonTitle:@"关闭" otherButtonTitles:nil] show];
                     } else {
                         // 有获取失败项
-                        [[MNAlertView alertViewWithTitle:@"提示" message:@"请求iCloud内容失败\n是否继续?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
+                        [[MNAlertView alertViewWithTitle:nil message:@"请求iCloud内容失败\n确定结束选择?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
                             if (buttonIndex == alertView.ensureButtonIndex) {
-                                [self enterPickingAssets:succAssets];
+                                [self finishPickingAssets:succAssets];
                             }
                         } ensureButtonTitle:@"确定" otherButtonTitles:@"取消", nil] show];
                     }
@@ -246,7 +246,7 @@
     });
 }
 
-- (void)enterPickingAssets:(NSArray <MNAsset *>*)assets {
+- (void)finishPickingAssets:(NSArray <MNAsset *>*)assets {
     if ([self.configuration.delegate respondsToSelector:@selector(assetPicker:didFinishPickingAssets:)]) {
         [self.configuration.delegate assetPicker:kTransform(MNAssetPicker *, self.navigationController) didFinishPickingAssets:assets.copy];
     }

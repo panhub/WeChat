@@ -9,6 +9,7 @@
 #import "MNAsset.h"
 #import "MNAssetHelper.h"
 #import <Photos/Photos.h>
+#import "UIImage+MNAnimated.h"
 
 @interface MNAsset ()
 @property (nonatomic, getter=isCapturingModel) BOOL capturing;
@@ -46,7 +47,7 @@
     model->_source = MNAssetSourceResource;
     if ([content isKindOfClass:UIImage.class]) {
         UIImage *image = content;
-        if (image.images.count) {
+        if (image.isAnimatedImage) {
             model->_type = MNAssetTypeGif;
             model->_thumbnail = [image.images.firstObject resizingToPix:MAX(renderSize.width, renderSize.height)];
         } else {
@@ -114,28 +115,28 @@
 }
 
 #pragma mark - Change
-- (void)changeStatus:(MNAssetStatus)status {
+- (void)updateStatus:(MNAssetStatus)status {
     if (status == _status) return;
     [self willChangeValueForKey:@"status"];
     self->_status = status;
     [self didChangeValueForKey:@"status"];
 }
 
-- (void)changeSource:(MNAssetSourceType)source {
+- (void)updateSource:(MNAssetSourceType)source {
     if (source == _source) return;
     [self willChangeValueForKey:@"source"];
     self->_source = source;
     [self didChangeValueForKey:@"source"];
 }
 
-- (void)changeProgress:(double)progress {
+- (void)updateProgress:(double)progress {
     if (progress == _progress) return;
     [self willChangeValueForKey:@"progress"];
     self->_progress = progress;
     [self didChangeValueForKey:@"progress"];
 }
 
-- (void)changeThumbnail:(UIImage *)thumbnail {
+- (void)updateThumbnail:(UIImage *)thumbnail {
     [self willChangeValueForKey:@"thumbnail"];
     self->_thumbnail = thumbnail;
     [self didChangeValueForKey:@"thumbnail"];
@@ -149,6 +150,16 @@
     self.progressChangeHandler = nil;
     [MNAssetHelper cancelThumbnailRequestWithAsset:self];
     [MNAssetHelper cancelContentRequestWithAsset:self];
+}
+
+@end
+
+
+
+@implementation PHAsset (MNHelper)
+
+- (CGSize)pixelSize {
+    return CGSizeMake(self.pixelWidth, self.pixelHeight);
 }
 
 @end
