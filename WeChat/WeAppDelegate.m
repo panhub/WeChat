@@ -176,10 +176,15 @@
             [self->_tabBarController reset];
             [[MNChatHelper helper] reloadData];
             [snapshotView removeFromSuperview];
+            WXPreference.preference.launchState = WXAppLaunchStateFinish;
             if (WXPreference.preference.isAllowsDebug) [MNDebuger startDebug];
             NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:WXShareExtensionSandboox];
             [userDefaults setBool:NO forKey:WXShareExtensionLogin];
             [userDefaults synchronize];
+            // 打开外界调用
+            NSString *cls = WXPreference.preference.next_cls;
+            WXPreference.preference.next_cls = nil;
+            [self handOpenViewController:cls];
         }];
     });
 }
@@ -198,14 +203,15 @@
         } completion:^(BOOL finished) {
             @strongify(self);
             [snapshotView removeFromSuperview];
+            WXPreference.preference.launchState = WXAppLaunchStateFinish;
             // 调试
             if (WXPreference.preference.isAllowsDebug) [MNDebuger startDebug];
+            // 更新朋友圈角标
+            [self.tabBarController updateMomentBadgeValue];
             // 保存已登录
             NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:WXShareExtensionSandboox];
             [userDefaults setBool:YES forKey:WXShareExtensionLogin];
             [userDefaults synchronize];
-            // 更新朋友圈角标
-            [self.tabBarController updateMomentBadgeValue];
             // 打开外界调用
             NSString *cls = WXPreference.preference.next_cls;
             WXPreference.preference.next_cls = nil;
@@ -289,18 +295,29 @@
 }
 
 - (BOOL)handOpenUrl:(NSString *)url {
-    return YES;
+    if ([url hasPrefix:@"mnchat://"]) {
+        NSArray *components = [url componentsSeparatedByString:@"="];
+        if (components.count == 2) {
+            if (WXPreference.preference.launchState == WXAppLaunchStateUnknown) {
+                WXPreference.preference.next_cls = components.lastObject;
+                return YES;
+            }
+            return [self handOpenViewController:components.lastObject];
+        }
+    }
+    return NO;
 }
 
 #pragma mark - OpenViewController
-- (void)handOpenViewController:(NSString *)string {
-    if (string.length <= 0) return;
+- (BOOL)handOpenViewController:(NSString *)string {
+    if (string.length <= 0) return NO;
     UINavigationController *nav = UIWindow.presentedViewController.navigationController;
     UIViewController *vc = [nav.viewControllers lastObject];
     if ([vc isKindOfClass:NSClassFromString(string)] == NO) {
         vc = [NSClassFromString(string) new];
         [nav pushViewController:vc animated:YES];
     }
+    return YES;
 }
 
 #pragma mark - ShareExtension

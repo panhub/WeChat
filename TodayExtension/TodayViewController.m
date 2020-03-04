@@ -27,7 +27,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    /// 配置视图大小 
+    /// 配置视图大小
+    //self.extensionContext.widgetLargestAvailableDisplayMode = NCWidgetDisplayModeExpanded;
     self.preferredContentSize = CGSizeMake(0.f, 100.f);
     
     /// 钟表
@@ -75,29 +76,6 @@
     diskMemoryLabel.type = TEMemoryLabelDisk;
     [self.view addSubview:diskMemoryLabel];
     self.diskMemoryLabel = diskMemoryLabel;
-    /*
-    /// 唤起
-    NSArray <NSString *>*titles = @[@"扫一扫", @"朋友圈"];
-    NSArray <NSString *>*imgs = @[@"ext_today_scan", @"ext_today_moment"];
-    CGFloat wh = 35.f;
-    CGFloat x = (self.view.width_mn - imgs.count*wh)/(imgs.count + 1);
-    [imgs enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.tag = idx;
-        button.frame = CGRectMake(x + (wh + x)*idx, watchView.bottom_mn + 15.f, wh, wh);
-        [button setBackgroundImage:[UIImage imageNamed:obj] forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:button];
-        
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, button.bottom_mn + 5.f, 40.f, 12.f)];
-        label.centerX_mn = button.centerX_mn;
-        label.textColor = [[UIColor darkTextColor] colorWithAlphaComponent:.8f];
-        label.font = [UIFont systemFontOfSize:12.f];
-        label.textAlignment = NSTextAlignmentCenter;
-        label.text = titles[idx];
-        [self.view addSubview:label];
-    }];
-    */
 }
 
 #pragma mark - Life Cycle
@@ -138,7 +116,7 @@
 }
 
 - (void)watchClicked {
-    NSString *url = @"mnchat://app.extension.today?10";
+    NSString *url = @"mnchat://app.extension.today?action=WXWatchViewController";
     [self.extensionContext openURL:[NSURL URLWithString:url] completionHandler:nil];
 }
 
