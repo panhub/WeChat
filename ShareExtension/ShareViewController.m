@@ -56,7 +56,7 @@
     self.scrollView = scrollView;
     
     // 导航
-    SENavigationBar *navigationBar = [[SENavigationBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.view.width_mn, 52.f)];
+    SENavigationBar *navigationBar = [[SENavigationBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.view.width_mn, 60.f)];
     navigationBar.delegate = self;
     [self.view addSubview:navigationBar];
     self.navigationBar = navigationBar;

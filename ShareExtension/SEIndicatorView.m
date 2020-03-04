@@ -31,7 +31,14 @@
         self.hidden = YES;
         self.clipsToBounds = YES;
         self.layer.cornerRadius = 5.f;
-        self.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.51f];
+        self.backgroundColor = UIColor.clearColor;
+        //self.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.51f];
+        
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        effectView.frame = self.bounds;
+        effectView.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self addSubview:effectView];
         
         UIActivityIndicatorView *indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
         indicatorView.center_mn = self.bounds_center;

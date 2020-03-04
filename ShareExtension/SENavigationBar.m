@@ -85,7 +85,7 @@
         titleLabel.width_mn = 150.f;
         titleLabel.height_mn = SENavigationBarTitleFontSize;
         titleLabel.centerX_mn = self.width_mn/2.f;
-        titleLabel.centerY_mn = self.height_mn/2.f + 5.f;
+        titleLabel.centerY_mn = self.height_mn/2.f + 6.f;
         titleLabel.textAlignment = NSTextAlignmentCenter;
         _titleLabel = titleLabel;
     }

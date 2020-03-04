@@ -28,7 +28,14 @@
         
         self.clipsToBounds = YES;
         self.layer.cornerRadius = 5.f;
-        self.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.51f];
+        self.backgroundColor = UIColor.clearColor;
+        //self.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.51f];
+        
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        effectView.frame = self.bounds;
+        effectView.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self addSubview:effectView];
         
         // 优化视图效果 /3
         CGFloat y = (self.height_mn - 35.f - 25.f)/3.f;
