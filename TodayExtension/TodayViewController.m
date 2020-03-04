@@ -109,12 +109,6 @@
 }
 
 #pragma mark - Event
-- (void)buttonClicked:(UIButton *)button {
-    /// 启动Containing App
-    NSString *url = [NSString stringWithFormat:@"mnchat://app.extension.today?%@", @(button.tag)];
-    [self.extensionContext openURL:[NSURL URLWithString:url] completionHandler:nil];
-}
-
 - (void)watchClicked {
     NSString *url = @"mnchat://app.extension.today?action=WXWatchViewController";
     [self.extensionContext openURL:[NSURL URLWithString:url] completionHandler:nil];
