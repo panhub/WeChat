@@ -42,6 +42,10 @@
         CGFloat _x = x + (w + xm)*(i%rows);
         CGFloat _y = y + (h + ym)*(i/rows);
         CGRect rect = CGRectMake(_x, _y, w, h);
+        UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        keyButton.frame = rect;
+        [keyButton setTitle:keys[i] forState:UIControlStateNormal];
+        [self.view addSubview:keyButton];
     }
     
     // Perform custom UI setup here
