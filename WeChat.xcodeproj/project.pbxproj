@@ -780,6 +780,8 @@
 		E20E79AE234C8CFD00B1896F /* CAAnimation+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E20E79AD234C8CFD00B1896F /* CAAnimation+MNHelper.m */; };
 		E25FD006234A28FE00B5D19F /* CALayer+MNAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */; };
 		E27AE8C0234C6602003225B6 /* MNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = E27AE8BF234C6602003225B6 /* MNUtilities.m */; };
+		E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */; };
+		E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBB3222157B7002B7763 /* UIColor+MNHelper.m */; };
 		E81CD975240F94F10063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD976240F94F20063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD978240F98260063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
@@ -2476,6 +2478,8 @@
 		E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNAnimation.m"; sourceTree = "<group>"; };
 		E27AE8BE234C6602003225B6 /* MNUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNUtilities.h; sourceTree = "<group>"; };
 		E27AE8BF234C6602003225B6 /* MNUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNUtilities.m; sourceTree = "<group>"; };
+		E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+NKHelper.h"; sourceTree = "<group>"; };
+		E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+NKHelper.m"; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
 		E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNLayoutConstraint.h; sourceTree = "<group>"; };
@@ -6150,6 +6154,8 @@
 				E8F200C12413721C008F20BB /* KeyboardViewController.h */,
 				E8F200C22413721C008F20BB /* KeyboardViewController.m */,
 				E8F200C42413721C008F20BB /* Info.plist */,
+				E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */,
+				E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */,
 			);
 			path = NumberKeyboard;
 			sourceTree = "<group>";
@@ -7089,6 +7095,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */,
+				E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */,
 				E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */,
 				E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */,
 				E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */,

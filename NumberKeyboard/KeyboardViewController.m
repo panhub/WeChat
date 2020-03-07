@@ -9,58 +9,103 @@
 #import "KeyboardViewController.h"
 #import "MNLayoutConstraint.h"
 #import "UIView+MNLayout.h"
+#import "UIColor+MNHelper.h"
+#import "UIImage+NKHelper.h"
+
+#define NKNextButtonTag     100
+#define NKDeleteButtonTag   200
+#define NKHorSeparatorTag   300
+#define NKVerSeparatorTag   400
 
 @interface KeyboardViewController ()
 @property (nonatomic, strong) UIButton *nextKeyboardButton;
+@property (nonatomic, strong) UIButton *deleteKeyboardButton;
 @end
 
 @implementation KeyboardViewController
 
-- (void)updateViewConstraints {
-    [super updateViewConstraints];
-    
-    // Add custom view sizing constraints here
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    CGFloat keyHeight = 55.f;
-    CGFloat keyWidth = self.view.width_mn/3.f;
-    CGFloat keyboardHeight = keyHeight*4.f;
-    self.view.layout.heightEqual(keyboardHeight);
+    self.view.backgroundColor = UIColorWithSingleRGB(240.f);
     
+    NSArray <NSString *>*keys = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @(NKNextButtonTag).stringValue, @"0", @(NKDeleteButtonTag).stringValue];
+    [keys enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        keyButton.tag = obj.integerValue;
+        [keyButton setTitleColor:UIColor.darkTextColor forState:UIControlStateNormal];
+        keyButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:22.f];
+        if (keyButton.tag != NKNextButtonTag && keyButton.tag != NKDeleteButtonTag) {
+            [keyButton setTitle:obj forState:UIControlStateNormal];
+        }
+        if ([keyButton titleForState:UIControlStateNormal].length) {
+            [keyButton setBackgroundImage:[UIImage imageWithColor:UIColor.whiteColor] forState:UIControlStateNormal];
+        } else {
+            [keyButton setBackgroundImage:[UIImage imageWithColor:self.view.backgroundColor] forState:UIControlStateNormal];
+        }
+        [keyButton setBackgroundImage:[UIImage imageWithColor:self.view.backgroundColor] forState:UIControlStateHighlighted];
+        keyButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:keyButton];
+        if (keyButton.tag == NKNextButtonTag) self.nextKeyboardButton = keyButton;
+        if (keyButton.tag == NKDeleteButtonTag) self.deleteKeyboardButton = keyButton;
+    }];
+    
+    for (NSInteger idx = 0; idx < 4; idx++) {
+        UIView *horLine = [[UIView alloc] init];
+        horLine.tag = NKHorSeparatorTag + idx;
+        horLine.backgroundColor = self.view.backgroundColor;
+        horLine.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:horLine];
+        if (idx%2 != 0) continue;
+        UIView *verLine = [[UIView alloc] init];
+        verLine.tag = NKVerSeparatorTag + idx;
+        verLine.backgroundColor = self.view.backgroundColor;
+        verLine.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:verLine];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (self.view.constraints.count) return;
+    [self updateKeyboardButtonConstraints];
+}
+
+- (void)updateKeyboardButtonConstraints {
+    
+    NSInteger rows = 3;
+    NSInteger lines = 4;
+    CGFloat keyHeight = 55.f;
+    CGFloat keyWidth = self.view.width_mn/rows*1.f;
+    CGFloat keyboardHeight = keyHeight*lines*1.f;
     CGFloat x = 0.f;
     CGFloat y = 0.f;
     CGFloat w = keyWidth;
     CGFloat h = keyHeight;
     CGFloat xm = 0.f;
     CGFloat ym = 0.f;
-    NSInteger rows = 3;
-    NSArray <NSString *>*keys = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", (self.textDocumentProxy.keyboardType == UIKeyboardTypeDecimalPad ? @"." : @""), @"0", @""];
-    for (NSUInteger i = 0; i < keys.count; i++) {
-        CGFloat _x = x + (w + xm)*(i%rows);
-        CGFloat _y = y + (h + ym)*(i/rows);
-        CGRect rect = CGRectMake(_x, _y, w, h);
-        UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        keyButton.frame = rect;
-        [keyButton setTitle:keys[i] forState:UIControlStateNormal];
-        [self.view addSubview:keyButton];
+    
+    self.view.layout.heightEqual(keyboardHeight);
+    
+    [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (![obj isKindOfClass:UIButton.class]) return;
+        NSInteger index = obj.tag;
+        if (index == 0) index = 11;
+        if (index == NKNextButtonTag) index = 10;
+        if (index == NKDeleteButtonTag) index = 12;
+        index --;
+        CGFloat left = x + (w + xm)*(index%rows);
+        CGFloat top = y + (h + ym)*(index/rows);
+        obj.layout.leftOffsetToView(self.view, left).topOffsetToView(self.view, top).widthEqual(w).heightEqual(h);
+    }];
+    
+    for (NSInteger idx = 0; idx < lines; idx++) {
+        UIView *horLine = [self.view viewWithTag:NKHorSeparatorTag + idx];
+        horLine.layout.leftOffsetToView(self.view, 0.f).topOffsetToView(self.view, keyHeight*idx).widthEqual(self.view.width_mn).heightEqual(.5f);
+        if (idx%2 != 0) continue;
+        UIView *verLine = [self.view viewWithTag:NKVerSeparatorTag + idx];
+        verLine.layout.leftOffsetToView(self.view, keyWidth*((idx/2) + 1)).topOffsetToView(self.view, 0.f).widthEqual(.5f).heightEqual(self.view.height_mn);
     }
-    
-    // Perform custom UI setup here
-    self.nextKeyboardButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    
-    [self.nextKeyboardButton setTitle:NSLocalizedString(@"Next Keyboard", @"Title for 'Next Keyboard' button") forState:UIControlStateNormal];
-    [self.nextKeyboardButton sizeToFit];
-    self.nextKeyboardButton.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self.nextKeyboardButton addTarget:self action:@selector(handleInputModeListFromView:withEvent:) forControlEvents:UIControlEventAllTouchEvents];
-    
-    [self.view addSubview:self.nextKeyboardButton];
-    
-    [self.nextKeyboardButton.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-    [self.nextKeyboardButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 }
 
 - (void)viewWillLayoutSubviews

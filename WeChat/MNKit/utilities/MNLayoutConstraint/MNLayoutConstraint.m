@@ -191,6 +191,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^heightEqual)(CGFloat) = ^(CGFloat margin) {
             checkLayout
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.f constant:margin];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
