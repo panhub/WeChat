@@ -780,21 +780,28 @@
 		E20E79AE234C8CFD00B1896F /* CAAnimation+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E20E79AD234C8CFD00B1896F /* CAAnimation+MNHelper.m */; };
 		E25FD006234A28FE00B5D19F /* CALayer+MNAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */; };
 		E27AE8C0234C6602003225B6 /* MNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = E27AE8BF234C6602003225B6 /* MNUtilities.m */; };
-		E81CD96C240F86900063B8F8 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E81CD96B240F86900063B8F8 /* KeyboardViewController.m */; };
-		E81CD970240F86900063B8F8 /* Keyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E81CD968240F86900063B8F8 /* Keyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		E81CD974240F92DC0063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD975240F94F10063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD976240F94F20063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD978240F98260063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
-		E81CD979240F98280063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
 		E81CD97A240F982A0063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
+		E81CD97B240F9A820063B8F8 /* CALayer+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */; };
+		E81CD97C240F9A830063B8F8 /* CALayer+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */; };
+		E81CD97E240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */; };
+		E81CD97F240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */; };
 		E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 200FC0D022215926002B7763 /* libc++.tbd */; };
 		E840D4C1240D4F81001553B9 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077A6602286C73D000EFB85 /* ExternalAccessory.framework */; };
+		E89D2EAA2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
+		E89D2EAB2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
+		E89D2EAC2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E89F23E0240DFD1A0060358E /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DB240DFD1A0060358E /* AMapLocationKit.framework */; };
 		E89F23E1240DFD1A0060358E /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DC240DFD1A0060358E /* AMapFoundationKit.framework */; };
 		E89F23E2240DFD1A0060358E /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E89F23DD240DFD1A0060358E /* AMap.bundle */; };
 		E89F23E3240DFD1A0060358E /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DE240DFD1A0060358E /* MAMapKit.framework */; };
 		E89F23E4240DFD1A0060358E /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */; };
+		E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F200C22413721C008F20BB /* KeyboardViewController.m */; };
+		E8F200C72413721C008F20BB /* NumberKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E8F200BF2413721C008F20BB /* NumberKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
+		E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -812,12 +819,12 @@
 			remoteGlobalIDString = 20FD714B227897A000EE1B5F;
 			remoteInfo = TodayExtension;
 		};
-		E81CD96E240F86900063B8F8 /* PBXContainerItemProxy */ = {
+		E8F200C52413721C008F20BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 200DEF5F221D7180006830B5 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = E81CD967240F86900063B8F8;
-			remoteInfo = Keyboard;
+			remoteGlobalIDString = E8F200BE2413721C008F20BB;
+			remoteInfo = NumberKeyboard;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -828,8 +835,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E81CD970240F86900063B8F8 /* Keyboard.appex in Embed App Extensions */,
 				20FD7159227897A000EE1B5F /* TodayExtension.appex in Embed App Extensions */,
+				E8F200C72413721C008F20BB /* NumberKeyboard.appex in Embed App Extensions */,
 				209EC6DE2275975800E02DB4 /* ShareExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -2469,12 +2476,10 @@
 		E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNAnimation.m"; sourceTree = "<group>"; };
 		E27AE8BE234C6602003225B6 /* MNUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNUtilities.h; sourceTree = "<group>"; };
 		E27AE8BF234C6602003225B6 /* MNUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNUtilities.m; sourceTree = "<group>"; };
-		E81CD968240F86900063B8F8 /* Keyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Keyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		E81CD96A240F86900063B8F8 /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		E81CD96B240F86900063B8F8 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
-		E81CD96D240F86900063B8F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
+		E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNLayoutConstraint.h; sourceTree = "<group>"; };
+		E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNLayoutConstraint.m; sourceTree = "<group>"; };
 		E89F23DB240DFD1A0060358E /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
 		E89F23DC240DFD1A0060358E /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
 		E89F23DD240DFD1A0060358E /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
@@ -2482,6 +2487,10 @@
 		E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
 		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
 		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
+		E8F200BF2413721C008F20BB /* NumberKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NumberKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8F200C12413721C008F20BB /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
+		E8F200C22413721C008F20BB /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
+		E8F200C42413721C008F20BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2557,7 +2566,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E81CD965240F86900063B8F8 /* Frameworks */ = {
+		E8F200BC2413721C008F20BB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2589,7 +2598,7 @@
 				200DEF69221D7180006830B5 /* WeChat */,
 				209EC6D42275975800E02DB4 /* ShareExtension */,
 				20FD714F227897A000EE1B5F /* TodayExtension */,
-				E81CD969240F86900063B8F8 /* Keyboard */,
+				E8F200C02413721C008F20BB /* NumberKeyboard */,
 				200DEF68221D7180006830B5 /* Products */,
 				200FC0C7222158E9002B7763 /* Frameworks */,
 			);
@@ -2601,7 +2610,7 @@
 				200DEF67221D7180006830B5 /* WeChat.app */,
 				209EC6D32275975800E02DB4 /* ShareExtension.appex */,
 				20FD714C227897A000EE1B5F /* TodayExtension.appex */,
-				E81CD968240F86900063B8F8 /* Keyboard.appex */,
+				E8F200BF2413721C008F20BB /* NumberKeyboard.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2682,6 +2691,7 @@
 		200FB9DE222157B7002B7763 /* utilities */ = {
 			isa = PBXGroup;
 			children = (
+				E89D2EA12411FC0900A973C8 /* MNLayoutConstraint */,
 				BF605BFE23BE081A0022F124 /* MNAssetExport */,
 				BFA28ADE23A405B6003CB264 /* MNLivePhoto */,
 				BFF5E74D235D860400DAC98B /* MNPurchase */,
@@ -6113,14 +6123,13 @@
 			path = MNPurchase;
 			sourceTree = "<group>";
 		};
-		E81CD969240F86900063B8F8 /* Keyboard */ = {
+		E89D2EA12411FC0900A973C8 /* MNLayoutConstraint */ = {
 			isa = PBXGroup;
 			children = (
-				E81CD96A240F86900063B8F8 /* KeyboardViewController.h */,
-				E81CD96B240F86900063B8F8 /* KeyboardViewController.m */,
-				E81CD96D240F86900063B8F8 /* Info.plist */,
+				E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */,
+				E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */,
 			);
-			path = Keyboard;
+			path = MNLayoutConstraint;
 			sourceTree = "<group>";
 		};
 		E89F23DA240DFD1A0060358E /* AMap */ = {
@@ -6133,6 +6142,16 @@
 				E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */,
 			);
 			path = AMap;
+			sourceTree = "<group>";
+		};
+		E8F200C02413721C008F20BB /* NumberKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				E8F200C12413721C008F20BB /* KeyboardViewController.h */,
+				E8F200C22413721C008F20BB /* KeyboardViewController.m */,
+				E8F200C42413721C008F20BB /* Info.plist */,
+			);
+			path = NumberKeyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -6152,7 +6171,7 @@
 			dependencies = (
 				209EC6DD2275975800E02DB4 /* PBXTargetDependency */,
 				20FD7158227897A000EE1B5F /* PBXTargetDependency */,
-				E81CD96F240F86900063B8F8 /* PBXTargetDependency */,
+				E8F200C62413721C008F20BB /* PBXTargetDependency */,
 			);
 			name = WeChat;
 			productName = WeChat;
@@ -6193,21 +6212,21 @@
 			productReference = 20FD714C227897A000EE1B5F /* TodayExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		E81CD967240F86900063B8F8 /* Keyboard */ = {
+		E8F200BE2413721C008F20BB /* NumberKeyboard */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E81CD973240F86900063B8F8 /* Build configuration list for PBXNativeTarget "Keyboard" */;
+			buildConfigurationList = E8F200C82413721C008F20BB /* Build configuration list for PBXNativeTarget "NumberKeyboard" */;
 			buildPhases = (
-				E81CD964240F86900063B8F8 /* Sources */,
-				E81CD965240F86900063B8F8 /* Frameworks */,
-				E81CD966240F86900063B8F8 /* Resources */,
+				E8F200BB2413721C008F20BB /* Sources */,
+				E8F200BC2413721C008F20BB /* Frameworks */,
+				E8F200BD2413721C008F20BB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Keyboard;
-			productName = Keyboard;
-			productReference = E81CD968240F86900063B8F8 /* Keyboard.appex */;
+			name = NumberKeyboard;
+			productName = NumberKeyboard;
+			productReference = E8F200BF2413721C008F20BB /* NumberKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -6247,7 +6266,7 @@
 							};
 						};
 					};
-					E81CD967240F86900063B8F8 = {
+					E8F200BE2413721C008F20BB = {
 						CreatedOnToolsVersion = 11.4;
 					};
 				};
@@ -6270,7 +6289,7 @@
 				200DEF66221D7180006830B5 /* WeChat */,
 				209EC6D22275975800E02DB4 /* ShareExtension */,
 				20FD714B227897A000EE1B5F /* TodayExtension */,
-				E81CD967240F86900063B8F8 /* Keyboard */,
+				E8F200BE2413721C008F20BB /* NumberKeyboard */,
 			);
 		};
 /* End PBXProject section */
@@ -6306,7 +6325,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E81CD966240F86900063B8F8 /* Resources */ = {
+		E8F200BD2413721C008F20BB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -6623,6 +6642,7 @@
 				201DB05122E8953C0063E88A /* WXAddUserInfoCell.m in Sources */,
 				BFAF39BE23CA3F160018B82A /* UIView+MNLoadDialog.m in Sources */,
 				200FBF4A222157B8002B7763 /* UIColor+MNHelper.m in Sources */,
+				E89D2EAA2412001A00A973C8 /* MNLayoutConstraint.m in Sources */,
 				2055D6AE22E007180012E43E /* YYCGUtilities.m in Sources */,
 				200FBF28222157B8002B7763 /* MNProgressDialog.m in Sources */,
 				201DAF0622E894410063E88A /* WXAppletResultController.m in Sources */,
@@ -7030,11 +7050,14 @@
 				20FD714722788B8C00EE1B5F /* SECompletedDialog.m in Sources */,
 				E81CD975240F94F10063B8F8 /* UIView+MNLayout.m in Sources */,
 				BFA0112223D9A50600B594B5 /* SETextView.m in Sources */,
+				E81CD97E240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */,
+				E81CD97B240F9A820063B8F8 /* CALayer+MNLayout.m in Sources */,
 				BFA0112B23D9DA0800B594B5 /* SESessionHeader.m in Sources */,
 				BF1BFDC623DA9C3100C5DF34 /* SEMainView.m in Sources */,
 				BFAD416C23D96BB800F67EE4 /* SENavigationBar.m in Sources */,
 				BF1BFDCC23DAA64900C5DF34 /* SESessionView.m in Sources */,
 				209EC6D72275975800E02DB4 /* ShareViewController.m in Sources */,
+				E89D2EAB2412001A00A973C8 /* MNLayoutConstraint.m in Sources */,
 				BFA0112523D9D0F200B594B5 /* SESession.m in Sources */,
 				BFA0112E23D9E1CC00B594B5 /* SEIndicatorView.m in Sources */,
 				E81CD97A240F982A0063B8F8 /* UIView+MNHelper.m in Sources */,
@@ -7050,7 +7073,10 @@
 				2017F0DF227B0B740058978A /* TEMemoryLabel.m in Sources */,
 				E81CD976240F94F20063B8F8 /* UIView+MNLayout.m in Sources */,
 				200E79DE227A13A30064ADAB /* TEScaleView.m in Sources */,
+				E81CD97F240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */,
+				E89D2EAC2412001A00A973C8 /* MNLayoutConstraint.m in Sources */,
 				2017F0E5227B24770058978A /* Reachability.m in Sources */,
+				E81CD97C240F9A830063B8F8 /* CALayer+MNLayout.m in Sources */,
 				E81CD978240F98260063B8F8 /* UIView+MNHelper.m in Sources */,
 				2017F0E2227B23600058978A /* TEStreamLabel.m in Sources */,
 				20FD7152227897A000EE1B5F /* TodayViewController.m in Sources */,
@@ -7059,13 +7085,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E81CD964240F86900063B8F8 /* Sources */ = {
+		E8F200BB2413721C008F20BB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E81CD96C240F86900063B8F8 /* KeyboardViewController.m in Sources */,
-				E81CD979240F98280063B8F8 /* UIView+MNHelper.m in Sources */,
-				E81CD974240F92DC0063B8F8 /* UIView+MNLayout.m in Sources */,
+				E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */,
+				E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */,
+				E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7082,10 +7108,10 @@
 			target = 20FD714B227897A000EE1B5F /* TodayExtension */;
 			targetProxy = 20FD7157227897A000EE1B5F /* PBXContainerItemProxy */;
 		};
-		E81CD96F240F86900063B8F8 /* PBXTargetDependency */ = {
+		E8F200C62413721C008F20BB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E81CD967240F86900063B8F8 /* Keyboard */;
-			targetProxy = E81CD96E240F86900063B8F8 /* PBXContainerItemProxy */;
+			target = E8F200BE2413721C008F20BB /* NumberKeyboard */;
+			targetProxy = E8F200C52413721C008F20BB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -7374,38 +7400,38 @@
 			};
 			name = Release;
 		};
-		E81CD971240F86900063B8F8 /* Debug */ = {
+		E8F200C92413721C008F20BB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WU3CY66229;
-				INFOPLIST_FILE = Keyboard/Info.plist;
+				INFOPLIST_FILE = NumberKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mn.chat.Keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mn.chat.NumberKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		E81CD972240F86900063B8F8 /* Release */ = {
+		E8F200CA2413721C008F20BB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WU3CY66229;
-				INFOPLIST_FILE = Keyboard/Info.plist;
+				INFOPLIST_FILE = NumberKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mn.chat.Keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mn.chat.NumberKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -7451,11 +7477,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E81CD973240F86900063B8F8 /* Build configuration list for PBXNativeTarget "Keyboard" */ = {
+		E8F200C82413721C008F20BB /* Build configuration list for PBXNativeTarget "NumberKeyboard" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E81CD971240F86900063B8F8 /* Debug */,
-				E81CD972240F86900063B8F8 /* Release */,
+				E8F200C92413721C008F20BB /* Debug */,
+				E8F200CA2413721C008F20BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

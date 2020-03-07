@@ -6,6 +6,7 @@
 //  Copyright © 2018年 小斯. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
 @interface CALayer (MNHelper)

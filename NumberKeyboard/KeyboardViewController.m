@@ -1,13 +1,12 @@
 //
 //  KeyboardViewController.m
-//  Keyboard
+//  NumberKeyboard
 //
-//  Created by Vicent on 2020/3/4.
+//  Created by Vicent on 2020/3/7.
 //  Copyright © 2020 Vincent. All rights reserved.
 //
 
 #import "KeyboardViewController.h"
-#import "UIView+MNLayout.h"
 
 @interface KeyboardViewController ()
 @property (nonatomic, strong) UIButton *nextKeyboardButton;
@@ -23,7 +22,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     // Perform custom UI setup here
     self.nextKeyboardButton = [UIButton buttonWithType:UIButtonTypeSystem];
     

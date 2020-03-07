@@ -45,6 +45,7 @@
     model->_content = content;
     model->_renderSize = renderSize;
     model->_source = MNAssetSourceResource;
+    model->_status = MNAssetStatusCompleted;
     if ([content isKindOfClass:UIImage.class]) {
         UIImage *image = content;
         if (image.isAnimatedImage) {

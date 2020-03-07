@@ -103,6 +103,7 @@
 #import "MNRotationGestureRecognizer.h"
 #import "MNLivePhoto.h"
 #import "MNAssetExport.h"
+#import "MNLayoutConstraint.h"
 
 #import "MNSafeArray.h"
 #import "MNSafeDictionary.h"
