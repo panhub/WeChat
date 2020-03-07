@@ -31,8 +31,10 @@
     
     NSArray <NSString *>*keys = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @(NKNextButtonTag).stringValue, @"0", @(NKDeleteButtonTag).stringValue];
     [keys enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeCustom];
         keyButton.tag = obj.integerValue;
+        keyButton.enabled = YES;
+        keyButton.userInteractionEnabled = NO;
         [keyButton setTitleColor:UIColor.darkTextColor forState:UIControlStateNormal];
         keyButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:22.f];
         if (keyButton.tag != NKNextButtonTag && keyButton.tag != NKDeleteButtonTag) {
@@ -45,9 +47,18 @@
         }
         [keyButton setBackgroundImage:[UIImage imageWithColor:self.view.backgroundColor] forState:UIControlStateHighlighted];
         keyButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [keyButton addTarget:self action:@selector(keyboardButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        if (keyButton.tag == NKNextButtonTag) {
+            //[keyButton addTarget:self action:@selector(handleInputModeListFromView:withEvent:) forControlEvents:UIControlEventAllTouchEvents];
+            [keyButton setImage:[UIImage imageNamed:@"keyboard_switch"] forState:UIControlStateNormal];
+            [keyButton setImage:[UIImage imageNamed:@"keyboard_switch"] forState:UIControlStateHighlighted];
+            self.nextKeyboardButton = keyButton;
+        } else if (keyButton.tag == NKDeleteButtonTag) {
+            [keyButton setImage:[UIImage imageNamed:@"keyboard_delete"] forState:UIControlStateNormal];
+            [keyButton setImage:[UIImage imageNamed:@"keyboard_delete_highlight"] forState:UIControlStateHighlighted];
+            self.deleteKeyboardButton = keyButton;
+        }
         [self.view addSubview:keyButton];
-        if (keyButton.tag == NKNextButtonTag) self.nextKeyboardButton = keyButton;
-        if (keyButton.tag == NKDeleteButtonTag) self.deleteKeyboardButton = keyButton;
     }];
     
     for (NSInteger idx = 0; idx < 4; idx++) {
@@ -67,11 +78,12 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.view.constraints.count) return;
-    [self updateKeyboardButtonConstraints];
+    [self updateButtonConstraints];
 }
 
-- (void)updateKeyboardButtonConstraints {
+- (void)updateButtonConstraints {
+    
+    if (self.view.constraints.count) return;
     
     NSInteger rows = 3;
     NSInteger lines = 4;
@@ -97,6 +109,13 @@
         CGFloat left = x + (w + xm)*(index%rows);
         CGFloat top = y + (h + ym)*(index/rows);
         obj.layout.leftOffsetToView(self.view, left).topOffsetToView(self.view, top).widthEqual(w).heightEqual(h);
+        if (obj.tag == NKNextButtonTag) {
+            UIButton *keyButton = (UIButton *)obj;
+            [keyButton setImageEdgeInsets:UIEdgeInsetsMake((keyHeight - 23.f)/2.f, (keyWidth - 23.f)/2.f, (keyHeight - 23.f)/2.f, (keyWidth - 23.f)/2.f)];
+        } else if (obj.tag == NKDeleteButtonTag) {
+            UIButton *keyButton = (UIButton *)obj;
+            [keyButton setImageEdgeInsets:UIEdgeInsetsMake((keyHeight - 37.f)/2.f, (keyWidth - 52.f)/2.f, (keyHeight - 37.f)/2.f, (keyWidth - 52.f)/2.f)];
+        }
     }];
     
     for (NSInteger idx = 0; idx < lines; idx++) {
@@ -128,6 +147,11 @@
         textColor = [UIColor blackColor];
     }
     [self.nextKeyboardButton setTitleColor:textColor forState:UIControlStateNormal];
+}
+
+#pragma mark - 键盘按钮点击
+- (void)keyboardButtonTouchUpInside:(UIButton *)keyButton {
+    NSLog(@"");
 }
 
 @end
