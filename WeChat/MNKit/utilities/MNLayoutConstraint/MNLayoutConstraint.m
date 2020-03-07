@@ -15,18 +15,17 @@
 if (!weakself.view || !weakself.view.superview) { \
     NSLog(@"建议先添加视图再进行约束"); \
     return weakself; \
-} \
-weakself.view.translatesAutoresizingMaskIntoConstraints = NO;
+}
 
 #define checkLayoutWithView \
 if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superview != view && !view.superview)) { \
     NSLog(@"建议先添加视图再进行约束"); \
     return weakself; \
-} \
-weakself.view.translatesAutoresizingMaskIntoConstraints = NO;
+}
 
 @implementation MNLayoutConstraint
 @synthesize widthEqual = _widthEqual;
+@synthesize widthEqualToView = _widthEqualToView;
 @synthesize leftOffsetToView = _leftOffsetToView;
 @synthesize leftSpaceToView = _leftSpaceToView;
 @synthesize leftEqualToView = _leftEqualToView;
@@ -36,6 +35,7 @@ weakself.view.translatesAutoresizingMaskIntoConstraints = NO;
 @synthesize centerXOffsetToView = _centerXOffsetToView;
 @synthesize centerXEqualToView = _centerXEqualToView;
 @synthesize heightEqual = _heightEqual;
+@synthesize heightEqualToView = _heightEqualToView;
 @synthesize topOffsetToView = _topOffsetToView;
 @synthesize topSpaceToView = _topSpaceToView;
 @synthesize topEqualToView = _topEqualToView;
@@ -50,13 +50,27 @@ weakself.view.translatesAutoresizingMaskIntoConstraints = NO;
         typeofWeakSelf;
         MNLayoutConstraint *(^widthEqual)(CGFloat) = ^(CGFloat margin) {
             checkLayout
-            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:margin];
+            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.f constant:margin];
             constraint.active = YES;
             return weakself;
         };
         _widthEqual = [widthEqual copy];
     }
     return _widthEqual;
+}
+
+- (MNLayoutEqualToView)widthEqualToView {
+    if (_widthEqualToView == nil) {
+        typeofWeakSelf
+        MNLayoutConstraint *(^widthEqualToView)(UIView *) = ^(UIView *view) {
+            checkLayoutWithView
+            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeWidth multiplier:1.f constant:0.f];
+            constraint.active = YES;
+            return weakself;
+        };
+        _widthEqualToView = [widthEqualToView copy];
+    }
+    return _widthEqualToView;
 }
 
 - (MNLayoutOffsetToView)leftOffsetToView {
@@ -176,13 +190,27 @@ weakself.view.translatesAutoresizingMaskIntoConstraints = NO;
         typeofWeakSelf
         MNLayoutConstraint *(^heightEqual)(CGFloat) = ^(CGFloat margin) {
             checkLayout
-            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:margin];
+            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.f constant:margin];
             constraint.active = YES;
             return weakself;
         };
         _heightEqual = [heightEqual copy];
     }
     return _heightEqual;
+}
+
+- (MNLayoutEqualToView)heightEqualToView {
+    if (_heightEqualToView == nil) {
+        typeofWeakSelf
+        MNLayoutConstraint *(^heightEqualToView)(UIView *) = ^(UIView *view) {
+            checkLayoutWithView
+            NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeHeight multiplier:1.f constant:0.f];
+            constraint.active = YES;
+            return weakself;
+        };
+        _heightEqualToView = [heightEqualToView copy];
+    }
+    return _heightEqualToView;
 }
 
 - (MNLayoutOffsetToView)topOffsetToView {
@@ -311,6 +339,7 @@ static const NSString *UIViewLayoutConstraintAssociatedKey = @"com.mn.layout.con
         layout = [[MNLayoutConstraint alloc] init];
         [layout setValue:self forKey:@"view"];
         objc_setAssociatedObject(self, &UIViewLayoutConstraintAssociatedKey, layout, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        self.translatesAutoresizingMaskIntoConstraints = NO;
     }
     return layout;
 }

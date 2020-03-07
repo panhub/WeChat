@@ -20,6 +20,8 @@ typedef MNLayoutConstraint *(^MNLayoutOffsetToView)(UIView *, CGFloat);
 
 @property (nonatomic, readonly, copy) MNLayoutEqual widthEqual;
 
+@property (nonatomic, readonly, copy) MNLayoutEqualToView widthEqualToView;
+
 @property (nonatomic, readonly, copy) MNLayoutOffsetToView leftOffsetToView;
 
 @property (nonatomic, readonly, copy) MNLayoutOffsetToView leftSpaceToView;
@@ -37,6 +39,8 @@ typedef MNLayoutConstraint *(^MNLayoutOffsetToView)(UIView *, CGFloat);
 @property (nonatomic, readonly, copy) MNLayoutEqualToView centerXEqualToView;
 
 @property (nonatomic, readonly, copy) MNLayoutEqual heightEqual;
+
+@property (nonatomic, readonly, copy) MNLayoutEqualToView heightEqualToView;
 
 @property (nonatomic, readonly, copy) MNLayoutOffsetToView topOffsetToView;
 

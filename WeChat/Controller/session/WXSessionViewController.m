@@ -79,7 +79,6 @@
     /// 首次加载, 手动刷新列表
     [self setNeedsReloadList];
     
-    
     self.contentView.hidden = YES;
     
     UIView *redView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 200.f, 200.f)];
@@ -90,7 +89,7 @@
     UIView *blueView = [[UIView alloc] init];
     blueView.backgroundColor = UIColor.blueColor;
     [redView addSubview:blueView];
-    blueView.layout.rightOffsetToView(redView, -50.f).widthEqual(100.f).bottomOffsetToView(redView, -50.f).heightEqual(100.f);
+    blueView.layout.leftOffsetToView(redView, 0.f).widthEqualToView(redView).topOffsetToView(redView, 0.f).heightEqualToView(redView);
 }
 
 - (void)loadData {

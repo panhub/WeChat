@@ -7,6 +7,8 @@
 //
 
 #import "KeyboardViewController.h"
+#import "MNLayoutConstraint.h"
+#import "UIView+MNLayout.h"
 
 @interface KeyboardViewController ()
 @property (nonatomic, strong) UIButton *nextKeyboardButton;
@@ -22,6 +24,25 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    CGFloat keyHeight = 55.f;
+    CGFloat keyWidth = self.view.width_mn/3.f;
+    CGFloat keyboardHeight = keyHeight*4.f;
+    self.view.layout.heightEqual(keyboardHeight);
+    
+    CGFloat x = 0.f;
+    CGFloat y = 0.f;
+    CGFloat w = keyWidth;
+    CGFloat h = keyHeight;
+    CGFloat xm = 0.f;
+    CGFloat ym = 0.f;
+    NSInteger rows = 3;
+    NSArray <NSString *>*keys = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", (self.textDocumentProxy.keyboardType == UIKeyboardTypeDecimalPad ? @"." : @""), @"0", @""];
+    for (NSUInteger i = 0; i < keys.count; i++) {
+        CGFloat _x = x + (w + xm)*(i%rows);
+        CGFloat _y = y + (h + ym)*(i/rows);
+        CGRect rect = CGRectMake(_x, _y, w, h);
+    }
     
     // Perform custom UI setup here
     self.nextKeyboardButton = [UIButton buttonWithType:UIButtonTypeSystem];
