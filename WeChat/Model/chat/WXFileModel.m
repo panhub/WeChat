@@ -139,7 +139,7 @@
                 _content = [UIImage imageWithData:imageData];
             }
         } else if (self.type == WXFileTypeAudio) {
-            _content = [NSString stringWithFormat:@"%@", [NSNumber numberWithInt:ceil([MNAssetExporter exportMediaDurationWithContentsOfPath:filePath])]];
+            _content = [NSString stringWithFormat:@"%@", [NSNumber numberWithInt:ceil([MNAssetExporter exportDurationWithAssetAtPath:filePath])]];
             _content = [NSString replacingBlankCharacter:_content withCharacter:@"0"];
         } else if (self.type == WXFileTypeVideo) {
             filePath = [filePath.stringByDeletingPathExtension stringByAppendingString:@".png"];

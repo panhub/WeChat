@@ -250,7 +250,7 @@
     [self resetSubviews];
     // 计算视频长度, 截图个数
     CGSize size = [MNAssetExporter exportNaturalSizeOfVideoAtPath:videoPath];
-    CGFloat duration = [MNAssetExporter exportMediaDurationWithContentsOfPath:videoPath];
+    CGFloat duration = [MNAssetExporter exportDurationWithAssetAtPath:videoPath];
     self.duration = duration;
     CGFloat width = self.scrollView.width_mn - self.scrollView.contentInset.left - self.scrollView.contentInset.right;
     CGFloat multiply = width/self.maxTimeInterval;

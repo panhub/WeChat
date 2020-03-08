@@ -35,7 +35,7 @@ FOUNDATION_EXTERN MNMetadataKey const MNMetadataKeyDuration;
  @param filePath 媒体资源路径
  @return 媒体资源时长
  */
-+ (NSTimeInterval)exportMediaDurationWithContentsOfPath:(NSString *)filePath;
++ (NSTimeInterval)exportDurationWithAssetAtPath:(NSString *)filePath;
 
 /**
  获取视频尺寸
@@ -66,6 +66,14 @@ FOUNDATION_EXTERN MNMetadataKey const MNMetadataKeyDuration;
  @return 视频图像
  */
 + (UIImage *)exportThumbnailOfVideoAtPath:(NSString *)filePath atProgress:(float)progress;
+
+/**
+ 获取视频图像
+ @param filePath 视频路径
+ @param seconds 指定秒
+ @param maximumSize 最大尺寸
+*/
++ (UIImage *)exportThumbnailOfVideoAtPath:(NSString *)filePath atSeconds:(NSTimeInterval)seconds maximumSize:(CGSize)maximumSize;
 
 /**
  获取媒体文件元数据

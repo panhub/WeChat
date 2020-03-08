@@ -31,7 +31,7 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
 
 @implementation MNAssetExporter (MNExportMetadata)
 #pragma mark - 获取媒体资源时长
-+ (NSTimeInterval)exportMediaDurationWithContentsOfPath:(NSString *)filePath {
++ (NSTimeInterval)exportDurationWithAssetAtPath:(NSString *)filePath {
     AVURLAsset *asset = [AVAsset assetWithContentsOfPath:filePath];
     if (!asset) return 0.f;
     return asset.seconds;
@@ -51,20 +51,28 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
 
 + (UIImage *)exportThumbnailOfVideoAtPath:(NSString *)filePath atProgress:(float)progress {
     progress = MIN(.99f, MAX(.01f, progress));
-    NSTimeInterval duration = [self exportMediaDurationWithContentsOfPath:filePath];
+    NSTimeInterval duration = [self exportDurationWithAssetAtPath:filePath];
     return [self exportThumbnailOfVideoAtPath:filePath atSeconds:duration*progress];
 }
 
 + (UIImage *)exportThumbnailOfVideoAtPath:(NSString *)filePath atSeconds:(NSTimeInterval)seconds {
-    CGSize naturalSize = [self exportNaturalSizeOfVideoAtPath:filePath];
-    if (CGSizeEqualToSize(naturalSize, CGSizeZero)) return nil;
+    return [self exportThumbnailOfVideoAtPath:filePath atSeconds:seconds maximumSize:CGSizeZero];
+}
+
++ (UIImage *)exportThumbnailOfVideoAtPath:(NSString *)filePath atSeconds:(NSTimeInterval)seconds maximumSize:(CGSize)maximumSize {
+    if (MNAssetExportIsEmptySize(maximumSize)) {
+        CGSize naturalSize = [self exportNaturalSizeOfVideoAtPath:filePath];
+        maximumSize = MNAssetExportIsEmptySize(naturalSize) ? CGSizeMake(500.f, 500.f) : naturalSize;
+    }
     AVAsset *videoAsset = [AVAsset assetWithContentsOfPath:filePath];
     AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:videoAsset];
     generator.appliesPreferredTrackTransform = YES;
     generator.requestedTimeToleranceBefore = kCMTimeZero;
     generator.requestedTimeToleranceAfter = kCMTimeZero;
-    generator.maximumSize = naturalSize;
-    CGImageRef imageRef = [generator copyCGImageAtTime:CMTimeMakeWithSeconds(seconds, videoAsset.duration.timescale) actualTime:NULL error:NULL];
+    generator.maximumSize = maximumSize;
+    CMTime time = videoAsset.duration;
+    time.value = time.timescale*seconds;
+    CGImageRef imageRef = [generator copyCGImageAtTime:time actualTime:NULL error:NULL];
     if (imageRef == NULL) return nil;
     return [UIImage imageWithCGImage:imageRef];
 }
@@ -81,7 +89,7 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
     [dictionary setObject:filePath forKey:MNMetadataKeyFilePath];
     CGFloat itemSize = [MNFileManager itemSizeAtPath:filePath];
     [dictionary setObject:[NSString stringWithFormat:@"%@", @(itemSize)] forKey:MNMetadataKeySize];
-    NSTimeInterval duration = [self exportMediaDurationWithContentsOfPath:filePath];
+    NSTimeInterval duration = [self exportDurationWithAssetAtPath:filePath];
     [dictionary setObject:[NSString stringWithFormat:@"%@", @(duration)] forKey:MNMetadataKeyDuration];
     if (videoTrack) {
         [dictionary setObject:videoTrack.mediaType forKey:MNMetadataKeyType];

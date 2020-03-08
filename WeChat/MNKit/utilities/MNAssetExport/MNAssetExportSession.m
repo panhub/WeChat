@@ -12,7 +12,7 @@
 #import "AVAsset+MNExportMetadata.h"
 #import "AVAssetTrack+MNExportMetadata.h"
 
-static BOOL MNAssetExportIsEmptySize (CGSize size) {
+static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return (isnan(size.width) || isnan(size.height) || size.width <= 0.f || size.height <= 0.f);
 }
 
@@ -67,7 +67,7 @@ static BOOL MNAssetExportIsEmptySize (CGSize size) {
     
     /*
     // 检查输出参数
-    if (self.exportVideoTrack && MNAssetExportIsEmptySize(self.outputRect.size)) {
+    if (self.exportVideoTrack && MNAssetExportSessionIsEmptySize(self.outputRect.size)) {
         [self finishExportWithError:[NSError errorWithDomain:AVFoundationErrorDomain
                                                         code:AVErrorExportFailed
                                                     userInfo:@{NSLocalizedDescriptionKey:@"output rect error"}]];
@@ -157,12 +157,12 @@ static BOOL MNAssetExportIsEmptySize (CGSize size) {
 
 - (void)setVideoCompositionForExportSession:(AVAssetExportSession *)exporter {
     
-    if (MNAssetExportIsEmptySize(self.outputRect.size)) return;
+    if (MNAssetExportSessionIsEmptySize(self.outputRect.size)) return;
     
     AVAssetTrack *videoTrack = [exporter.asset trackWithMediaType:AVMediaTypeVideo];
     if (!videoTrack || CMTIME_IS_INVALID(videoTrack.timeRange.duration)) return;
     
-    if (MNAssetExportIsEmptySize(videoTrack.naturalSizeOfVideo)) return;
+    if (MNAssetExportSessionIsEmptySize(videoTrack.naturalSizeOfVideo)) return;
     
     AVMutableVideoCompositionLayerInstruction *videoLayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
     [videoLayerInstruction setOpacity:1.f atTime:kCMTimeZero];
@@ -219,7 +219,7 @@ static BOOL MNAssetExportIsEmptySize (CGSize size) {
 }
 
 - (CGSize)renderSize {
-    if (MNAssetExportIsEmptySize(_renderSize)) {
+    if (MNAssetExportSessionIsEmptySize(_renderSize)) {
         self.renderSize = self.outputRect.size;
     }
     return _renderSize;

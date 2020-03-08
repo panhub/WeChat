@@ -60,7 +60,7 @@
         thumbnail = [thumbnail resizingToPix:MAX(renderSize.width, renderSize.height)];
         model->_thumbnail = thumbnail;
         model->_type = MNAssetTypeVideo;
-        model->_duration = [NSDate playTimeStringWithInterval:@([MNAssetExporter exportMediaDurationWithContentsOfPath:content])];
+        model->_duration = [NSDate playTimeStringWithInterval:@([MNAssetExporter exportDurationWithAssetAtPath:content])];
     } else if ([content isKindOfClass:NSClassFromString(@"PHLivePhoto")]) {
         model->_type = MNAssetTypeLivePhoto;
     }

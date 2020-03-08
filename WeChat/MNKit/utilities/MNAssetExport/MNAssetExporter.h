@@ -64,6 +64,8 @@ FOUNDATION_EXTERN MNAssetExportPresetName const MNAssetExportPreset1024x1024;
 FOUNDATION_EXTERN MNAssetExportPresetName const MNAssetExportPreset800x800;
 FOUNDATION_EXTERN MNAssetExportPresetName const MNAssetExportPreset600x600;
 
+FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
+
 @interface MNAssetExporter : NSObject
 /**视频路径*/
 @property (nonatomic, copy) NSString *filePath;

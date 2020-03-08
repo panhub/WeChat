@@ -64,7 +64,7 @@
     quickLabel.bottom_mn = videoCropView.top_mn;
     [self.contentView addSubview:quickLabel];
     
-    CGFloat duration = [MNAssetExporter exportMediaDurationWithContentsOfPath:self.videoPath];
+    CGFloat duration = [MNAssetExporter exportDurationWithAssetAtPath:self.videoPath];
     if (duration > 15.f) {
         [quickLabel sizeToFit];
         quickLabel.height_mn = quickLabel.font.pointSize;

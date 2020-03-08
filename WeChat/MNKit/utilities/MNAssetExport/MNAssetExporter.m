@@ -44,12 +44,12 @@ MNAssetExportPresetName const MNAssetExportPreset1024x1024 = @"com.mn.asset.expo
 MNAssetExportPresetName const MNAssetExportPreset800x800 = @"com.mn.asset.export.800x800";
 MNAssetExportPresetName const MNAssetExportPreset600x600 = @"com.mn.asset.export.600x600";
 
-static float MNAssetExportPresetResolution (CGSize size) {
-    return size.width*size.height;
+BOOL MNAssetExportIsEmptySize (CGSize size) {
+    return (isnan(size.width) || isnan(size.height) || size.width <= 0.f || size.height <= 0.f);
 }
 
-static BOOL MNAssetExportIsEmptySize (CGSize size) {
-    return (isnan(size.width) || isnan(size.height) || size.width <= 0.f || size.height <= 0.f);
+static float MNAssetExportPresetResolution (CGSize size) {
+    return size.width*size.height;
 }
 
 static CGSize MNAssetExportPresetSize (MNAssetExportPresetName presetName) {
