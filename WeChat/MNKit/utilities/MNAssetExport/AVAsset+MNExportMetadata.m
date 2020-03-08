@@ -15,15 +15,15 @@
 }
 
 #pragma mark - 获取本地资源
-+ (AVURLAsset *)assetWithContentsOfPath:(NSString *)filePath {
++ (AVURLAsset *)assetWithMediaAtPath:(NSString *)filePath {
     if ([filePath hasPrefix:@"http"]) {
-        return [self assetWithContentsOfURL:[NSURL URLWithString:filePath]];
+        return [self assetWithMediaOfURL:[NSURL URLWithString:filePath]];
     } else {
-        return [self assetWithContentsOfURL:[NSURL fileURLWithPath:filePath]];
+        return [self assetWithMediaOfURL:[NSURL fileURLWithPath:filePath]];
     }
 }
 
-+ (AVURLAsset *)assetWithContentsOfURL:(NSURL *)URL {
++ (AVURLAsset *)assetWithMediaOfURL:(NSURL *)URL {
     if (!URL) return nil;
     if (URL.isFileURL && ![NSFileManager.defaultManager fileExistsAtPath:URL.path]) return nil;
     return [AVURLAsset URLAssetWithURL:URL options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@(YES)}];
@@ -37,7 +37,7 @@
 }
 
 + (AVAssetTrack *)trackWithMediaAtPath:(NSString *)filePath mediaType:(AVMediaType)mediaType {
-    return [[self assetWithContentsOfPath:filePath] trackWithMediaType:mediaType];
+    return [[self assetWithMediaAtPath:filePath] trackWithMediaType:mediaType];
 }
 
 @end

@@ -189,7 +189,7 @@
         }
     } else {
         // 判断时长是否符合限制要求
-        NSTimeInterval duration = [[AVAsset assetWithContentsOfPath:self.capturer.filePath] seconds];
+        NSTimeInterval duration = [[AVAsset assetWithMediaAtPath:self.capturer.filePath] seconds];
         if (self.configuration.minVideoDuration > 0.f && duration < self.configuration.minVideoDuration) {
             [self.view showInfoDialog:[NSString stringWithFormat:@"请选择大于%@s的视频", @(self.configuration.minVideoDuration)]];
             return;

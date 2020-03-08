@@ -32,7 +32,7 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
 @implementation MNAssetExporter (MNExportMetadata)
 #pragma mark - 获取媒体资源时长
 + (NSTimeInterval)exportDurationWithAssetAtPath:(NSString *)filePath {
-    AVURLAsset *asset = [AVAsset assetWithContentsOfPath:filePath];
+    AVURLAsset *asset = [AVAsset assetWithMediaAtPath:filePath];
     if (!asset) return 0.f;
     return asset.seconds;
 }
@@ -64,7 +64,7 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
         CGSize naturalSize = [self exportNaturalSizeOfVideoAtPath:filePath];
         maximumSize = MNAssetExportIsEmptySize(naturalSize) ? CGSizeMake(500.f, 500.f) : naturalSize;
     }
-    AVAsset *videoAsset = [AVAsset assetWithContentsOfPath:filePath];
+    AVAsset *videoAsset = [AVAsset assetWithMediaAtPath:filePath];
     AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:videoAsset];
     generator.appliesPreferredTrackTransform = YES;
     generator.requestedTimeToleranceBefore = kCMTimeZero;
@@ -81,7 +81,7 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
 + (NSDictionary<MNMetadataKey, id>*)exportMediaMetadataWithContentsOfPath:(NSString *)filePath {
     BOOL isDirectory = NO;
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] || isDirectory) return nil;
-    AVAsset *asset = [AVAsset assetWithContentsOfPath:filePath];
+    AVAsset *asset = [AVAsset assetWithMediaAtPath:filePath];
     AVAssetTrack *videoTrack = [asset trackWithMediaType:AVMediaTypeVideo];
     AVAssetTrack *audioTrack = [asset trackWithMediaType:AVMediaTypeAudio];
     if (!videoTrack && !audioTrack) return nil;

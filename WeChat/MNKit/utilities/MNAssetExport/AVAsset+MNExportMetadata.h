@@ -17,14 +17,14 @@
  @param filePath 媒体资源路径
  @return 媒体资源文件
  */
-+ (AVURLAsset *)assetWithContentsOfPath:(NSString *)filePath;
++ (AVURLAsset *)assetWithMediaAtPath:(NSString *)filePath;
 
 /**
  获取本地媒体资源
  @param URL 媒体资源URL
  @return 媒体资源文件
  */
-+ (AVURLAsset *)assetWithContentsOfURL:(NSURL *)URL;
++ (AVURLAsset *)assetWithMediaOfURL:(NSURL *)URL;
 
 /**
  获取资源轨道

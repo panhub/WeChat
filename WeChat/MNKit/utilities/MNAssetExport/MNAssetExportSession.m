@@ -287,7 +287,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 - (void)setFilePath:(NSString *)filePath {
     if (_filePath.length > 0) return;
     _filePath = filePath.copy;
-    [self appendAsset:[AVAsset assetWithContentsOfPath:filePath]];
+    [self appendAsset:[AVAsset assetWithMediaAtPath:filePath]];
 }
 
 - (void)setRenderSize:(CGSize)renderSize {
@@ -324,7 +324,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 
 #pragma mark - Append
 - (void)appendAssetWithContentsOfFile:(NSString *)filePath {
-    [self appendAsset:[AVAsset assetWithContentsOfPath:filePath]];
+    [self appendAsset:[AVAsset assetWithMediaAtPath:filePath]];
 }
 
 - (void)appendAsset:(AVAsset *)asset {
