@@ -51,6 +51,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^widthEqual)(CGFloat) = ^(CGFloat margin) {
             checkLayout
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.f constant:margin];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -65,6 +66,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^widthEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeWidth multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -79,6 +81,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^leftOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeLeft multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -93,6 +96,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^leftSpaceToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset){
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeRight multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -107,6 +111,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^leftEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeLeft multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -121,6 +126,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^rightOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeRight multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -135,6 +141,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^rightSpaceToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset){
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeLeft multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -149,6 +156,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^rightEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeRight multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -163,6 +171,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^centerXOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterX multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -177,6 +186,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^centerXEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterX multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -206,6 +216,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^heightEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeHeight multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -220,6 +231,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^topOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:view attribute:NSLayoutAttributeTop multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -234,6 +246,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^topSpaceToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset){
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeBottom multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -248,6 +261,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^topEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTop multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -262,6 +276,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^bottomOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeBottom multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -276,6 +291,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^bottomSpaceToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset){
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTop multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -290,6 +306,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^bottomEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeBottom multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -304,6 +321,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^centerYOffsetToView)(UIView *, CGFloat) = ^(UIView *view, CGFloat offset) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.f constant:offset];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
@@ -318,6 +336,7 @@ if (!weakself.view || !weakself.view.superview || !view || (weakself.view.superv
         MNLayoutConstraint *(^centerYEqualToView)(UIView *) = ^(UIView *view) {
             checkLayoutWithView
             NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:weakself.view attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.f constant:0.f];
+            constraint.identifier = NSStringFromSelector(_cmd);
             constraint.active = YES;
             return weakself;
         };
