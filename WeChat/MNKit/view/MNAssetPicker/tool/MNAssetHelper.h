@@ -86,21 +86,17 @@
 #if __has_include(<AVFoundation/AVFoundation.h>)
 /**
  导出视频资源
- @param model 资源模型
+ @param asset 资源模型
  @param outputPath 导出路径
- @param presetName 模式
- @param completion 完成回调
+ @param presetName 视频质量<AVAssetExportPresetHighestQuality>
+ @param progressHandler 进度回调
+ @param completionHandler 完成回调
  */
-+ (void)exportVideoWithAsset:(MNAsset *)model  withOutputPath:(NSString *)outputPath presetName:(NSString *)presetName completion:(void(^)(NSString *filePath))completion;
-
-/**
- 导出本地视频资源
- @param URL 本地资源
- @param outputPath 导出路径
- @param presetName 模式
- @param completion 完成回调
- */
-+ (void)exportVideoWithContentsOfURL:(NSURL *)URL withOutputPath:(NSString *)outputPath presetName:(NSString *)presetName completion:(void(^)(NSString *filePath))completion;
++ (void)exportVideoWithAsset:(MNAsset *)asset
+                  outputPath:(NSString *)outputPath
+                  presetName:(NSString *)presetName
+             progressHandler:(void(^)(float progress))progressHandler
+           completionHandler:(void(^)(NSString *filePath))completionHandler;
 #endif
 
 #pragma mark - Write

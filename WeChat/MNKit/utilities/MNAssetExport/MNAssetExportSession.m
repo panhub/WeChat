@@ -12,17 +12,26 @@
 #import "AVAsset+MNExportMetadata.h"
 #import "AVAssetTrack+MNExportMetadata.h"
 
+#define MNAssetExportObserverKey    @"status"
 static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return (isnan(size.width) || isnan(size.height) || size.width <= 0.f || size.height <= 0.f);
 }
 
 @interface MNAssetExportSession ()
+/**进度信息*/
+@property (nonatomic) float progress;
 /**错误信息*/
 @property (nonatomic, copy) NSError *error;
 /**输出状态*/
 @property (nonatomic) AVAssetExportSessionStatus status;
 /**资源合成器*/
 @property (nonatomic, strong) AVMutableComposition *composition;
+/**查询进度值*/
+@property (nonatomic, weak) CADisplayLink *displayLink;
+/**资源输出会话*/
+@property (nonatomic, weak) AVAssetExportSession *exportSession;
+/**进度回调*/
+@property (nonatomic, copy) MNAssetExportSessionProgressHandler progressHandler;
 /**结束回调*/
 @property (nonatomic, copy) MNAssetExportSessionCompletionHandler completionHandler;
 @end
@@ -39,33 +48,35 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return self;
 }
 
-- (instancetype)initWithAsset:(AVAsset *)asset {
-    if (!asset) return nil;
-    self = [self init];
-    if (!self) return nil;
-    [self appendAsset:asset];
-    return self;
+- (instancetype)initWithAsset:(AVURLAsset *)asset {
+    if (asset.URL.path.length <= 0) return nil;
+    return [self initWithAssetAtPath:asset.URL.path];
 }
 
-- (instancetype)initWithContentsOfFile:(NSString *)filePath {
+- (instancetype)initWithAssetAtPath:(NSString *)filePath {
     self = [self init];
     if (!self) return nil;
     self.filePath = filePath;
     return self;
 }
 
-- (instancetype)initWithContentsOfURL:(NSURL *)fileURL {
-    return [self initWithContentsOfFile:fileURL.path];
+- (instancetype)initWithAssetOfURL:(NSURL *)fileURL {
+    return [self initWithAssetAtPath:fileURL.path];
 }
 
 #pragma mark - Export
 - (void)exportAsynchronouslyWithCompletionHandler:(MNAssetExportSessionCompletionHandler)completionHandler {
+    [self exportAsynchronouslyWithProgressHandler:nil completionHandler:completionHandler];
+}
+
+- (void)exportAsynchronouslyWithProgressHandler:(MNAssetExportSessionProgressHandler)progressHandler completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler {
     if (self.status == AVAssetExportSessionStatusWaiting || self.status == AVAssetExportSessionStatusExporting) return;
     self.error = nil;
+    self.progress = 0.f;
+    self.progressHandler = progressHandler;
     self.completionHandler = completionHandler;
     self.status = AVAssetExportSessionStatusUnknown;
     
-    /*
     // 检查输出参数
     if (self.exportVideoTrack && MNAssetExportSessionIsEmptySize(self.outputRect.size)) {
         [self finishExportWithError:[NSError errorWithDomain:AVFoundationErrorDomain
@@ -73,8 +84,8 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
                                                     userInfo:@{NSLocalizedDescriptionKey:@"output rect error"}]];
         return;
     }
-    */
     
+    /*
     // 检查输出目录
     if (self.outputPath.length <= 0 || ![NSFileManager.defaultManager createDirectoryAtPath:[self.outputPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:nil]) {
         [self finishExportWithError:[NSError errorWithDomain:NSURLErrorDomain
@@ -82,6 +93,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
                                                     userInfo:@{NSLocalizedDescriptionKey:@"create output directory failed"}]];
         return;
     }
+    */
     
     // 检查媒体文件
     if (self.composition.tracks.count <= 0) {
@@ -143,15 +155,18 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     exporter.outputURL = [NSURL fileURLWithPath:self.outputPath];
     exporter.shouldOptimizeForNetworkUse = self.shouldOptimizeForNetworkUse;
     [self setVideoCompositionForExportSession:exporter];
+    [exporter addObserver:self forKeyPath:MNAssetExportObserverKey options:NSKeyValueObservingOptionNew context:nil];
+    self.exportSession = exporter;
     __weak typeof(exporter) weakexporter = exporter;
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         AVAssetExportSessionStatus status = weakexporter.status;
         self.status = status;
         self.error = weakexporter.error;
-        if (status == AVAssetExportSessionStatusCompleted || status == AVAssetExportSessionStatusFailed || status == AVAssetExportSessionStatusCancelled) {
-            if (status != AVAssetExportSessionStatusCompleted) [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
-            if (self.completionHandler) self.completionHandler(self.status, self.error);
-        }
+        self.exportSession = nil;
+        self.displayLink.paused = YES;
+        [weakexporter removeObserver:self forKeyPath:MNAssetExportObserverKey];
+        if (status != AVAssetExportSessionStatusCompleted) [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+        if (self.completionHandler) self.completionHandler(self.status, self.error);
     }];
 }
 
@@ -161,8 +176,6 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     
     AVAssetTrack *videoTrack = [exporter.asset trackWithMediaType:AVMediaTypeVideo];
     if (!videoTrack || CMTIME_IS_INVALID(videoTrack.timeRange.duration)) return;
-    
-    if (MNAssetExportSessionIsEmptySize(videoTrack.naturalSizeOfVideo)) return;
     
     AVMutableVideoCompositionLayerInstruction *videoLayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
     [videoLayerInstruction setOpacity:1.f atTime:kCMTimeZero];
@@ -188,8 +201,8 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     NSMutableArray <NSString *>*presetNames = @[].mutableCopy;
     if (videoTrack && self.isExportVideoTrack) {
         [presetNames addObject:AVAssetExportPresetHighestQuality];
-        [presetNames addObject:AVAssetExportPresetMediumQuality];
         [presetNames addObject:AVAssetExportPreset1280x720];
+        [presetNames addObject:AVAssetExportPresetMediumQuality];
         [presetNames addObject:AVAssetExportPresetLowQuality];
     }
     if (audioTrack && self.isExportAudioTrack) {
@@ -205,12 +218,37 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return presetName ? : AVAssetExportPresetPassthrough;
 }
 
+- (void)updateProgress:(float)progress {
+    self.progress = progress;
+    if (self.progressHandler) self.progressHandler(progress);
+}
+
 - (void)finishExportWithError:(NSError *)error {
     self.error = error;
     self.status = AVAssetExportSessionStatusFailed;
     if (self.completionHandler) {
         self.completionHandler(self.status, self.error);
     }
+}
+
+#pragma mark - ObserveValue && DisplayLinkEvent
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:MNAssetExportObserverKey]) {
+        NSNumber *value = change[NSKeyValueChangeNewKey];
+        AVAssetExportSessionStatus status = value.integerValue;
+        self.status = status;
+        if (status == AVAssetExportSessionStatusExporting) {
+            self.displayLink.paused = NO;
+        } else if (status == AVAssetExportSessionStatusCompleted || status == AVAssetExportSessionStatusFailed || status == AVAssetExportSessionStatusCancelled) {
+            self.displayLink.paused = YES;
+            if (status == AVAssetExportSessionStatusCompleted) [self updateProgress:1.f];
+        }
+    }
+}
+
+- (void)tip:(CADisplayLink *)link {
+    if (link.isPaused || !self.exportSession) return;
+    [self updateProgress:self.exportSession.progress];
 }
 
 #pragma mark - Getter
@@ -224,6 +262,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     }
     return _renderSize;
 }
+
 /*
 - (CGRect)outputRect {
     if (CGRectIsEmpty(_outputRect)) {
@@ -233,6 +272,16 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return _outputRect;
 }
 */
+
+- (CADisplayLink *)displayLink {
+    if (!_displayLink) {
+        CADisplayLink *displayLink = [CADisplayLink displayLinkWithTarget:[MNWeakProxy proxyWithTarget:self] selector:@selector(tip:)];
+        displayLink.paused = YES;
+        [displayLink addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
+        _displayLink = displayLink;
+    }
+    return _displayLink;
+}
 
 #pragma mark - Setter
 - (void)setFilePath:(NSString *)filePath {
@@ -288,7 +337,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 }
 
 - (BOOL)appendAssetTrack:(AVAssetTrack *)assetTrack toComposition:(AVMutableComposition *)composition {
-    if (!CMTIMERANGE_IS_VALID(assetTrack.timeRange)) return NO;
+    if (CMTIMERANGE_IS_INVALID(assetTrack.timeRange)) return NO;
     NSError *error;
     if ([assetTrack.mediaType isEqualToString:AVMediaTypeVideo]) {
         AVMutableCompositionTrack *videoTrack = [self trackOfComposition:composition mediaType:AVMediaTypeVideo];
@@ -324,7 +373,13 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 #pragma mark - dealloc
 - (void)dealloc {
     MNDeallocLog;
+    self.progressHandler = nil;
     self.completionHandler = nil;
+    if (_displayLink) {
+        _displayLink.paused = YES;
+        [_displayLink removeFromRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
+        [_displayLink invalidate];
+    }
 }
 
 @end

@@ -499,31 +499,22 @@ static MNAssetHelper *_helper;
 
 #pragma mark - Export Video
 #if __has_include(<AVFoundation/AVFoundation.h>)
-+ (void)exportVideoWithAsset:(MNAsset *)model  withOutputPath:(NSString *)outputPath presetName:(NSString *)presetName completion:(void(^)(NSString *filePath))completion {
-    if (!completion) return;
-    if (model.type != MNAssetTypeVideo) {
-        if (completion) completion(nil);
++ (void)exportVideoWithAsset:(MNAsset *)asset  outputPath:(NSString *)outputPath presetName:(NSString *)presetName progressHandler:(void(^)(float progress))progressHandler completionHandler:(void(^)(NSString *filePath))completionHandler {
+    if (asset.type != MNAssetTypeVideo) {
+        if (completionHandler) completionHandler(nil);
         return;
     }
-    [MNAssetHelper requestAssetContent:model configuration:nil completion:^(MNAsset *m) {
+    if (outputPath.length <= 0) outputPath = MNCacheDirectoryAppending(MNFileMP4Name);
+    [MNAssetHelper requestAssetContent:asset configuration:nil completion:^(MNAsset *m) {
         if (!m.content) {
-            if (completion) completion(nil);
+            if (completionHandler) completionHandler(nil);
             return;
         }
-        [self exportVideoWithContentsOfURL:[NSURL fileURLWithPath:m.content] withOutputPath:outputPath presetName:presetName completion:completion];
-    }];
-}
-
-+ (void)exportVideoWithContentsOfURL:(NSURL *)URL  withOutputPath:(NSString *)outputPath presetName:(NSString *)presetName completion:(void(^)(NSString *filePath))completion {
-    if (outputPath.length <= 0) outputPath = MNCacheDirectoryAppending(MNFileMP4Name);
-    [MNAssetExportSession exportAsynchronouslyOfVideoAtPath:URL.path
-                                                 outputPath:outputPath
-                                                 presetName:presetName
-                                          completionHandler:^(AVAssetExportSessionStatus status, NSError * _Nullable error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(status == AVAssetExportSessionStatusCompleted ? outputPath : nil);
-        });
+        [MNAssetExportSession exportAsynchronouslyOfVideoAtPath:m.content outputPath:outputPath presetName:presetName progressHandler:progressHandler completionHandler:^(AVAssetExportSessionStatus status, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completionHandler) completionHandler(status == AVAssetExportSessionStatusCompleted ? outputPath : nil);
+            });
+        }];
     }];
 }
 #endif

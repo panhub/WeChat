@@ -10,7 +10,7 @@
 
 @implementation MNAssetExporter (MNExportSession)
 
-+ (void)exportVideoTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportVideoTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                    progressHandler:(MNAssetExportProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler
@@ -19,10 +19,11 @@
     exporter.filePath = filePath;
     exporter.outputPath = outputPath;
     exporter.exportAudioTrack = NO;
+    exporter.presetName = MNAssetExportPresetHighestQuality;
     [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
 }
 
-+ (void)exportAudioTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportAudioTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                    progressHandler:(MNAssetExportProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler
@@ -41,6 +42,7 @@
 + (void)exportAsynchronouslyOfVideoAtPath:(NSString *)filePath
                                outputPath:(NSString *)outputPath
                                presetName:(NSString *)presetName
+                          progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                         completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
@@ -48,12 +50,13 @@
     exporter.outputPath = outputPath;
     exporter.presetName = presetName;
     exporter.outputFileType = AVFileTypeMPEG4;
-    [exporter exportAsynchronouslyWithCompletionHandler:completionHandler];
+    [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
 }
 
-+ (void)exportVideoTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportVideoTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                         presetName:(NSString *)presetName
+                                    progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
@@ -62,11 +65,12 @@
     exporter.presetName = presetName;
     exporter.exportAudioTrack = NO;
     exporter.outputFileType = AVFileTypeMPEG4;
-    [exporter exportAsynchronouslyWithCompletionHandler:completionHandler];
+    [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
 }
 
-+ (void)exportAudioTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportAudioTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
+                                    progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
@@ -75,7 +79,7 @@
     exporter.exportVideoTrack = NO;
     exporter.presetName = AVAssetExportPresetAppleM4A;
     exporter.outputFileType = AVFileTypeAppleM4A;
-    [exporter exportAsynchronouslyWithCompletionHandler:completionHandler];
+    [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
 }
 
 @end

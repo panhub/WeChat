@@ -10,13 +10,17 @@
 #if __has_include(<AVFoundation/AVFoundation.h>)
 
 /**
+进度回调
+@param progress 进度信息
+*/
+typedef void(^MNAssetExportSessionProgressHandler)(float progress);
+
+/**
  输出回调
  @param status 输出状态
  @param error 错误信息(nullable)
  */
-typedef void(^MNAssetExportSessionCompletionHandler)(AVAssetExportSessionStatus status, NSError * _Nullable error);
-
-NS_ASSUME_NONNULL_BEGIN
+typedef void(^MNAssetExportSessionCompletionHandler)(AVAssetExportSessionStatus status, NSError *error);
 
 @interface MNAssetExportSession : NSObject
 /**资源对象, 内部依据初始化自行转化*/
@@ -24,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**视频路径*/
 @property (nonatomic, copy) NSString *filePath;
 /**质量 AVAssetExportPresetHighestQuality */
-@property (nonatomic, copy, nullable) NSString *presetName;
+@property (nonatomic, copy) NSString *presetName;
 /**文件封装格式*/
-@property (nonatomic, copy, nullable) AVFileType outputFileType;
+@property (nonatomic, copy) AVFileType outputFileType;
 /**裁剪片段*/
 @property (nonatomic) CMTimeRange timeRange;
 /**裁剪区域, 不赋值则不裁剪*/
@@ -43,35 +47,45 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, getter=isExportAudioTrack) BOOL exportAudioTrack;
 /**输出状态*/
 @property (nonatomic, readonly) AVAssetExportSessionStatus status;
-/*错误信息*/
-@property (nonatomic, readonly, nullable) NSError *error;
+/**进度信息*/
+@property (nonatomic, readonly) float progress;
+/**错误信息*/
+@property (nonatomic, readonly) NSError *error;
 
 /**
 依据资源文件实例化输出者
 @param asset 资源文件
 @return 视/音输出者
 */
-- (instancetype)initWithAsset:(AVAsset *)asset;
+- (instancetype)initWithAsset:(AVURLAsset *)asset;
 
 /**
  依据视/音频路径实例化输出者
  @param filePath 视/音频路径
  @return 视/音输出者
  */
-- (instancetype)initWithContentsOfFile:(NSString *)filePath;
+- (instancetype)initWithAssetAtPath:(NSString *)filePath NS_DESIGNATED_INITIALIZER;
 
 /**
  依据视/音频本地URL实例化输出者
  @param fileURL 视/音频本地URL
  @return 视/音输出者
  */
-- (instancetype)initWithContentsOfURL:(NSURL *)fileURL;
+- (instancetype)initWithAssetOfURL:(NSURL *)fileURL;
 
 /**
  异步输出操作
  @param completionHandler 结束回调
  */
 - (void)exportAsynchronouslyWithCompletionHandler:(MNAssetExportSessionCompletionHandler)completionHandler;
+
+/**
+ 异步输出
+ @param progressHandler 进度回调
+ @param completionHandler 完成回调
+ */
+- (void)exportAsynchronouslyWithProgressHandler:(MNAssetExportSessionProgressHandler)progressHandler
+                              completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler;
 
 /**
  获取时间片段
@@ -97,6 +111,4 @@ NS_ASSUME_NONNULL_BEGIN
 - (CMTimeRange)timeRangeFromSeconds:(NSTimeInterval)fromSeconds toSeconds:(NSTimeInterval)toSeconds;
 
 @end
-
-NS_ASSUME_NONNULL_END
 #endif

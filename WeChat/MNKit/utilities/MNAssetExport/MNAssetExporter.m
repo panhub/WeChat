@@ -105,23 +105,20 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     return self;
 }
 
-- (instancetype)initWithAsset:(AVAsset *)asset {
-    if (!asset) return nil;
-    self = [self init];
-    if (!self) return nil;
-    [self appendAsset:asset];
-    return self;
+- (instancetype)initWithAsset:(AVURLAsset *)asset {
+    if (asset.URL.path.length <= 0) return nil;
+    return [self initWithAssetAtPath:asset.URL.path];
 }
 
-- (instancetype)initWithContentsOfFile:(NSString *)filePath {
+- (instancetype)initWithAssetAtPath:(NSString *)filePath {
     self = [self init];
     if (!self) return nil;
     self.filePath = filePath;
     return self;
 }
 
-- (instancetype)initWithContentsOfURL:(NSURL *)fileURL {
-    return [self initWithContentsOfFile:fileURL.path];
+- (instancetype)initWithAssetOfURL:(NSURL *)fileURL {
+    return [self initWithAssetAtPath:fileURL.path];
 }
 
 #pragma mark - Export

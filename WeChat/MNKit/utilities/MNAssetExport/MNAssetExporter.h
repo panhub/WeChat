@@ -106,14 +106,14 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
  @param filePath 视/音频路径
  @return 视/音输出者
  */
-- (instancetype)initWithContentsOfFile:(NSString *)filePath;
+- (instancetype)initWithAssetAtPath:(NSString *)filePath NS_DESIGNATED_INITIALIZER;
 
 /**
  依据视/音频本地URL实例化输出者
  @param fileURL 视/音频本地URL
  @return 视/音输出者
  */
-- (instancetype)initWithContentsOfURL:(NSURL *)fileURL;
+- (instancetype)initWithAssetOfURL:(NSURL *)fileURL;
 
 /**
  异步输出

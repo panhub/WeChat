@@ -17,7 +17,7 @@
  @param progressHandler 进度回调
  @param completionHandler 结束回调
  */
-+ (void)exportVideoTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportVideoTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                    progressHandler:(MNAssetExportProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler;
@@ -29,7 +29,7 @@
 @param progressHandler 进度回调
 @param completionHandler 结束回调
 */
-+ (void)exportAudioTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportAudioTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                    progressHandler:(MNAssetExportProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler;
@@ -43,11 +43,13 @@
 @param filePath 视频路径
 @param outputPath 输出路径
 @param presetName 视频质量
+@param progressHandler 进度回调
 @param completionHandler 结束回调
 */
 + (void)exportAsynchronouslyOfVideoAtPath:(NSString *)filePath
                                outputPath:(NSString *)outputPath
                                presetName:(NSString *)presetName
+                          progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                         completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler;
 
 /**
@@ -55,21 +57,25 @@
  @param filePath 视频路径
  @param outputPath 输出路径
  @param presetName 视频质量
+ @param progressHandler 进度回调
  @param completionHandler 结束回调
  */
-+ (void)exportVideoTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportVideoTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
                                         presetName:(NSString *)presetName
+                                    progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler;
 
 /**
 从视频中提取音频
 @param filePath 视频路径
 @param outputPath 输出路径
+@param progressHandler 进度回调
 @param completionHandler 结束回调
 */
-+ (void)exportAudioTrackAsynchronouslyWithFilePath:(NSString *)filePath
++ (void)exportAudioTrackAsynchronouslyWithAssetPath:(NSString *)filePath
                                         outputPath:(NSString *)outputPath
+                                    progressHandler:(MNAssetExportSessionProgressHandler)progressHandler
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler;
 
 @end

@@ -435,8 +435,13 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
         MNAsset *asset = assets.firstObject;
         if (asset.type == MNAssetTypeVideo) {
             @weakify(self);
-            [self.view showLoadDialog:@"视频导出中"];
-            [MNAssetHelper exportVideoWithAsset:assets.firstObject withOutputPath:nil presetName:AVAssetExportPresetMediumQuality completion:^(NSString *filePath) {
+            [self.view showProgressDialog:@"视频导出中"];
+            [MNAssetHelper exportVideoWithAsset:assets.firstObject outputPath:nil presetName:AVAssetExportPresetHighestQuality progressHandler:^(float progress){
+                dispatch_async_main(^{
+                    @strongify(self);
+                    [self.view updateDialogProgress:progress];
+                });
+            } completionHandler:^(NSString *filePath) {
                 @strongify(self);
                 if (filePath) {
                     [self.view closeDialog];
@@ -472,8 +477,13 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
         MNAsset *asset = assets.firstObject;
         if (asset.type == MNAssetTypeVideo) {
             @weakify(self);
-            [self.view showLoadDialog:@"视频导出中"];
-            [MNAssetHelper exportVideoWithAsset:assets.firstObject withOutputPath:nil presetName:AVAssetExportPresetMediumQuality completion:^(NSString *filePath) {
+            [self.view showProgressDialog:@"视频导出中"];
+            [MNAssetHelper exportVideoWithAsset:assets.firstObject outputPath:nil presetName:AVAssetExportPresetHighestQuality progressHandler:^(float progress){
+                dispatch_async_main(^{
+                    @strongify(self);
+                    [self.view updateDialogProgress:progress];
+                });
+            } completionHandler:^(NSString *filePath) {
                 @strongify(self);
                 if (filePath) {
                     [self.view closeDialog];

@@ -399,6 +399,7 @@
     BOOL isFrameResizing = self.isFrameResizing;
     MNRange cutRange = self.videoCropView.cropRange;
     NSString *outputPath = MNCacheDirectoryAppending([MNFileHandle fileNameWithExtension:@"mp4"]);
+    [self.view showProgressDialog:@"视频处理中"];
     // 进度回调
     MNAssetExportProgressHandler progressHandler = ^(float progress) {
         dispatch_async_main(^{
@@ -412,12 +413,8 @@
             @strongify(self);
             if (status == MNAssetExportStatusCompleted) {
                 @weakify(self);
-                if (isFrameResizing) {
-                    [self.view updateDialogProgress:0.f];
-                    [self.view updateDialogMessage:@"LivePhoto转换中"];
-                } else {
-                    [self.view showProgressDialog:@"LivePhoto转换中"];
-                }
+                [self.view updateDialogProgress:0.f];
+                [self.view updateDialogMessage:@"LivePhoto转换中"];
                 [MNLivePhoto requestLivePhotoWithVideoResourceOfPath:outputPath progressHandler:^(float progress) {
                     dispatch_async_main(^{
                         @strongify(self);
@@ -445,8 +442,7 @@
     };
     if (isFrameResizing) {
         // 裁剪了画面, 使用自定义裁剪方案
-        [self.view showProgressDialog:@"视频处理中"];
-        MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithContentsOfFile:self.videoPath];
+        MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:self.videoPath];
         exporter.outputPath = outputPath;
         exporter.outputRect = self.videoExportOutputRect;
         exporter.presetName = self.videoExportPresetName;
@@ -454,8 +450,7 @@
         [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
     } else {
         // 没裁剪画面, 使用系统时长裁剪方案
-        [self.view showLoadDialog:@"视频处理中"];
-        MNAssetExportSession *session = [[MNAssetExportSession alloc] initWithContentsOfFile:self.videoPath];
+        MNAssetExportSession *session = [[MNAssetExportSession alloc] initWithAssetAtPath:self.videoPath];
         session.outputPath = outputPath;
         session.outputFileType = AVFileTypeMPEG4;
         session.presetName = AVAssetExportPresetHighestQuality;
