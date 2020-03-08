@@ -2892,7 +2892,7 @@
 			children = (
 				200FBA6E222157B7002B7763 /* MNAVManager.h */,
 				200FBA62222157B7002B7763 /* MNAudioRecorder */,
-				200FBA6B222157B7002B7763 /* MNAVPlayer */,
+				200FBA6B222157B7002B7763 /* MNPlayer */,
 				200FBA6F222157B7002B7763 /* MNAudioConvert */,
 				200FBA85222157B7002B7763 /* MNMediaCache */,
 			);
@@ -2908,13 +2908,13 @@
 			path = MNAudioRecorder;
 			sourceTree = "<group>";
 		};
-		200FBA6B222157B7002B7763 /* MNAVPlayer */ = {
+		200FBA6B222157B7002B7763 /* MNPlayer */ = {
 			isa = PBXGroup;
 			children = (
 				200FBA6D222157B7002B7763 /* MNPlayer.h */,
 				200FBA6C222157B7002B7763 /* MNPlayer.m */,
 			);
-			path = MNAVPlayer;
+			path = MNPlayer;
 			sourceTree = "<group>";
 		};
 		200FBA6F222157B7002B7763 /* MNAudioConvert */ = {
