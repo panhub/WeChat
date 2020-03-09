@@ -219,6 +219,8 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 }
 
 - (void)updateProgress:(float)progress {
+    // 系统返回的进度在0 - .5 之间
+    progress = MIN(progress/.5f, .99f);
     self.progress = progress;
     if (self.progressHandler) self.progressHandler(progress);
 }
