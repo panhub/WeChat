@@ -13,15 +13,15 @@
  KeyWindow
  <命名keyWindow 会崩溃, 估计与内部冲突>
  */
-@property (nonatomic, weak, readonly, class) UIWindow *mainWindow;
+@property (nonatomic, readonly, class) UIWindow *mainWindow;
 /**
  正在显示的控制器
  */
-@property (nonatomic, weak, readonly, class) UIViewController *presentedViewController;
+@property (nonatomic, readonly, class) UIViewController *presentedViewController;
 /**
  正在显示的导航控制器
  */
-@property (nonatomic, weak, readonly, class) UINavigationController *presentedNavigationController;
+@property (nonatomic, readonly, class) UINavigationController *presentedNavigationController;
 
 /**
  取消键盘, 结束输入响应
