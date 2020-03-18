@@ -78,18 +78,6 @@
     
     /// 首次加载, 手动刷新列表
     [self setNeedsReloadList];
-    
-    self.contentView.hidden = YES;
-    
-    UIView *redView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 200.f, 200.f)];
-    redView.center_mn = self.view.bounds_center;
-    redView.backgroundColor = UIColor.redColor;
-    [self.view addSubview:redView];
-    
-    UIView *blueView = [[UIView alloc] init];
-    blueView.backgroundColor = UIColor.blueColor;
-    [redView addSubview:blueView];
-    blueView.layout.leftOffsetToView(redView, 0.f).widthEqualToView(redView).topOffsetToView(redView, 0.f).heightEqualToView(redView);
 }
 
 - (void)loadData {

@@ -30,26 +30,33 @@ MNAssetExportPresetName const MNAssetExportPreset640x360 = @"com.mn.asset.export
 MNAssetExportPresetName const MNAssetExportPreset360x640 = @"com.mn.asset.export.360x640";
 MNAssetExportPresetName const MNAssetExportPreset640x480 = @"com.mn.asset.export.640x480";
 MNAssetExportPresetName const MNAssetExportPreset480x640 = @"com.mn.asset.export.480x640";
+MNAssetExportPresetName const MNAssetExportPreset800x600 = @"com.mn.asset.export.800x600";
+MNAssetExportPresetName const MNAssetExportPreset600x800 = @"com.mn.asset.export.600x800";
 MNAssetExportPresetName const MNAssetExportPreset960x540 = @"com.mn.asset.export.960x540";
 MNAssetExportPresetName const MNAssetExportPreset540x960 = @"com.mn.asset.export.540x960";
 MNAssetExportPresetName const MNAssetExportPreset1024x576 = @"com.mn.asset.export.1024x576";
 MNAssetExportPresetName const MNAssetExportPreset576x1024 = @"com.mn.asset.export.576x1024";
+MNAssetExportPresetName const MNAssetExportPreset1024x768 = @"com.mn.asset.export.1024x768";
+MNAssetExportPresetName const MNAssetExportPreset768x1024 = @"com.mn.asset.export.768x1024";
+MNAssetExportPresetName const MNAssetExportPreset1280x960 = @"com.mn.asset.export.1280x960";
+MNAssetExportPresetName const MNAssetExportPreset960x1280 = @"com.mn.asset.export.960x1280";
+MNAssetExportPresetName const MNAssetExportPreset1152x864 = @"com.mn.asset.export.1152x864";
+MNAssetExportPresetName const MNAssetExportPreset864x1152 = @"com.mn.asset.export.864x1152";
 MNAssetExportPresetName const MNAssetExportPreset1280x720 = @"com.mn.asset.export.1280x720";
 MNAssetExportPresetName const MNAssetExportPreset720x1280 = @"com.mn.asset.export.720x1280";
+MNAssetExportPresetName const MNAssetExportPreset1440x1080 = @"com.mn.asset.export.1440x1080";
+MNAssetExportPresetName const MNAssetExportPreset1080x1440 = @"com.mn.asset.export.1080x1440";
 MNAssetExportPresetName const MNAssetExportPreset1920x1080 = @"com.mn.asset.export.1920x1080";
 MNAssetExportPresetName const MNAssetExportPreset1080x1920 = @"com.mn.asset.export.1080x1920";
 MNAssetExportPresetName const MNAssetExportPreset3840x2160 = @"com.mn.asset.export.3840x2160";
 MNAssetExportPresetName const MNAssetExportPreset2160x3840 = @"com.mn.asset.export.2160x3840";
+MNAssetExportPresetName const MNAssetExportPreset1080x1080 = @"com.mn.asset.export.1080x1080";
 MNAssetExportPresetName const MNAssetExportPreset1024x1024 = @"com.mn.asset.export.1024x1024";
 MNAssetExportPresetName const MNAssetExportPreset800x800 = @"com.mn.asset.export.800x800";
 MNAssetExportPresetName const MNAssetExportPreset600x600 = @"com.mn.asset.export.600x600";
 
 BOOL MNAssetExportIsEmptySize (CGSize size) {
     return (isnan(size.width) || isnan(size.height) || size.width <= 0.f || size.height <= 0.f);
-}
-
-static float MNAssetExportPresetResolution (CGSize size) {
-    return size.width*size.height;
 }
 
 static CGSize MNAssetExportPresetSize (MNAssetExportPresetName presetName) {
@@ -463,11 +470,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 - (CGSize)renderSize {
     if (MNAssetExportIsEmptySize(_renderSize)) {
         CGSize presetSize = MNAssetExportPresetSize(self.presetName);
-        if (!MNAssetExportIsEmptySize(presetSize)) {
-            _renderSize = presetSize;
-        } else {
-            self.renderSize = self.outputRect.size;
-        }
+        _renderSize = MNAssetExportIsEmptySize(presetSize) ? self.outputRect.size : presetSize;
     }
     return _renderSize;
 }
@@ -493,9 +496,11 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 
 - (float)videoBitRate {
     // 默认最大支持1080p, 最小支持240p
-    float bitRate = 0.f;
-    float minWH = MIN(self.renderSize.width, self.renderSize.height);
+    //float bitRate = 0.f;
+    //float minWH = MIN(self.renderSize.width, self.renderSize.height);
     CGSize presetSize = MNAssetExportPresetSize(self.presetName);
+    float bitRate = MNAssetExportIsEmptySize(presetSize) ? self.renderSize.width*self.renderSize.height : presetSize.width*presetSize.height;
+    /*
     if (!MNAssetExportIsEmptySize(presetSize)) {
         bitRate = presetSize.width*presetSize.height;
     } else if (minWH >= MNAssetExportPreset1080P) {
@@ -513,13 +518,15 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     } else if (minWH >= MNAssetExportPreset240P) {
         bitRate = minWH*360.f;
     } else {
-        bitRate = MNAssetExportPresetResolution(MNAssetExportPresetSize(MNAssetExportPreset360x240));
+        presetSize = MNAssetExportPresetSize(MNAssetExportPreset360x240);
+        bitRate = presetSize.width*presetSize.height;
     }
+    */
     return self.videoBitRateRatio*bitRate;
 }
 
 - (float)videoBitRateRatio {
-    float bitRateRatio = 3.8f;
+    float bitRateRatio = 3.7f;
     MNAssetExportPresetName presetName = self.presetName;
     CGSize presetSize = MNAssetExportPresetSize(presetName);
     if (!MNAssetExportIsEmptySize(presetSize)) {
@@ -527,7 +534,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     } else if ([presetName isEqualToString:MNAssetExportPresetLowQuality]) {
         bitRateRatio = 2.5f;
     } else if ([presetName isEqualToString:MNAssetExportPresetMediumQuality]) {
-        bitRateRatio = 3.3f;
+        bitRateRatio = 3.f;
     }
     return bitRateRatio;
 }
@@ -541,8 +548,12 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 
 - (void)setRenderSize:(CGSize)renderSize {
     //使用MPEG-2和MPEG-4(和其他基于DCT的编解码器), 压缩被应用于16×16像素宏块的网格, 使用MPEG-4第10部分(AVC/H.264), 4和8的倍数也是有效的, 但16是最有效的;
-    renderSize.width = floor(ceil(renderSize.width)/16.f)*16.f;
-    renderSize.height = floor(ceil(renderSize.height)/16.f)*16.f;
+    CGFloat width8 = floor(ceil(renderSize.width)/8.f)*8.f;
+    CGFloat width16 = floor(ceil(renderSize.width)/16.f)*16.f;
+    if (width8 != renderSize.width && width16 != renderSize.width) renderSize.width = width16;
+    CGFloat height8 = floor(ceil(renderSize.height)/8.f)*8.f;
+    CGFloat height16 = floor(ceil(renderSize.height)/16.f)*16.f;
+    if (height8 != renderSize.height && height16 != renderSize.height) renderSize.height = height16;
     _renderSize = renderSize;
 }
 

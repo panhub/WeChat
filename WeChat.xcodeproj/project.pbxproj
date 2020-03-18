@@ -457,7 +457,6 @@
 		201DB0AF22E8953C0063E88A /* WXCityListSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB04B22E8953C0063E88A /* WXCityListSectionHeaderView.m */; };
 		201DB0B022E8953C0063E88A /* WXSessionListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB04E22E8953C0063E88A /* WXSessionListCell.m */; };
 		2025E327223CA6DF00763BB6 /* MNAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = 2025E326223CA6DF00763BB6 /* MNAddressBook.m */; };
-		20292A0022295DC6001D4CEB /* MNIAPHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 202929FF22295DC6001D4CEB /* MNIAPHandle.m */; };
 		202968CF2340960E00253B77 /* MNSegmentPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 202968B92340960E00253B77 /* MNSegmentPageController.m */; };
 		202968D02340960E00253B77 /* UIScrollView+MNSegmentPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 202968BB2340960E00253B77 /* UIScrollView+MNSegmentPage.m */; };
 		202968D12340960E00253B77 /* MNSegmentPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 202968BE2340960E00253B77 /* MNSegmentPageView.m */; };
@@ -1746,8 +1745,6 @@
 		201DB04E22E8953C0063E88A /* WXSessionListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSessionListCell.m; sourceTree = "<group>"; };
 		2025E325223CA6DF00763BB6 /* MNAddressBook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNAddressBook.h; sourceTree = "<group>"; };
 		2025E326223CA6DF00763BB6 /* MNAddressBook.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNAddressBook.m; sourceTree = "<group>"; };
-		202929FE22295DC6001D4CEB /* MNIAPHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNIAPHandle.h; sourceTree = "<group>"; };
-		202929FF22295DC6001D4CEB /* MNIAPHandle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNIAPHandle.m; sourceTree = "<group>"; };
 		202968B92340960E00253B77 /* MNSegmentPageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNSegmentPageController.m; sourceTree = "<group>"; };
 		202968BA2340960E00253B77 /* MNSegmentPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNSegmentPageView.h; sourceTree = "<group>"; };
 		202968BB2340960E00253B77 /* UIScrollView+MNSegmentPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+MNSegmentPage.m"; sourceTree = "<group>"; };
@@ -2708,7 +2705,6 @@
 				201BCC82224DEEFB00633012 /* MNSafeArray */,
 				201A28E7224E3E2F009EEB55 /* MNSafeDictionary */,
 				2025E324223CA6BA00763BB6 /* MNAddressBook */,
-				202929FD22295DA2001D4CEB /* MNIAPHandle */,
 				200FB9DF222157B7002B7763 /* MNException */,
 				200FB9E2222157B7002B7763 /* MNKeyChain */,
 				200FB9E5222157B7002B7763 /* MNDatabase */,
@@ -4880,15 +4876,6 @@
 			path = MNAddressBook;
 			sourceTree = "<group>";
 		};
-		202929FD22295DA2001D4CEB /* MNIAPHandle */ = {
-			isa = PBXGroup;
-			children = (
-				202929FE22295DC6001D4CEB /* MNIAPHandle.h */,
-				202929FF22295DC6001D4CEB /* MNIAPHandle.m */,
-			);
-			path = MNIAPHandle;
-			sourceTree = "<group>";
-		};
 		202968B72340960E00253B77 /* MNSegmentController */ = {
 			isa = PBXGroup;
 			children = (
@@ -7047,7 +7034,6 @@
 				200FBF4F222157B8002B7763 /* CALayer+MNLayout.m in Sources */,
 				BFAF39BD23CA3F160018B82A /* MNMaskDialog.m in Sources */,
 				200FBF70222157B8002B7763 /* MNTabBarItem.m in Sources */,
-				20292A0022295DC6001D4CEB /* MNIAPHandle.m in Sources */,
 				201DAEF122E894410063E88A /* WXNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

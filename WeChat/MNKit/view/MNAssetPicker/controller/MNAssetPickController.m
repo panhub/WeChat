@@ -93,13 +93,12 @@
         [self.view addSubview:assetToolBar];
         self.assetToolBar = assetToolBar;
     }
-    
-    /// 监听相册变动代理
-    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    /// 监听相册变动代理
+    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     /// 注册3DTouch
     if (@available(iOS 9.0, *)) {
         if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
@@ -231,10 +230,10 @@
                         [self finishPickingAssets:succAssets];
                     } else if (succAssets.count <= 0 || succAssets.count < self.configuration.minPickingCount) {
                         // 仅有一个资源且获取失败或者成功的数量小于最小限制
-                        [[MNAlertView alertViewWithTitle:nil message:@"请求iCloud内容失败\n请切换网络重试!" handler:nil ensureButtonTitle:@"关闭" otherButtonTitles:nil] show];
+                        [[MNAlertView alertViewWithTitle:nil message:@"获取iCloud资源失败\n请检查网络后重试!" handler:nil ensureButtonTitle:@"关闭" otherButtonTitles:nil] show];
                     } else {
                         // 有获取失败项
-                        [[MNAlertView alertViewWithTitle:nil message:@"请求iCloud内容失败\n确定结束选择?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
+                        [[MNAlertView alertViewWithTitle:nil message:@"获取iCloud资源失败\n确定结束选择?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
                             if (buttonIndex == alertView.ensureButtonIndex) {
                                 [self finishPickingAssets:succAssets];
                             }

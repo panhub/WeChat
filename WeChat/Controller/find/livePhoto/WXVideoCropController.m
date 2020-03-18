@@ -445,7 +445,7 @@
         MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:self.videoPath];
         exporter.outputPath = outputPath;
         exporter.outputRect = self.videoExportOutputRect;
-        exporter.presetName = self.videoExportPresetName;
+        exporter.presetName = MNAssetExportPresetHighestQuality;
         exporter.timeRange = [exporter timeRangeFromProgress:cutRange.location toProgress:MNMaxRange(cutRange)];
         [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
     } else {
@@ -492,19 +492,17 @@
 // 视频画面输出尺寸
 - (CGRect)videoExportOutputRect {
     CGSize naturalSize = [MNAssetExporter exportNaturalSizeOfVideoAtPath:self.videoPath];
-    CGSize cropSize = self.cropView.bounds.size;
-    CGFloat cropRatio = MIN(naturalSize.width/cropSize.width, naturalSize.height/cropSize.height);
     CGRect cropRect = self.cropView.cropRect;
+    CGSize cropSize = self.cropView.bounds.size;
+    if (MIN(cropRect.size.width/cropSize.width, cropRect.size.height/cropSize.height) >= .99f) return CGRectFillToSize(naturalSize);
+    CGFloat cropRatio = MIN(naturalSize.width/cropSize.width, naturalSize.height/cropSize.height);
     cropRect = CGRectMultiplyByRatio(cropRect, cropRatio);
     return cropRect;
 }
 
 // 判断是否调整了尺寸
 - (BOOL)isFrameResizing {
-    if (!self.cropView || self.cropView.hidden) return NO;
-    CGSize cropViewSize = self.cropView.bounds.size;
-    CGSize cropRectSize = self.cropView.cropRect.size;
-    return MIN(cropRectSize.width/cropViewSize.width, cropRectSize.height/cropViewSize.height) <= .99f;
+    return (self.cropView && self.cropView.hidden == NO);
 }
 
 #pragma mark - Lazy
