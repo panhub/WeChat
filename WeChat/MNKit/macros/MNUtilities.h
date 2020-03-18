@@ -8,13 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#include <CoreGraphics/CoreGraphics.h>
 
 /**
  CGFloat 相反数
  @param number 数字
  @return 相反数
  */
-UIKIT_STATIC_INLINE CGFloat fopposite (CGFloat number) {
+CG_INLINE CGFloat fopposite (CGFloat number) {
     return -1.f*number;
 }
 
@@ -23,7 +24,7 @@ UIKIT_STATIC_INLINE CGFloat fopposite (CGFloat number) {
  @param number 数字
  @return 相反数
  */
-UIKIT_STATIC_INLINE CGFloat opposite (NSInteger number) {
+CG_INLINE CGFloat opposite (NSInteger number) {
     return -1.f*number;
 }
 
@@ -60,7 +61,7 @@ UIKIT_STATIC_INLINE UIEdgeInsets UIEdgeInsetMultiplyByRatio (UIEdgeInsets inset,
  @param value 指定值
  @return value/2.f
  */
-UIKIT_STATIC_INLINE CGFloat MEAN (CGFloat value) {
+CG_INLINE CGFloat MEAN (CGFloat value) {
     return ((value)/2.f);
 }
 
@@ -69,7 +70,7 @@ UIKIT_STATIC_INLINE CGFloat MEAN (CGFloat value) {
  @param value 指定值
  @return value/3.f
  */
-UIKIT_STATIC_INLINE CGFloat MEAN_3 (CGFloat value) {
+CG_INLINE CGFloat MEAN_3 (CGFloat value) {
     return ((value)/3.f);
 }
 
@@ -78,7 +79,7 @@ UIKIT_STATIC_INLINE CGFloat MEAN_3 (CGFloat value) {
  @param value 指定值
  @return value/3.f*2.f
  */
-UIKIT_STATIC_INLINE CGFloat MEAN_3_2 (CGFloat value) {
+CG_INLINE CGFloat MEAN_3_2 (CGFloat value) {
     return ((value)/3.f*2.f);
 }
 
@@ -96,7 +97,7 @@ UIKIT_STATIC_INLINE NSInteger RandomValue (NSInteger value) {
  @param degrees 角度
  @return 弧度
  */
-UIKIT_STATIC_INLINE CGFloat DegreeToRadian (CGFloat degrees) {
+CG_INLINE CGFloat DegreeToRadian (CGFloat degrees) {
     return (M_PI*(degrees )/180.f);
 }
 
@@ -105,7 +106,7 @@ UIKIT_STATIC_INLINE CGFloat DegreeToRadian (CGFloat degrees) {
  @param radians 弧度
  @return 角度
  */
-UIKIT_STATIC_INLINE CGFloat RadianToDegree (CGFloat radians) {
+CG_INLINE CGFloat RadianToDegree (CGFloat radians) {
     return ((radians*180.f)/M_PI);
 }
 
@@ -114,7 +115,7 @@ UIKIT_STATIC_INLINE CGFloat RadianToDegree (CGFloat radians) {
  @param size 尺寸
  @return 最大值
  */
-UIKIT_STATIC_INLINE CGFloat CGSizeMax (CGSize size) {
+CG_INLINE CGFloat CGSizeMax (CGSize size) {
     return MAX(size.width, size.height);
 }
 
@@ -123,7 +124,7 @@ UIKIT_STATIC_INLINE CGFloat CGSizeMax (CGSize size) {
  @param size 尺寸
  @return 最小值
  */
-UIKIT_STATIC_INLINE CGFloat CGSizeMin (CGSize size) {
+CG_INLINE CGFloat CGSizeMin (CGSize size) {
     return MIN(size.width, size.height);
 }
 
@@ -132,8 +133,35 @@ UIKIT_STATIC_INLINE CGFloat CGSizeMin (CGSize size) {
  @param size 尺寸
  @return 是否为空
  */
-UIKIT_STATIC_INLINE BOOL CGSizeIsEmpty (CGSize size) {
+CG_INLINE BOOL CGSizeIsEmpty (CGSize size) {
     return (isnan(size.width) || size.width <= 0.f || isnan(size.height) || size.height <= 0.f);
+}
+
+/**
+判断尺寸是否存在 NaN
+@param size 尺寸
+@return 是否存在 NaN
+*/
+CG_INLINE BOOL CGSizeIsNaN(CGSize size) {
+    return (isnan(size.width) || isnan(size.height));
+}
+
+/**
+判断尺寸是否存在 infinite
+@param size 尺寸
+@return 是否存在 infinite
+*/
+CG_INLINE BOOL CGSizeIsInf(CGSize size) {
+    return (isinf(size.width) || isinf(size.height));
+}
+
+/**
+判断尺寸是否合法
+@param size 尺寸
+@return 是否合法
+*/
+CG_INLINE BOOL CGSizeIsValidated(CGSize size) {
+    return !CGSizeIsEmpty(size) && !CGSizeIsInf(size) && !CGSizeIsNaN(size);
 }
 
 /**
@@ -142,7 +170,7 @@ UIKIT_STATIC_INLINE BOOL CGSizeIsEmpty (CGSize size) {
  @param multiplier 比例
  @return 比例尺寸
  */
-UIKIT_STATIC_INLINE CGSize CGSizeMultiplyByRatio (CGSize size, CGFloat multiplier) {
+CG_INLINE CGSize CGSizeMultiplyByRatio (CGSize size, CGFloat multiplier) {
     return CGSizeMake(size.width*multiplier, size.height*multiplier);
 }
 
@@ -152,7 +180,7 @@ UIKIT_STATIC_INLINE CGSize CGSizeMultiplyByRatio (CGSize size, CGFloat multiplie
  @param width 指定宽度
  @return 比例尺寸
  */
-UIKIT_STATIC_INLINE CGSize CGSizeMultiplyToWidth (CGSize size, CGFloat width) {
+CG_INLINE CGSize CGSizeMultiplyToWidth (CGSize size, CGFloat width) {
     if (width <= 0.f || CGSizeIsEmpty(size)) return CGSizeZero;
     return CGSizeMake(width, size.height/(size.width/width));
 }
@@ -163,9 +191,29 @@ UIKIT_STATIC_INLINE CGSize CGSizeMultiplyToWidth (CGSize size, CGFloat width) {
  @param height 指定高度
  @return 比例尺寸
  */
-UIKIT_STATIC_INLINE CGSize CGSizeMultiplyToHeight (CGSize size, CGFloat height) {
+CG_INLINE CGSize CGSizeMultiplyToHeight (CGSize size, CGFloat height) {
     if (height <= 0.f || CGSizeIsEmpty(size)) return CGSizeZero;
     return CGSizeMake(size.width/(size.height/height), height);
+}
+
+/**
+最小值缩放到指定大小
+@param size 指定尺寸
+@param min 最小值
+@return 比例尺寸
+*/
+CG_INLINE CGSize CGSizeMultiplyToMin (CGSize size, CGFloat min) {
+    return size.width <= size.height ? CGSizeMultiplyToWidth(size, min) : CGSizeMultiplyToHeight(size, min);
+}
+
+/**
+最大值缩放到指定大小
+@param size 指定尺寸
+@param max 最大值
+@return 比例尺寸
+*/
+CG_INLINE CGSize CGSizeMultiplyToMax (CGSize size, CGFloat max) {
+    return size.width >= size.height ? CGSizeMultiplyToWidth(size, max) : CGSizeMultiplyToHeight(size, max);
 }
 
 /**
@@ -173,7 +221,7 @@ UIKIT_STATIC_INLINE CGSize CGSizeMultiplyToHeight (CGSize size, CGFloat height) 
  @param size 尺寸
  @return {CGPointZero, size}
  */
-UIKIT_STATIC_INLINE CGRect CGRectFillToSize (CGSize size) {
+CG_INLINE CGRect CGRectFillToSize (CGSize size) {
     return (CGRect){CGPointZero, size};
 }
 
@@ -183,7 +231,7 @@ UIKIT_STATIC_INLINE CGRect CGRectFillToSize (CGSize size) {
  @param size 适应大小
  @return 最终位置
  */
-UIKIT_STATIC_INLINE CGRect CGRectFitToSize (CGRect rect, CGSize size) {
+CG_INLINE CGRect CGRectFitToSize (CGRect rect, CGSize size) {
     CGFloat x = (rect.size.width - size.width)/2.f;
     x = MAX(0.f, x);
     CGFloat y = (rect.size.height - size.height)/2.f;
@@ -197,7 +245,7 @@ UIKIT_STATIC_INLINE CGRect CGRectFitToSize (CGRect rect, CGSize size) {
  @param insets 块约束
  @return 位置
  */
-UIKIT_STATIC_INLINE CGRect CGRectFitInset(CGRect rect, UIEdgeInsets insets) {
+CG_INLINE CGRect CGRectFitInset(CGRect rect, UIEdgeInsets insets) {
     rect.origin.x += insets.left;
     rect.size.width -= insets.left + insets.right;
     rect.origin.y += insets.top;
@@ -213,7 +261,7 @@ UIKIT_STATIC_INLINE CGRect CGRectFitInset(CGRect rect, UIEdgeInsets insets) {
  @param side 边长
  @return CGRect结构体
  */
-UIKIT_STATIC_INLINE CGRect CGRectCenterSide(CGPoint center, CGFloat side) {
+CG_INLINE CGRect CGRectCenterSide(CGPoint center, CGFloat side) {
     CGRect rect = CGRectZero;
     rect.origin.x = center.x - fabs(side)/2.f;
     rect.origin.y = center.y - fabs(side)/2.f;
@@ -228,7 +276,7 @@ UIKIT_STATIC_INLINE CGRect CGRectCenterSide(CGPoint center, CGFloat side) {
  @param size 大小
  @return CGRect结构体
  */
-UIKIT_STATIC_INLINE CGRect CGRectCenterSize(CGPoint center, CGSize size) {
+CG_INLINE CGRect CGRectCenterSize(CGPoint center, CGSize size) {
     CGRect rect = CGRectZero;
     rect.origin.x = center.x - size.width/2.f;
     rect.origin.y = center.y - size.height/2.f;
@@ -242,7 +290,7 @@ UIKIT_STATIC_INLINE CGRect CGRectCenterSize(CGPoint center, CGSize size) {
  @param size 大小
  @return CGRect结构体
  */
-UIKIT_STATIC_INLINE CGRect CGRectOriginSize(CGPoint origin, CGSize size) {
+CG_INLINE CGRect CGRectOriginSize(CGPoint origin, CGSize size) {
     CGRect rect = CGRectZero;
     rect.origin = origin;
     rect.size = size;
@@ -255,7 +303,7 @@ UIKIT_STATIC_INLINE CGRect CGRectOriginSize(CGPoint origin, CGSize size) {
  @param multiplier 指定倍数
  @return CGRect结构体
  */
-UIKIT_STATIC_INLINE CGRect CGRectMultiplyByRatio(CGRect rect, CGFloat multiplier) {
+CG_INLINE CGRect CGRectMultiplyByRatio(CGRect rect, CGFloat multiplier) {
     return CGRectMake(rect.origin.x*multiplier, rect.origin.y*multiplier, rect.size.width*multiplier, rect.size.height*multiplier);
 }
 
