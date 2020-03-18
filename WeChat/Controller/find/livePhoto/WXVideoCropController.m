@@ -446,6 +446,7 @@
         exporter.outputPath = outputPath;
         exporter.outputRect = self.videoExportOutputRect;
         exporter.presetName = MNAssetExportPresetHighestQuality;
+        //exporter.renderSize = CGSizeMin(exporter.outputRect.size) < 1080.f ? CGSizeMultiplyToMin(exporter.outputRect.size, 1080.f) : exporter.outputRect.size;
         exporter.timeRange = [exporter timeRangeFromProgress:cutRange.location toProgress:MNMaxRange(cutRange)];
         [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
     } else {
