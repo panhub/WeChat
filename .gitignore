@@ -6,6 +6,7 @@
 ## WeChat/Vendor/AMap/AMap.bundle
 ## *.framework
 WeChat/Vendor/AMap/
+WeChat/Vendor/OpenCV-4.2.0/
 
 ## User settings
 xcuserdata/
