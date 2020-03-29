@@ -795,15 +795,15 @@
 		E89D2EAA2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E89D2EAB2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E89D2EAC2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
-		E89F23E0240DFD1A0060358E /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DB240DFD1A0060358E /* AMapLocationKit.framework */; };
-		E89F23E1240DFD1A0060358E /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DC240DFD1A0060358E /* AMapFoundationKit.framework */; };
-		E89F23E2240DFD1A0060358E /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E89F23DD240DFD1A0060358E /* AMap.bundle */; };
-		E89F23E3240DFD1A0060358E /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DE240DFD1A0060358E /* MAMapKit.framework */; };
-		E89F23E4240DFD1A0060358E /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */; };
 		E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F200C22413721C008F20BB /* KeyboardViewController.m */; };
 		E8F200C72413721C008F20BB /* NumberKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E8F200BF2413721C008F20BB /* NumberKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
+		E8FD03442430CA0D00841036 /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */; };
+		E8FD03452430CA0D00841036 /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */; };
+		E8FD03462430CA0D00841036 /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E8FD03412430CA0D00841036 /* AMap.bundle */; };
+		E8FD03472430CA0D00841036 /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03422430CA0D00841036 /* MAMapKit.framework */; };
+		E8FD03482430CA0D00841036 /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03432430CA0D00841036 /* AMapSearchKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2483,17 +2483,17 @@
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
 		E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNLayoutConstraint.h; sourceTree = "<group>"; };
 		E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNLayoutConstraint.m; sourceTree = "<group>"; };
-		E89F23DB240DFD1A0060358E /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
-		E89F23DC240DFD1A0060358E /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
-		E89F23DD240DFD1A0060358E /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
-		E89F23DE240DFD1A0060358E /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
-		E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
 		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
 		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
 		E8F200BF2413721C008F20BB /* NumberKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NumberKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8F200C12413721C008F20BB /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
 		E8F200C22413721C008F20BB /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		E8F200C42413721C008F20BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
+		E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
+		E8FD03412430CA0D00841036 /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
+		E8FD03422430CA0D00841036 /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
+		E8FD03432430CA0D00841036 /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2517,8 +2517,8 @@
 				2077A6612286C73E000EFB85 /* ExternalAccessory.framework in Frameworks */,
 				200FC0F122215A4C002B7763 /* Security.framework in Frameworks */,
 				200FC0CD22215903002B7763 /* SystemConfiguration.framework in Frameworks */,
-				E89F23E3240DFD1A0060358E /* MAMapKit.framework in Frameworks */,
-				E89F23E0240DFD1A0060358E /* AMapLocationKit.framework in Frameworks */,
+				E8FD03472430CA0D00841036 /* MAMapKit.framework in Frameworks */,
+				E8FD03442430CA0D00841036 /* AMapLocationKit.framework in Frameworks */,
 				E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */,
 				2004560C222D3FEE001E65D2 /* Intents.framework in Frameworks */,
 				2004560D222D3FEE001E65D2 /* IntentsUI.framework in Frameworks */,
@@ -2539,7 +2539,7 @@
 				200FC0DF222159E5002B7763 /* AddressBook.framework in Frameworks */,
 				200FC0DD222159DA002B7763 /* CoreLocation.framework in Frameworks */,
 				200FC0D922215978002B7763 /* MessageUI.framework in Frameworks */,
-				E89F23E1240DFD1A0060358E /* AMapFoundationKit.framework in Frameworks */,
+				E8FD03452430CA0D00841036 /* AMapFoundationKit.framework in Frameworks */,
 				200FC0D72221596C002B7763 /* Photos.framework in Frameworks */,
 				200FC0C9222158E9002B7763 /* libsqlite3.tbd in Frameworks */,
 				BF6F7CED239750AA00F928F3 /* libavcodec.a in Frameworks */,
@@ -2547,7 +2547,7 @@
 				200FBECC222157B8002B7763 /* libmp3lame.a in Frameworks */,
 				BF6F7CEB239750AA00F928F3 /* libavutil.a in Frameworks */,
 				BF6F7CEE239750AA00F928F3 /* libavformat.a in Frameworks */,
-				E89F23E4240DFD1A0060358E /* AMapSearchKit.framework in Frameworks */,
+				E8FD03482430CA0D00841036 /* AMapSearchKit.framework in Frameworks */,
 				BF6F7CEF239750AA00F928F3 /* libavdevice.a in Frameworks */,
 				200FBECF222157B8002B7763 /* libopencore-amrnb.a in Frameworks */,
 				BF6F7CEC239750AA00F928F3 /* libavfilter.a in Frameworks */,
@@ -2655,7 +2655,7 @@
 		200DEF8A221D7617006830B5 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
-				E89F23DA240DFD1A0060358E /* AMap */,
+				E8FD033E2430CA0D00841036 /* AMap */,
 				BF6F7C72239750AA00F928F3 /* FFmpeg */,
 				20A92A5B22F5C91300868FBE /* SDCycleScrollView */,
 				20805C7E22EDB99F00BD682B /* SDAutoLayout */,
@@ -6125,18 +6125,6 @@
 			path = MNLayoutConstraint;
 			sourceTree = "<group>";
 		};
-		E89F23DA240DFD1A0060358E /* AMap */ = {
-			isa = PBXGroup;
-			children = (
-				E89F23DB240DFD1A0060358E /* AMapLocationKit.framework */,
-				E89F23DC240DFD1A0060358E /* AMapFoundationKit.framework */,
-				E89F23DD240DFD1A0060358E /* AMap.bundle */,
-				E89F23DE240DFD1A0060358E /* MAMapKit.framework */,
-				E89F23DF240DFD1A0060358E /* AMapSearchKit.framework */,
-			);
-			path = AMap;
-			sourceTree = "<group>";
-		};
 		E8F200C02413721C008F20BB /* NumberKeyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -6148,6 +6136,18 @@
 				E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */,
 			);
 			path = NumberKeyboard;
+			sourceTree = "<group>";
+		};
+		E8FD033E2430CA0D00841036 /* AMap */ = {
+			isa = PBXGroup;
+			children = (
+				E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */,
+				E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */,
+				E8FD03412430CA0D00841036 /* AMap.bundle */,
+				E8FD03422430CA0D00841036 /* MAMapKit.framework */,
+				E8FD03432430CA0D00841036 /* AMapSearchKit.framework */,
+			);
+			path = AMap;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -6299,7 +6299,7 @@
 				200DEF74221D7181006830B5 /* Assets.xcassets in Resources */,
 				200FBFF8222157B8002B7763 /* MJRefresh.bundle in Resources */,
 				BF7B525523E5C815003DA959 /* WeChat.bundle in Resources */,
-				E89F23E2240DFD1A0060358E /* AMap.bundle in Resources */,
+				E8FD03462430CA0D00841036 /* AMap.bundle in Resources */,
 				BF6F923B23D5FBF800EF6774 /* MNCityPicker.plist in Resources */,
 				BFD03FD4238C0EC30004EAB5 /* InfoPlist.strings in Resources */,
 			);
