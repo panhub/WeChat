@@ -804,6 +804,7 @@
 		E8FD03462430CA0D00841036 /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E8FD03412430CA0D00841036 /* AMap.bundle */; };
 		E8FD03472430CA0D00841036 /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03422430CA0D00841036 /* MAMapKit.framework */; };
 		E8FD03482430CA0D00841036 /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03432430CA0D00841036 /* AMapSearchKit.framework */; };
+		E8FD03502430CE1900841036 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD034F2430CE1900841036 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2494,6 +2495,7 @@
 		E8FD03412430CA0D00841036 /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
 		E8FD03422430CA0D00841036 /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
 		E8FD03432430CA0D00841036 /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
+		E8FD034F2430CE1900841036 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2501,6 +2503,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8FD03502430CE1900841036 /* Accelerate.framework in Frameworks */,
 				BFAFFFAA23965BE000BB659E /* libiconv.tbd in Frameworks */,
 				BFAFFFA823965BD700BB659E /* libbz2.tbd in Frameworks */,
 				200FC0D322215932002B7763 /* libz.tbd in Frameworks */,
@@ -3873,6 +3876,7 @@
 		200FC0C7222158E9002B7763 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E8FD034F2430CE1900841036 /* Accelerate.framework */,
 				BFAFFFA923965BE000BB659E /* libiconv.tbd */,
 				BFAFFFA723965BD700BB659E /* libbz2.tbd */,
 				BFAFFFA523965BC300BB659E /* VideoToolbox.framework */,
@@ -7246,6 +7250,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_ENTITLEMENTS = WeChat/WeChat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -7256,6 +7261,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeChat/Vendor/AMap",
+					"$(PROJECT_DIR)/WeChat/Vendor/OpenCV-4.2.0",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/WeChat/WeChat.pch";
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/WeChat/Vendor/FFmpeg/include";
@@ -7285,6 +7291,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_ENTITLEMENTS = WeChat/WeChat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -7293,6 +7300,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeChat/Vendor/AMap",
+					"$(PROJECT_DIR)/WeChat/Vendor/OpenCV-4.2.0",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/WeChat/WeChat.pch";
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/WeChat/Vendor/FFmpeg/include";
