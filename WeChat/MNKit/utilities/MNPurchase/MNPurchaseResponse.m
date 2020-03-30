@@ -55,11 +55,11 @@
         } break;
         case MNPurchaseResponseCodeRestored:
         {
-            msg = @"已有产品购买中,请耐心等待";
+            msg = @"消耗型商品购买后不可恢复";
         } break;
         case MNPurchaseResponseCodeRestoreUnknown:
         {
-            msg = @"未发现购买记录";
+            msg = @"未发现可恢复购买产品";
         } break;
         case MNPurchaseResponseCodeVerifyError:
         {

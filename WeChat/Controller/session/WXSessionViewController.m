@@ -111,9 +111,12 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self.view showLoadDialog:@"购买中"];
-    [[MNPurchaseManager defaultManager] startPurchaseProduct:@"10001" completionHandler:^(MNPurchaseResponse *response) {
-        [self.view closeDialog];
+    [self.view showLoadDialog:@"产品购买中"];
+//    [[MNPurchaseManager defaultManager] restoreCompletedPurchaseWithCompletionHandler:^(MNPurchaseResponse *response) {
+//        [self.view closeDialog];
+//    }];
+    [[MNPurchaseManager defaultManager] startPurchaseProduct:@"1" completionHandler:^(MNPurchaseResponse *response) {
+        [self.view showInfoDialog:response.message];
     }];
     return;
     MNTableViewCell *cell = (MNTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];

@@ -11,7 +11,6 @@
 #import "MNURLDataRequest.h"
 #import <StoreKit/StoreKit.h>
 
-#define kMNPurchaseReceiptIdentifier  @"com.mn.purchase.receipt.identifier"
 #define MNReceiptVerifyItunes    @"https://buy.itunes.apple.com/verifyReceipt"
 #define MNReceiptVerifySandbox    @"https://sandbox.itunes.apple.com/verifyReceipt"
 
@@ -224,7 +223,7 @@ static MNPurchaseManager *_manager;
         return;
     }
     receipt.identifier = productIdentifier;
-    if (receipt.identifier) receipt.identifier = transaction.transactionIdentifier;
+    if (receipt.identifier <= 0) receipt.identifier = transaction.transactionIdentifier;
     if (transaction.originalTransaction || self.request.isSubscribe) receipt.subscribe = YES;
     if (transaction.transactionState == SKPaymentTransactionStateRestored) receipt.restore = YES;
     // 将凭证保存沙盒
@@ -241,7 +240,7 @@ static MNPurchaseManager *_manager;
     if (transaction.transactionState == SKPaymentTransactionStateRestored) {
         code = MNPurchaseResponseCodeRestored;
     } else if (transaction.error.code == SKErrorPaymentCancelled) {
-        code = MNPurchaseResponseCodeRestored;
+        code = MNPurchaseResponseCodeCancelled;
     }
     // 结束前检查是否有本地凭证, 有则删除
     if ([MNPurchaseReceipt.localReceipt.identifier isEqualToString:transaction.payment.productIdentifier]) {
@@ -280,22 +279,15 @@ static MNPurchaseManager *_manager;
         }
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         if (!json || error) {
-            [MNPurchaseReceipt removeLocalReceipt];
             [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
             return;
         }
-        NSString *status = [NSString stringWithFormat:@"%@",json[@"status"]];
-        if (status.length) {
-            NSInteger code = status.integerValue;
-            if (code == MNPurchaseResponseCodeServerError || code == MNPurchaseResponseCodeSandboxError) {
-                [self verifyReceiptToItunes:receipt sandbox:!isSandbox];
-            } else {
-                [MNPurchaseReceipt removeLocalReceipt];
-                [self finishPurchaseWithCode:code];
-            }
+        NSInteger status = [[json objectForKey:@"status"] integerValue];
+        if (status == MNPurchaseResponseCodeServerError || status == MNPurchaseResponseCodeSandboxError) {
+            [self verifyReceiptToItunes:receipt sandbox:!isSandbox];
         } else {
-            [MNPurchaseReceipt removeLocalReceipt];
-            [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
+            if (status == MNPurchaseResponseCodeSucceed) [MNPurchaseReceipt removeLocalReceipt];
+            [self finishPurchaseWithCode:status];
         }
     }];
     [dataTask resume];
