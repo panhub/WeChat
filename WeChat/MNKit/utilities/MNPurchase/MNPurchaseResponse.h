@@ -12,7 +12,7 @@ typedef NS_ENUM(NSInteger, MNPurchaseResponseCode) {
     MNPurchaseResponseCodeFailed = 0,
     MNPurchaseResponseCodeSucceed = 1,
     MNPurchaseResponseCodeCancelled = 2,
-    MNPurchaseResponseCodeNeedVerify = 3,
+    MNPurchaseResponseCodeExistReceipt = 3,
     MNPurchaseResponseCodeCannotPayment = 4,
     MNPurchaseResponseCodeRestored = 5,
     MNPurchaseResponseCodeRestoreUnknown = 6,

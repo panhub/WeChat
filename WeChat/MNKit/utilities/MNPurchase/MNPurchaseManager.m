@@ -7,7 +7,6 @@
 //
 
 #import "MNPurchaseManager.h"
-#import "MNPurchaseRequest.h"
 #import "MNPurchaseReceipt.h"
 #import "MNURLDataRequest.h"
 #import <StoreKit/StoreKit.h>
@@ -87,6 +86,13 @@ static MNPurchaseManager *_manager;
     // 开启监测
     [self startTransactionObserve];
     // 检查是否满足内购要求
+    if (self.request) return;
+    if (MNPurchaseReceipt.hasLocalReceipt) {
+        if (completionHandler) {
+            completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeExistReceipt]);
+        }
+        return;
+    }
     if (self.canPayment == NO) {
         if (completionHandler) {
             completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeCannotPayment]);
@@ -106,7 +112,14 @@ static MNPurchaseManager *_manager;
     // 开启检测
     [self startTransactionObserve];
     // 检查是否满足内购要求
-    if (request.productIdentifier.length <= 0 || request.isRestore || self.canPayment == NO) {
+    if (self.request || request.productIdentifier.length <= 0 || request.isRestore) return;
+    if (MNPurchaseReceipt.hasLocalReceipt) {
+        if (request.completionHandler) {
+            request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeExistReceipt]);
+        }
+        return;
+    }
+    if (self.canPayment == NO) {
         if (request.completionHandler) {
             request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeCannotPayment]);
         }
@@ -142,11 +155,6 @@ static MNPurchaseManager *_manager;
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = 1;
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-}
-
-- (void)requestDidFinish:(SKRequest *)request {
-    if (![request isKindOfClass:SKProductsRequest.class]) return;
-    NSLog(@"产品请求结束===%@", ((SKProductsRequest *)request).productIdentifier);
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
@@ -270,7 +278,7 @@ static MNPurchaseManager *_manager;
             [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
             return;
         }
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         if (!json || error) {
             [MNPurchaseReceipt removeLocalReceipt];
             [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
@@ -279,7 +287,7 @@ static MNPurchaseManager *_manager;
         NSString *status = [NSString stringWithFormat:@"%@",json[@"status"]];
         if (status.length) {
             NSInteger code = status.integerValue;
-            if (code == MNPurchaseResponseCodeSandboxError) {
+            if (code == MNPurchaseResponseCodeServerError || code == MNPurchaseResponseCodeSandboxError) {
                 [self verifyReceiptToItunes:receipt sandbox:!isSandbox];
             } else {
                 [MNPurchaseReceipt removeLocalReceipt];
@@ -338,7 +346,7 @@ static MNPurchaseManager *_manager;
 
 #pragma mark - Getter
 - (BOOL)canPayment {
-    if (self.request || MNPurchaseReceipt.localReceipt.receipt.length || UIDevice.isBreakDevice) return NO;
+    if (UIDevice.isBreakDevice) return NO;
     return [SKPaymentQueue canMakePayments];
 }
 

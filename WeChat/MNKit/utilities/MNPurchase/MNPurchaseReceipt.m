@@ -31,6 +31,7 @@
 
 + (instancetype)localReceipt {
     NSData *receiptData = [MNKeyChain dataForKey:kMNPurchaseReceipt];
+    if (receiptData.length <= 0) return nil;
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:receiptData options:kNilOptions error:nil];
     if (dic.allKeys.count <= 0) return nil;
     //NSDictionary *dic = [NSUserDefaults.standardUserDefaults objectForKey:kMNPurchaseReceipt];

@@ -97,7 +97,7 @@
 #import "MNCapturer.h"
 #import "MNQRCode.h"
 #import "MNEmojiManager.h"
-#import "MNPurchaseRequest.h"
+#import "MNPurchaseManager.h"
 #import "MNAddressBook.h"
 #import "MNTouchContext.h"
 #import "MNRotationGestureRecognizer.h"

@@ -120,6 +120,9 @@
     [[MNChatHelper helper] asyncLoadContacts];
     /// 加载公共数据
     [[MNConfiguration configuration] loadDataWithCompletionHandler:nil];
+    /// 内购
+    MNPurchaseManager.defaultManager.allowsAlertIfNeeded = YES;
+    [[MNPurchaseManager defaultManager] startTransactionObserve];
     /// 触发联网提示
     MNNetworkReachability *reachability = [MNNetworkReachability reachability];
     [reachability startMonitoring];

@@ -111,6 +111,11 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.view showLoadDialog:@"购买中"];
+    [[MNPurchaseManager defaultManager] startPurchaseProduct:@"10001" completionHandler:^(MNPurchaseResponse *response) {
+        [self.view closeDialog];
+    }];
+    return;
     MNTableViewCell *cell = (MNTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
     if (cell.isEdit) {
         [cell endEditingUsingAnimation];

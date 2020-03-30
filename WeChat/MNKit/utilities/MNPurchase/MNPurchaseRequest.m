@@ -8,7 +8,6 @@
 
 #import "MNPurchaseRequest.h"
 #import "MNPurchaseManager.h"
-#import <StoreKit/StoreKit.h>
 
 @interface MNPurchaseRequest ()
 
