@@ -6108,14 +6108,14 @@
 			children = (
 				BFF5E757235D980600DAC98B /* MNPurchaseHandler.h */,
 				BFF5E758235D980600DAC98B /* MNPurchaseHandler.m */,
-				BFF5E754235D8FB100DAC98B /* MNPurchaseResponse.h */,
-				BFF5E755235D8FB100DAC98B /* MNPurchaseResponse.m */,
-				BFF5E751235D865100DAC98B /* MNPurchaseReceipt.h */,
-				BFF5E752235D865100DAC98B /* MNPurchaseReceipt.m */,
 				BFF5E74E235D863200DAC98B /* MNPurchaseManager.h */,
 				BFF5E74F235D863200DAC98B /* MNPurchaseManager.m */,
+				BFF5E751235D865100DAC98B /* MNPurchaseReceipt.h */,
+				BFF5E752235D865100DAC98B /* MNPurchaseReceipt.m */,
 				BF83E7A0235DF02B003E9D60 /* MNPurchaseRequest.h */,
 				BF83E7A1235DF02B003E9D60 /* MNPurchaseRequest.m */,
+				BFF5E754235D8FB100DAC98B /* MNPurchaseResponse.h */,
+				BFF5E755235D8FB100DAC98B /* MNPurchaseResponse.m */,
 			);
 			path = MNPurchase;
 			sourceTree = "<group>";

@@ -149,6 +149,22 @@ static MNPurchaseManager *_manager;
     });
 }
 
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
+    
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
+    
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
+    
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedDownloads:(NSArray<SKDownload *> *)downloads {
+    
+}
+
 #pragma mark - Updated Transaction
 - (void)completeTransaction:(SKPaymentTransaction *)transaction {
     if (transaction.originalTransaction) {
@@ -198,6 +214,10 @@ static MNPurchaseManager *_manager;
 
 - (BOOL)canPayment {
     return [SKPaymentQueue canMakePayments];
+}
+
+- (void)showErrorAlertViewMessage:(NSString *)msg {
+    [[[UIAlertView alloc] initWithTitle:nil message:msg delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil] show];
 }
 
 #pragma mark - dealloc
