@@ -30,34 +30,6 @@
 }
 @end
 
-@interface MNPurchaseRequest (MNHelper)
-@property (nonatomic) NSInteger requestCount;
-@property (nonatomic, getter=isSubscribe) BOOL subscribe;
-@end
-
-@implementation MNPurchaseRequest (MNHelper)
-- (void)setRequestCount:(NSInteger)requestCount {
-    objc_setAssociatedObject(self, "com.mn.product.request.count", @(requestCount), OBJC_ASSOCIATION_RETAIN);
-}
-
-- (NSInteger)requestCount {
-    NSNumber *n = objc_getAssociatedObject(self, "com.mn.product.request.count");
-    if (n) return n.integerValue;
-    return 0;
-}
-
-- (void)setSubscribe:(BOOL)subscribe {
-    objc_setAssociatedObject(self, "com.mn.product.purchase.subscribe", @(subscribe), OBJC_ASSOCIATION_RETAIN);
-}
-
-- (BOOL)isSubscribe {
-    NSNumber *n = objc_getAssociatedObject(self, "com.mn.product.purchase.subscribe");
-    if (n) return n.boolValue;
-    return NO;
-}
-
-@end
-
 @interface MNPurchaseManager ()<SKPaymentTransactionObserver, SKProductsRequestDelegate>
 @property (nonatomic, strong) MNPurchaseRequest *request;
 @end
@@ -86,11 +58,16 @@ static MNPurchaseManager *_manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _manager = [super init];
-        if (_manager) {
-            [[SKPaymentQueue defaultQueue] addTransactionObserver:_manager];
-        }
     });
     return _manager;
+}
+
+- (void)startTransactionObserve {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self verifyReceiptIfNeeded];
+        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    });
 }
 
 - (void)startPurchaseProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler {
@@ -99,24 +76,47 @@ static MNPurchaseManager *_manager;
     [self startRequest:request];
 }
 
-- (void)startRequest:(MNPurchaseRequest *)request {
-    /// 检查是否可请求
-    if (request.productIdentifier.length <= 0 || self.request) {
-        if (request.completionHandler) {
-            request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeRepeated]);
+- (void)startSubscribeProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler {
+    MNPurchaseRequest *request = [[MNPurchaseRequest alloc] initWithProductIdentifier:productId];
+    request.subscribe = YES;
+    request.completionHandler = completionHandler;
+    [self startRequest:request];
+}
+
+- (void)restoreCompletedPurchaseWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler {
+    // 开启监测
+    [self startTransactionObserve];
+    // 检查是否满足内购要求
+    if (self.canPayment == NO) {
+        if (completionHandler) {
+            completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeCannotPayment]);
         }
         return;
     }
-    /// 检查是否支持内购
-    if (self.canPayment == NO) {
+    // 保存请求
+    MNPurchaseRequest *request = MNPurchaseRequest.new;
+    request.completionHandler = completionHandler;
+    request.restore = YES;
+    self.request = request;
+    // 开启恢复购买请求
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
+- (void)startRequest:(MNPurchaseRequest *)request {
+    // 开启检测
+    [self startTransactionObserve];
+    // 检查是否满足内购要求
+    if (request.productIdentifier.length <= 0 || request.isRestore || self.canPayment == NO) {
         if (request.completionHandler) {
             request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeCannotPayment]);
         }
         return;
     }
-    /// 保存请求
+    // 结束所有未完成内购
+    [self finishUncompleteTransactions];
+    // 保存请求
     self.request = request;
-    /// 开始请求
+    // 开始请求
     [self startProductRequest];
 }
 
@@ -157,7 +157,7 @@ static MNPurchaseManager *_manager;
 - (void)productsRequest:(SKProductsRequest *)reqs didFailWithError:(NSError *)error {
     if ([reqs.productIdentifier isEqualToString:self.request.productIdentifier]) {
         if (self.request.requestCount >= self.request.requestOutCount) {
-            [self finishPurchaseWithCode:MNPurchaseResponseCodeProductError];
+            [self finishPurchaseWithCode:MNPurchaseResponseCodeRequestError];
         } else {
             [self startProductRequest];
         }
@@ -169,29 +169,39 @@ static MNPurchaseManager *_manager;
     dispatch_async(dispatch_get_main_queue(), ^{
         for (SKPaymentTransaction *transaction in transactions) {
             switch (transaction.transactionState) {
-                case SKPaymentTransactionStatePurchasing:
+                case SKPaymentTransactionStateRestored:
                 {
-                    // 添加到支付行列
+                    if (self.request && self.request.isRestore == NO) {
+                        [self finishTransaction:transaction];
+                    } else {
+                        [self completeTransaction:transaction];
+                    }
                 } break;
                 case SKPaymentTransactionStatePurchased:
                 {
-                    if (transaction.originalTransaction) {
-                        // 订阅
-                    }
                     [self completeTransaction:transaction];
                 } break;
-                case SKPaymentTransactionStateRestored:
                 case SKPaymentTransactionStateFailed:
                 {
                     [self finishTransaction:transaction];
                 } break;
                 default:
-                {
-                    
-                } break;
+                    break;
             }
         }
     });
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
+    if ([queue.transactions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.transactionState == %@", @(SKPaymentTransactionStateRestored)]].count <= 0 && self.request.isRestore) {
+        [self finishPurchaseWithCode:MNPurchaseResponseCodeRestoreUnknown];
+    }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
+    if (self.request.isRestore) {
+        [self finishPurchaseWithCode:MNPurchaseResponseCodeRestoreUnknown];
+    }
 }
 
 - (void)completeTransaction:(SKPaymentTransaction *)transaction {
@@ -206,55 +216,89 @@ static MNPurchaseManager *_manager;
         return;
     }
     receipt.identifier = productIdentifier;
-    if (self.request && [productIdentifier isEqualToString:self.request.productIdentifier]) {
-        receipt.subscribe = self.request.isSubscribe;
-    } else {
-        // 是上次验证失败的订单
-        receipt.subscribe = MNPurchaseReceipt.localReceipt.isSubscribe;
-        if (receipt.identifier <= 0) {
-            receipt.identifier = MNPurchaseReceipt.localReceipt.identifier;
-            if (receipt.identifier <= 0) receipt.identifier = @"com.mn.purchase.receipt.identifier";
-        }
-    }
+    if (receipt.identifier) receipt.identifier = transaction.transactionIdentifier;
+    if (transaction.originalTransaction || self.request.isSubscribe) receipt.subscribe = YES;
+    if (transaction.transactionState == SKPaymentTransactionStateRestored) receipt.restore = YES;
     // 将凭证保存沙盒
     [receipt saveReceiptToLocal];
-    // 验证凭证
-    [self verifyPurchaseWithReceipt:receipt];
+    // 无论验证是否通过都结束此次内购操作,否则会出现虚假凭证信息一直验证不通过,每次进入程序都得输入苹果账号;
+    // 收据已保存,下次开启支付前会检查收据,再次验证
+    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    // 验证收据
+    [self verifyReceiptIfNeeded];
 }
 
-- (void)verifyPurchaseWithReceipt:(MNPurchaseReceipt *)receipt {
-#if DEBUG
+- (void)finishTransaction:(SKPaymentTransaction *)transaction {
+    MNPurchaseResponseCode code = MNPurchaseResponseCodeFailed;
+    if (transaction.transactionState == SKPaymentTransactionStateRestored) {
+        code = MNPurchaseResponseCodeRestored;
+    } else if (transaction.error.code == SKErrorPaymentCancelled) {
+        code = MNPurchaseResponseCodeRestored;
+    }
+    // 结束前检查是否有本地凭证, 有则删除
+    if ([MNPurchaseReceipt.localReceipt.identifier isEqualToString:transaction.payment.productIdentifier]) {
+        [MNPurchaseReceipt removeLocalReceipt];
+    }
+    // 结束此次内购操作
+    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    // 回调结果
+    [self finishPurchaseWithCode:code];
+}
+
+#pragma mark - 验证收据
+- (void)verifyReceiptIfNeeded {
+    MNPurchaseReceipt *receipt = MNPurchaseReceipt.localReceipt;
+    if (!receipt) return;
+    #if DEBUG
+    // 默认先验证正式环境, 返回环境错误再验证沙箱环境
+    [self verifyReceiptToItunes:receipt sandbox:NO];
+    #else
+    [self verifyReceiptToServer:receipt];
+    #endif
+}
+
+- (void)verifyReceiptToItunes:(MNPurchaseReceipt *)receipt sandbox:(BOOL)isSandbox {
+    NSString *url = isSandbox ? MNReceiptVerifySandbox : MNReceiptVerifyItunes;
     NSString *body = [NSString stringWithFormat:@"{\"receipt-data\":\"%@\"",receipt.receipt];
     body = receipt.isSubscribe ? [NSString stringWithFormat:@"%@,\"password\":\"%@\"}", body, self.sharedKey] : [NSString stringWithFormat:@"%@}",body];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:MNReceiptVerifySandbox] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.f];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.f];
     request.HTTPMethod = @"POST";
     request.HTTPBody = [body dataUsingEncoding:NSUTF8StringEncoding];
-    NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        // 官方验证结果为空
-        if (data == nil)
-        {
+    NSURLSessionDataTask *dataTask = [NSURLSession.sharedSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (data.length <= 0 || error) {
+            NSLog(@"验证请求失败");
+            [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
             return;
         }
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
-        if (dict != nil) {
-            //~验证成功
-            if ([dict[@"status"] intValue] == 0) {
-             
-            }
-            else {
-                
-            }
-            
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        if (!json || error) {
+            [MNPurchaseReceipt removeLocalReceipt];
+            [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
+            return;
         }
-        else {
-        
+        NSString *status = [NSString stringWithFormat:@"%@",json[@"status"]];
+        if (status.length) {
+            NSInteger code = status.integerValue;
+            if (code == MNPurchaseResponseCodeSandboxError) {
+                [self verifyReceiptToItunes:receipt sandbox:!isSandbox];
+            } else {
+                [MNPurchaseReceipt removeLocalReceipt];
+                [self finishPurchaseWithCode:code];
+            }
+        } else {
+            [MNPurchaseReceipt removeLocalReceipt];
+            [self finishPurchaseWithCode:MNPurchaseResponseCodeVerifyError];
         }
     }];
     [dataTask resume];
-#else
+}
+
+- (void)verifyReceiptToServer:(MNPurchaseReceipt *)receipt {
     // 向服务器验证凭证<地址, 参数自定>
     MNURLDataRequest *request = MNURLDataRequest.new;
     request.method = MNURLHTTPMethodPost;
+    request.timeoutInterval = 15.f;
+    request.cachePolicy = MNURLDataCacheNever;
     [request loadData:^{
         
     } completion:^(MNURLResponse *response) {
@@ -265,33 +309,31 @@ static MNPurchaseManager *_manager;
             [self finishTransaction:nil];
         }
     }];
-#endif
 }
 
-#pragma mark - Updated Transaction
-- (void)finishTransaction:(SKPaymentTransaction *)transaction {
-    // transaction.originalTransaction
-    MNPurchaseResponseCode code = MNPurchaseResponseCodeFailed;
-    if (transaction.transactionState == SKPaymentTransactionStateRestored) {
-        code = MNPurchaseResponseCodeRestored;
-    } else {
-        
+- (void)finishUncompleteTransactions {
+    for (SKPaymentTransaction *transaction in SKPaymentQueue.defaultQueue.transactions) {
+        if (transaction.transactionState == SKPaymentTransactionStatePurchased ||
+            transaction.transactionState == SKPaymentTransactionStateRestored) {
+            [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+        }
     }
-    //NSString *productIdentifier = transaction.payment.productIdentifier;
-    
 }
 
-#pragma mark - Private
 - (void)finishPurchaseWithCode:(MNPurchaseResponseCode)responseCode {
-    MNPurchaseManager *manager = MNPurchaseManager.defaultManager;
-    if (!manager.request || !manager.request.completionHandler) return;
+    MNPurchaseRequest *request = self.request;
+    if (!request) return;
+    MNPurchaseManager.defaultManager.request = nil;
     MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (manager.request.completionHandler) {
-            manager.request.completionHandler(response);
-        }
-        manager.request = nil;
+        if (request.completionHandler) request.completionHandler(response);
+        [self showAlertWithResponse:response];
     });
+}
+
+- (void)showAlertWithResponse:(MNPurchaseResponse *)response {
+    if (self.isAllowsAlertIfNeeded == NO || response.code == MNPurchaseResponseCodeSucceed) return;
+    [[[UIAlertView alloc] initWithTitle:nil message:response.message delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil] show];
 }
 
 #pragma mark - Getter

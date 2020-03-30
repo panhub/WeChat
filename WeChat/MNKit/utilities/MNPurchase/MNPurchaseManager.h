@@ -18,13 +18,18 @@
 @property (nonatomic, copy) NSString *sharedKey;
 
 /**使用弹窗提示错误信息<几个重要错误>*/
-@property (nonatomic) BOOL useAlertHintIfNeeded;
+@property (nonatomic, getter=isAllowsAlertIfNeeded) BOOL allowsAlertIfNeeded;
 
 /**
  内购管理者实例化入口
  @return 内购管理者
 */
 + (MNPurchaseManager *)defaultManager;
+
+/**
+ 开启内购监听, 检查本地收据并尝试再次验证
+*/
+- (void)startTransactionObserve;
 
 /**
  开始内购请求
@@ -38,6 +43,19 @@
  @param completionHandler 结束回调
 */
 - (void)startPurchaseProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler;
+
+/**
+ 开始订阅产品
+ @param productId 指定产品ID
+ @param completionHandler 结束回调
+*/
+- (void)startSubscribeProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler;
+
+/**
+ 恢复购买
+ @param completionHandler 结束回调
+*/
+- (void)restoreCompletedPurchaseWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler;
 
 @end
 

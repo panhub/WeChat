@@ -13,17 +13,41 @@ typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 
 @interface MNPurchaseRequest : NSObject
 
-/// 请求产品信息失败后的尝试次数
+/**请求产品信息失败后的尝试次数*/
 @property (nonatomic) NSInteger requestOutCount;
 
-/// 请求结束回调
+/**请求结束回调*/
 @property (nonatomic, copy) MNPurchaseRequestHandler completionHandler;
 
-/// 产品标识
+/**产品标识*/
 @property (nonatomic, copy) NSString *productIdentifier;
 
+/**
+ 依据产品标识构造
+ @param identifier 产品标识
+ @return 产品请求
+*/
 - (instancetype)initWithProductIdentifier:(NSString *)identifier;
 
+/**
+ 开启产品请求
+ @param completionHandler 结束回调
+*/
 - (void)startRequestWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler;
 
 @end
+
+
+@interface MNPurchaseRequest (MNPurchasing)
+
+/**产品请求次数记录*/
+@property (nonatomic) NSInteger requestCount;
+
+/**是否是恢复购买*/
+@property (nonatomic, getter=isRestore) BOOL restore;
+
+/**是否是订阅*/
+@property (nonatomic, getter=isSubscribe) BOOL subscribe;
+
+@end
+

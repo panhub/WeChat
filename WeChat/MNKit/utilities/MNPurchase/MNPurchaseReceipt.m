@@ -7,11 +7,13 @@
 //
 
 #import "MNPurchaseReceipt.h"
+#import "MNKeyChain.h"
 
 #define kMNPurchaseReceipt    @"com.mn.purchase.receipt.key"
 #define kMNPurchaseReceiptString    @"receipt"
 #define kMNPurchaseReceiptIdentifier    @"identifier"
 #define kMNPurchaseReceiptSubscribe    @"subscribe"
+#define kMNPurchaseReceiptRestore    @"restore"
 #define MNPurchaseReceiptArchivePath  [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:NSStringFromClass(MNPurchaseReceipt.class)]
 
 @interface MNPurchaseReceipt ()
@@ -28,16 +30,21 @@
 }
 
 + (instancetype)localReceipt {
-    NSDictionary *dic = [NSUserDefaults.standardUserDefaults objectForKey:kMNPurchaseReceipt];
+    NSData *receiptData = [MNKeyChain dataForKey:kMNPurchaseReceipt];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:receiptData options:kNilOptions error:nil];
+    if (dic.allKeys.count <= 0) return nil;
+    //NSDictionary *dic = [NSUserDefaults.standardUserDefaults objectForKey:kMNPurchaseReceipt];
     NSString *receipt = [dic objectForKey:kMNPurchaseReceiptString];
     if (!receipt || receipt.length <= 0) return nil;
-    NSNumber *subscribe = [dic objectForKey:kMNPurchaseReceiptSubscribe];
+    BOOL restore = [[dic objectForKey:kMNPurchaseReceiptRestore] boolValue];
+    BOOL subscribe = [[dic objectForKey:kMNPurchaseReceiptSubscribe] boolValue];
     NSString *identifier = [dic objectForKey:kMNPurchaseReceiptIdentifier];
     if (identifier.length <= 0) identifier = @"com.mn.purchase.receipt.identifier";
     MNPurchaseReceipt *r = MNPurchaseReceipt.new;
     r.identifier = identifier;
     r.receipt = receipt;
-    r.subscribe = subscribe ? subscribe.boolValue : NO;
+    r.restore = restore;
+    r.subscribe = subscribe;
     return r;
     /*
     NSData *receiptData = [[NSData alloc] initWithContentsOfFile:MNPurchaseReceiptArchivePath];
@@ -55,8 +62,11 @@
 }
 
 + (BOOL)removeLocalReceipt {
+    return [MNKeyChain removeItemForKey:kMNPurchaseReceipt];
+    /*
     [NSUserDefaults.standardUserDefaults removeObjectForKey:kMNPurchaseReceipt];
     return YES;
+    */
     /*
     if ([NSFileManager.defaultManager fileExistsAtPath:MNPurchaseReceiptArchivePath] == NO) return YES;
     return [NSFileManager.defaultManager removeItemAtPath:MNPurchaseReceiptArchivePath error:nil];
@@ -67,11 +77,17 @@
     if (self.receipt.length <= 0) return NO;
     NSMutableDictionary *dic = @{}.mutableCopy;
     [dic setObject:self.receipt forKey:kMNPurchaseReceiptString];
+    [dic setObject:@(self.isRestore) forKey:kMNPurchaseReceiptRestore];
     [dic setObject:@(self.isSubscribe) forKey:kMNPurchaseReceiptSubscribe];
     if (self.identifier.length) [dic setObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
+    NSData *receiptData = [NSJSONSerialization dataWithJSONObject:dic options:kNilOptions error:nil];
+    if (receiptData.length <= 0) return NO;
+    return [MNKeyChain setData:receiptData forKey:kMNPurchaseReceipt];
+    /*
     [NSUserDefaults.standardUserDefaults setObject:dic.copy forKey:kMNPurchaseReceipt];
     [NSUserDefaults.standardUserDefaults synchronize];
     return YES;
+    */
     /*
     NSData *receiptData = NSData.data;
     #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
@@ -85,6 +101,10 @@
     #endif
     return [receiptData writeToFile:MNPurchaseReceiptArchivePath atomically:YES];
     */
+}
+
++ (BOOL)hasLocalReceipt {
+    return self.localReceipt != nil;
 }
 
 #pragma mark - NSSecureCoding

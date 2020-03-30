@@ -43,3 +43,38 @@
 }
 
 @end
+
+
+
+@implementation MNPurchaseRequest (MNPurchasing)
+- (void)setRequestCount:(NSInteger)requestCount {
+    objc_setAssociatedObject(self, "com.mn.product.request.count", @(requestCount), OBJC_ASSOCIATION_RETAIN);
+}
+
+- (NSInteger)requestCount {
+    NSNumber *n = objc_getAssociatedObject(self, "com.mn.product.request.count");
+    if (n) return n.integerValue;
+    return 0;
+}
+
+- (void)setSubscribe:(BOOL)subscribe {
+    objc_setAssociatedObject(self, "com.mn.product.purchase.subscribe", @(subscribe), OBJC_ASSOCIATION_RETAIN);
+}
+
+- (BOOL)isSubscribe {
+    NSNumber *n = objc_getAssociatedObject(self, "com.mn.product.purchase.subscribe");
+    if (n) return n.boolValue;
+    return NO;
+}
+
+- (void)setRestore:(BOOL)restore {
+    objc_setAssociatedObject(self, "com.mn.product.purchase.restore", @(restore), OBJC_ASSOCIATION_RETAIN);
+}
+
+- (BOOL)isRestore {
+    NSNumber *n = objc_getAssociatedObject(self, "com.mn.product.purchase.restore");
+    if (n) return n.boolValue;
+    return NO;
+}
+
+@end
