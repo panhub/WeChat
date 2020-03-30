@@ -106,9 +106,9 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
 @property (nonatomic, readonly) MNAssetExportStatus status;
 
 /**
-依据资源文件实例化输出者
-@param asset 资源文件
-@return 视/音输出者
+ 依据资源文件实例化输出者
+ @param asset 资源文件
+ @return 视/音输出者
 */
 - (instancetype)initWithAsset:(AVAsset *)asset;
 

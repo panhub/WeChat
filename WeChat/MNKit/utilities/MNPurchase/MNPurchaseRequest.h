@@ -7,27 +7,23 @@
 //  内购产品请求
 
 #import <Foundation/Foundation.h>
-#import "MNPurchaseReceipt.h"
 #import "MNPurchaseResponse.h"
 
-typedef BOOL(^MNPurchaseReceiptHandler)(MNPurchaseReceipt *receipt);
 typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 
 @interface MNPurchaseRequest : NSObject
 
 /// 请求产品信息失败后的尝试次数
 @property (nonatomic) NSInteger requestOutCount;
-/// 请求次数
-@property (nonatomic) NSInteger requestCount;
 
-@property (nonatomic, readonly) NSString *productIdentifier;
+/// 请求结束回调
+@property (nonatomic, copy) MNPurchaseRequestHandler completionHandler;
+
+/// 产品标识
+@property (nonatomic, copy) NSString *productIdentifier;
 
 - (instancetype)initWithProductIdentifier:(NSString *)identifier;
 
-- (void)startRequestPaymentWithReceiptHandler:(MNPurchaseReceiptHandler)receiptHandler completionHandler:(MNPurchaseRequestHandler)completionHandler;
-
-- (void)completeRequestWithReceiptData:(NSData *)receiptData;
-
-- (void)finishRequestWithResponseCode:(MNPurchaseResponseCode)responseCode;
+- (void)startRequestWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler;
 
 @end

@@ -88,12 +88,15 @@ static NSString * NSObjectAssociatedUserInfoKey = @"com.mn.obj.user.info.key";
 #pragma mark - 对象序列化
 - (NSData *)archivedData {
     if (([self conformsToProtocol:@protocol(NSSecureCoding)] || [self conformsToProtocol:@protocol(NSCoding)]) && [self respondsToSelector:@selector(encodeWithCoder:)]) {
-        #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 120000
-        if (@available(iOS 12.0, *)) {
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+        if (@available(iOS 11.0, *)) {
             return [NSKeyedArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:nil];
+        } else {
+            return [NSKeyedArchiver archivedDataWithRootObject:self];
         }
-        #endif
+        #else
         return [NSKeyedArchiver archivedDataWithRootObject:self];
+        #endif
     }
     return nil;
 }
@@ -101,12 +104,15 @@ static NSString * NSObjectAssociatedUserInfoKey = @"com.mn.obj.user.info.key";
 #pragma mark - 对象反序列化
 + (id)unarchiveFromData:(NSData *)data {
     if (data.length > 0 && ([self conformsToProtocol:@protocol(NSSecureCoding)] || [self conformsToProtocol:@protocol(NSCoding)]) && class_respondsToSelector(self, @selector(initWithCoder:))) {
-        #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 120000
-        if (@available(iOS 12.0, *)) {
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+        if (@available(iOS 11.0, *)) {
             return [NSKeyedUnarchiver unarchivedObjectOfClass:self.class fromData:data error:nil];
+        } else {
+            return [NSKeyedUnarchiver unarchiveObjectWithData:data];
         }
-        #endif
+        #else
         return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        #endif
     }
     return nil;
 }

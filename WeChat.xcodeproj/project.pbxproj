@@ -733,7 +733,6 @@
 		BF7B525523E5C815003DA959 /* WeChat.bundle in Resources */ = {isa = PBXBuildFile; fileRef = BF7B525423E5C815003DA959 /* WeChat.bundle */; };
 		BF7B525B23E5CCCD003DA959 /* WXSong.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B525A23E5CCCD003DA959 /* WXSong.m */; };
 		BF7B525E23E5CCEA003DA959 /* WXLyric.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B525D23E5CCEA003DA959 /* WXLyric.m */; };
-		BF83E7A2235DF02B003E9D60 /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = BF83E7A1235DF02B003E9D60 /* MNPurchaseRequest.m */; };
 		BF88DEB823F860C00070C58A /* MNEmojiKeyboardConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = BF88DEB723F860C00070C58A /* MNEmojiKeyboardConfiguration.m */; };
 		BFA0111F23D9952400B594B5 /* SEButton.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0111E23D9952400B594B5 /* SEButton.m */; };
 		BFA0112223D9A50600B594B5 /* SETextView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0112123D9A50600B594B5 /* SETextView.m */; };
@@ -772,16 +771,16 @@
 		BFEDE13723F8DD4F00D10CC8 /* MNEmojiCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFEDE13623F8DD4F00D10CC8 /* MNEmojiCell.m */; };
 		BFEDE13D23F8EA8200D10CC8 /* MNEmojiElementView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFEDE13B23F8EA8200D10CC8 /* MNEmojiElementView.m */; };
 		BFF58EE123F0E99C0026D7F6 /* WXMusicLyricLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF58EE023F0E99C0026D7F6 /* WXMusicLyricLabel.m */; };
-		BFF5E750235D863200DAC98B /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF5E74F235D863200DAC98B /* MNPurchaseManager.m */; };
-		BFF5E753235D865100DAC98B /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF5E752235D865100DAC98B /* MNPurchaseReceipt.m */; };
-		BFF5E756235D8FB100DAC98B /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF5E755235D8FB100DAC98B /* MNPurchaseResponse.m */; };
-		BFF5E759235D980600DAC98B /* MNPurchaseHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF5E758235D980600DAC98B /* MNPurchaseHandler.m */; };
 		E20E79AE234C8CFD00B1896F /* CAAnimation+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E20E79AD234C8CFD00B1896F /* CAAnimation+MNHelper.m */; };
 		E25FD006234A28FE00B5D19F /* CALayer+MNAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */; };
 		E27AE8C0234C6602003225B6 /* MNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = E27AE8BF234C6602003225B6 /* MNUtilities.m */; };
 		E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */; };
 		E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBB3222157B7002B7763 /* UIColor+MNHelper.m */; };
 		E810D47E2414038B0052D0F4 /* KeyboardAsset.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */; };
+		E8153057243181E20009C0A9 /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E815304E243181E20009C0A9 /* MNPurchaseManager.m */; };
+		E8153058243181E20009C0A9 /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = E815304F243181E20009C0A9 /* MNPurchaseResponse.m */; };
+		E815305A243181E20009C0A9 /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */; };
+		E815305B243181E20009C0A9 /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E8153056243181E20009C0A9 /* MNPurchaseRequest.m */; };
 		E81CD975240F94F10063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD976240F94F20063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD978240F98260063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
@@ -2388,8 +2387,6 @@
 		BF7B525A23E5CCCD003DA959 /* WXSong.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXSong.m; sourceTree = "<group>"; };
 		BF7B525C23E5CCEA003DA959 /* WXLyric.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLyric.h; sourceTree = "<group>"; };
 		BF7B525D23E5CCEA003DA959 /* WXLyric.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXLyric.m; sourceTree = "<group>"; };
-		BF83E7A0235DF02B003E9D60 /* MNPurchaseRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
-		BF83E7A1235DF02B003E9D60 /* MNPurchaseRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		BF88DEB623F860C00070C58A /* MNEmojiKeyboardConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNEmojiKeyboardConfiguration.h; sourceTree = "<group>"; };
 		BF88DEB723F860C00070C58A /* MNEmojiKeyboardConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNEmojiKeyboardConfiguration.m; sourceTree = "<group>"; };
 		BFA0111D23D9952400B594B5 /* SEButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEButton.h; sourceTree = "<group>"; };
@@ -2463,14 +2460,6 @@
 		BFEDE13C23F8EA8200D10CC8 /* MNEmojiElementView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNEmojiElementView.h; sourceTree = "<group>"; };
 		BFF58EDF23F0E99C0026D7F6 /* WXMusicLyricLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXMusicLyricLabel.h; sourceTree = "<group>"; };
 		BFF58EE023F0E99C0026D7F6 /* WXMusicLyricLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXMusicLyricLabel.m; sourceTree = "<group>"; };
-		BFF5E74E235D863200DAC98B /* MNPurchaseManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
-		BFF5E74F235D863200DAC98B /* MNPurchaseManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
-		BFF5E751235D865100DAC98B /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
-		BFF5E752235D865100DAC98B /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
-		BFF5E754235D8FB100DAC98B /* MNPurchaseResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
-		BFF5E755235D8FB100DAC98B /* MNPurchaseResponse.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
-		BFF5E757235D980600DAC98B /* MNPurchaseHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNPurchaseHandler.h; sourceTree = "<group>"; };
-		BFF5E758235D980600DAC98B /* MNPurchaseHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseHandler.m; sourceTree = "<group>"; };
 		E20E79AC234C8CFD00B1896F /* CAAnimation+MNHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CAAnimation+MNHelper.h"; sourceTree = "<group>"; };
 		E20E79AD234C8CFD00B1896F /* CAAnimation+MNHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CAAnimation+MNHelper.m"; sourceTree = "<group>"; };
 		E25FD004234A28FE00B5D19F /* CALayer+MNAnimation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CALayer+MNAnimation.h"; sourceTree = "<group>"; };
@@ -2480,6 +2469,14 @@
 		E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+NKHelper.h"; sourceTree = "<group>"; };
 		E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+NKHelper.m"; sourceTree = "<group>"; };
 		E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = KeyboardAsset.xcassets; sourceTree = "<group>"; };
+		E815304E243181E20009C0A9 /* MNPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
+		E815304F243181E20009C0A9 /* MNPurchaseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
+		E8153050243181E20009C0A9 /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
+		E8153051243181E20009C0A9 /* MNPurchaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
+		E8153052243181E20009C0A9 /* MNPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
+		E8153054243181E20009C0A9 /* MNPurchaseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
+		E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
+		E8153056243181E20009C0A9 /* MNPurchaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
 		E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNLayoutConstraint.h; sourceTree = "<group>"; };
@@ -2697,10 +2694,10 @@
 		200FB9DE222157B7002B7763 /* utilities */ = {
 			isa = PBXGroup;
 			children = (
+				E815304C243181E20009C0A9 /* MNPurchase */,
 				E89D2EA12411FC0900A973C8 /* MNLayoutConstraint */,
 				BF605BFE23BE081A0022F124 /* MNAssetExport */,
 				BFA28ADE23A405B6003CB264 /* MNLivePhoto */,
-				BFF5E74D235D860400DAC98B /* MNPurchase */,
 				203FEBE02331121200F65993 /* MNWeakProxy */,
 				208B8207232E3B720009A147 /* MNCapturer */,
 				20E6459F22CD8DFA009913A6 /* MNGestureRecognizer */,
@@ -6103,19 +6100,17 @@
 			path = crop;
 			sourceTree = "<group>";
 		};
-		BFF5E74D235D860400DAC98B /* MNPurchase */ = {
+		E815304C243181E20009C0A9 /* MNPurchase */ = {
 			isa = PBXGroup;
 			children = (
-				BFF5E757235D980600DAC98B /* MNPurchaseHandler.h */,
-				BFF5E758235D980600DAC98B /* MNPurchaseHandler.m */,
-				BFF5E74E235D863200DAC98B /* MNPurchaseManager.h */,
-				BFF5E74F235D863200DAC98B /* MNPurchaseManager.m */,
-				BFF5E751235D865100DAC98B /* MNPurchaseReceipt.h */,
-				BFF5E752235D865100DAC98B /* MNPurchaseReceipt.m */,
-				BF83E7A0235DF02B003E9D60 /* MNPurchaseRequest.h */,
-				BF83E7A1235DF02B003E9D60 /* MNPurchaseRequest.m */,
-				BFF5E754235D8FB100DAC98B /* MNPurchaseResponse.h */,
-				BFF5E755235D8FB100DAC98B /* MNPurchaseResponse.m */,
+				E8153052243181E20009C0A9 /* MNPurchaseManager.h */,
+				E815304E243181E20009C0A9 /* MNPurchaseManager.m */,
+				E8153050243181E20009C0A9 /* MNPurchaseReceipt.h */,
+				E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */,
+				E8153051243181E20009C0A9 /* MNPurchaseRequest.h */,
+				E8153056243181E20009C0A9 /* MNPurchaseRequest.m */,
+				E8153054243181E20009C0A9 /* MNPurchaseResponse.h */,
+				E815304F243181E20009C0A9 /* MNPurchaseResponse.m */,
 			);
 			path = MNPurchase;
 			sourceTree = "<group>";
@@ -6514,6 +6509,7 @@
 				200FBED4222157B8002B7763 /* MNMediaCacheWorker.m in Sources */,
 				BF605C0F23BE081B0022F124 /* MNAssetExporter+MNExportMetadata.m in Sources */,
 				200FBF55222157B8002B7763 /* NSArray+MNSafely.m in Sources */,
+				E815305B243181E20009C0A9 /* MNPurchaseRequest.m in Sources */,
 				208B81F4232E37C50009A147 /* MNAsset.m in Sources */,
 				201DB09122E8953C0063E88A /* WXMineInfoListCell.m in Sources */,
 				200FC009222157B8002B7763 /* MJRefreshComponent.m in Sources */,
@@ -6571,6 +6567,7 @@
 				201DB0A922E8953C0063E88A /* WXCookRecipeHeaderView.m in Sources */,
 				201DB05322E8953C0063E88A /* WXContactsSectionHeaderView.m in Sources */,
 				2055D68022E007180012E43E /* YYTextContainerView.m in Sources */,
+				E815305A243181E20009C0A9 /* MNPurchaseReceipt.m in Sources */,
 				201DB08322E8953C0063E88A /* WXBankCardAlertViewCell.m in Sources */,
 				200FBEF3222157B8002B7763 /* MNEmojiPreview.m in Sources */,
 				2055D68F22E007180012E43E /* YYTextAttribute.m in Sources */,
@@ -6602,6 +6599,7 @@
 				200FBE97222157B8002B7763 /* MNKeyChain.m in Sources */,
 				2055D6AF22E007180012E43E /* CALayer+YYAdd.m in Sources */,
 				201DB06222E8953C0063E88A /* WXMessageCell.m in Sources */,
+				E8153057243181E20009C0A9 /* MNPurchaseManager.m in Sources */,
 				2055D6B422E007180012E43E /* YYTransaction.m in Sources */,
 				201DB0A522E8953C0063E88A /* WXMomentMoreView.m in Sources */,
 				200FBF73222157B8002B7763 /* MNEmptyView.m in Sources */,
@@ -6622,7 +6620,6 @@
 				201DB07022E8953C0063E88A /* WXChatMoreInputView.m in Sources */,
 				20A6F92F2338B89F00FD7E11 /* MNLogCell.m in Sources */,
 				20B18DF7227295DE0006E4F7 /* MNSearchViewController.m in Sources */,
-				BFF5E759235D980600DAC98B /* MNPurchaseHandler.m in Sources */,
 				2025E327223CA6DF00763BB6 /* MNAddressBook.m in Sources */,
 				200FBF47222157B8002B7763 /* UIScrollView+MNHelper.m in Sources */,
 				BFDF923423EEF305009AC1C2 /* WXMusicArtworkView.m in Sources */,
@@ -6736,6 +6733,7 @@
 				201DB09C22E8953C0063E88A /* WXAddMomentCollectionViewCell.m in Sources */,
 				201DB09D22E8953C0063E88A /* WXAddMomentTableViewCell.m in Sources */,
 				20CEFC27224906080044BF95 /* MNDotDialog.m in Sources */,
+				E8153058243181E20009C0A9 /* MNPurchaseResponse.m in Sources */,
 				BFA6FC84237E85AC00D9BAD8 /* MNCropView.m in Sources */,
 				200362B7224B05AA00205C19 /* MNSearchBar.m in Sources */,
 				200FBE98222157B8002B7763 /* MNDatabase.m in Sources */,
@@ -6798,7 +6796,6 @@
 				208B81FB232E37C50009A147 /* MNAlbumSelectControl.m in Sources */,
 				2055D6A222E007180012E43E /* NSBundle+YYAdd.m in Sources */,
 				201DB0A122E8953C0063E88A /* WXMomentWebView.m in Sources */,
-				BF83E7A2235DF02B003E9D60 /* MNPurchaseRequest.m in Sources */,
 				201DAF6422E8945F0063E88A /* WXMoment.m in Sources */,
 				202968D32340960E00253B77 /* MNSegmentView.m in Sources */,
 				200FBF38222157B8002B7763 /* UITableView+MNHelper.m in Sources */,
@@ -6825,7 +6822,6 @@
 				200FBF49222157B8002B7763 /* UIWindow+MNHelper.m in Sources */,
 				200FBF6F222157B8002B7763 /* MNConfiguration.m in Sources */,
 				200FBEDB222157B8002B7763 /* MNMediaLoaderManager.m in Sources */,
-				BFF5E753235D865100DAC98B /* MNPurchaseReceipt.m in Sources */,
 				208B8201232E37C50009A147 /* MNAssetScrollView.m in Sources */,
 				200FBF20222157B8002B7763 /* MNPlayView.m in Sources */,
 				BF7B2ED923EC65FD003D923F /* WXVoiceCallController.m in Sources */,
@@ -6855,7 +6851,6 @@
 				20805C8522EDB9A000BD682B /* UITableView+SDAutoTableViewCellHeight.m in Sources */,
 				2055D68B22E007180012E43E /* NSParagraphStyle+YYText.m in Sources */,
 				200FBF57222157B8002B7763 /* NSUserDefaults+MNSafely.m in Sources */,
-				BFF5E750235D863200DAC98B /* MNPurchaseManager.m in Sources */,
 				201DB09522E8953C0063E88A /* WXAlbumTableHeaderView.m in Sources */,
 				201DB06822E8953C0063E88A /* WXRedpacketMessageCell.m in Sources */,
 				200FBF5F222157B8002B7763 /* NSObject+MNHelper.m in Sources */,
@@ -6902,7 +6897,6 @@
 				201DB09222E8953C0063E88A /* WXMineInfoHeaderView.m in Sources */,
 				208C4D8823004F0B00835507 /* MNContextConfig.m in Sources */,
 				2055D8EB22E021A40012E43E /* UIView+WebCache.m in Sources */,
-				BFF5E756235D8FB100DAC98B /* MNPurchaseResponse.m in Sources */,
 				200FBF30222157B8002B7763 /* MNPasswordView.m in Sources */,
 				201DAE4F22E893F40063E88A /* WXCookRecipeViewModel.m in Sources */,
 				20A6F92C2338B89F00FD7E11 /* MNStreamView.m in Sources */,

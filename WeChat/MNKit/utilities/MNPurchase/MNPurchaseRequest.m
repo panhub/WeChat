@@ -8,44 +8,38 @@
 
 #import "MNPurchaseRequest.h"
 #import "MNPurchaseManager.h"
+#import <StoreKit/StoreKit.h>
 
 @interface MNPurchaseRequest ()
-
-@property (nonatomic, copy) MNPurchaseReceiptHandler receiptHandler;
-
-@property (nonatomic, copy) MNPurchaseRequestHandler requestHandler;
 
 @end
 
 @implementation MNPurchaseRequest
-- (instancetype)initWithProductIdentifier:(NSString *)identifier {
-    if (identifier.length <= 0) return nil;
-    if (self = [super init]) {
-        self.requestOutCount = 1;
-        [self setValue:identifier forKey:@"productIdentifier"];
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.requestOutCount = 3;
+        self.productIdentifier = @"";
     }
     return self;
 }
 
-- (void)startRequestPaymentWithReceiptHandler:(MNPurchaseReceiptHandler)receiptHandler completionHandler:(MNPurchaseRequestHandler)completionHandler {
-    self.receiptHandler = receiptHandler;
-    self.requestHandler = completionHandler;
+- (instancetype)initWithProductIdentifier:(NSString *)identifier {
+    if (identifier.length <= 0) return nil;
+    if (self = [self init]) {
+        self.productIdentifier = identifier;
+    }
+    return self;
+}
+
+- (void)startRequestWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler {
     [[MNPurchaseManager defaultManager] startRequest:self];
 }
 
-- (void)finishRequestWithResponseCode:(MNPurchaseResponseCode)responseCode {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.requestHandler) {
-            self.requestHandler([MNPurchaseResponse responseWithCode:responseCode]);
-        }
-    });
-}
-
-- (void)completeRequest {
-    BOOL succeed = NO;
-    if (self.receiptHandler) {
-        
-    }
+#pragma mark - Setter
+- (void)setRequestOutCount:(NSInteger)requestOutCount {
+    requestOutCount = MAX(1, requestOutCount);
+    _requestOutCount = requestOutCount;
 }
 
 @end
