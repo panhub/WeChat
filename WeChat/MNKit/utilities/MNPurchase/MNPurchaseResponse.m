@@ -31,23 +31,15 @@
 }
 
 - (NSString *)responseMessageWithCode:(MNPurchaseResponseCode)code {
-    NSString *msg = @"发生未知错误";
+    NSString *msg = @"无法连接iTunesStore";
     switch (code) {
-        case MNPurchaseResponseCodeFailed:
-        {
-            msg = @"购买失败, 请检查网络后重试";
-        } break;
         case MNPurchaseResponseCodeSucceed:
         {
-            msg = @"购买成功";
+            msg = @"操作成功";
         } break;
         case MNPurchaseResponseCodeCancelled:
         {
             msg = @"已取消";
-        } break;
-        case MNPurchaseResponseCodeExistReceipt:
-        {
-            msg = @"本地有未验证完成的收据";
         } break;
         case MNPurchaseResponseCodeCannotPayment:
         {
@@ -57,17 +49,17 @@
         {
             msg = @"消耗型商品购买后不可恢复";
         } break;
-        case MNPurchaseResponseCodeRestoreUnknown:
+        case MNPurchaseResponseCodeRestoreNone:
         {
             msg = @"未发现可恢复购买产品";
         } break;
         case MNPurchaseResponseCodeVerifyError:
         {
-            msg = @"验证收据失败\n下次打开应用后将重新验证";
+            msg = @"验证收据失败";
         } break;
         case MNPurchaseResponseCodeRequestError:
         {
-            msg = @"获取商品信息失败\n请检查网络状态后重试";
+            msg = @"获取商品信息失败";
         } break;
         case MNPurchaseResponseCodeJSONError:
         case MNPurchaseResponseCodeReceiptError:
@@ -82,7 +74,7 @@
         case MNPurchaseResponseCodeServerError:
         case MNPurchaseResponseCodeSandboxError:
         {
-            msg = @"验证环境错误,请检查后重试";
+            msg = @"验证环境错误";
         } break;
         case MNPurchaseResponseCodeSubscribeError:
         {

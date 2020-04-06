@@ -9,103 +9,136 @@
 #import "MNPurchaseReceipt.h"
 #import "MNKeyChain.h"
 
-#define kMNPurchaseReceipt    @"com.mn.purchase.receipt.key"
-#define kMNPurchaseReceiptString    @"receipt"
+#define kMNPurchaseReceipts    @"com.mn.purchase.receipts.key"
+#define kMNPurchaseReceiptContent    @"receipt"
 #define kMNPurchaseReceiptIdentifier    @"identifier"
 #define kMNPurchaseReceiptSubscribe    @"subscribe"
 #define kMNPurchaseReceiptRestore    @"restore"
+#define kMNPurchaseReceiptFailCount    @"failCount"
+#define kMNPurchaseReceiptHeader    @"header"
 #define MNPurchaseReceiptArchivePath  [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:NSStringFromClass(MNPurchaseReceipt.class)]
 
 @interface MNPurchaseReceipt ()
-@property (nonatomic, copy) NSString *receipt;
+@property (nonatomic, copy) NSString *content;
+@property (nonatomic, readonly, class) NSMutableArray <MNPurchaseReceipt *>*receipts;
 @end
 
 @implementation MNPurchaseReceipt
-+ (nullable instancetype)receiptWithData:(NSData *)receiptData {
++ (instancetype)receiptWithData:(NSData *)receiptData {
     NSString *receipt = [receiptData base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
     if (receipt.length <= 0) return nil;
     MNPurchaseReceipt *r = MNPurchaseReceipt.new;
-    r.receipt = receipt;
+    r.content = receipt;
     return r;
 }
 
-+ (instancetype)localReceipt {
-    NSData *receiptData = [MNKeyChain dataForKey:kMNPurchaseReceipt];
-    if (receiptData.length <= 0) return nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:receiptData options:kNilOptions error:nil];
-    if (dic.allKeys.count <= 0) return nil;
-    //NSDictionary *dic = [NSUserDefaults.standardUserDefaults objectForKey:kMNPurchaseReceipt];
-    NSString *receipt = [dic objectForKey:kMNPurchaseReceiptString];
-    if (!receipt || receipt.length <= 0) return nil;
-    BOOL restore = [[dic objectForKey:kMNPurchaseReceiptRestore] boolValue];
-    BOOL subscribe = [[dic objectForKey:kMNPurchaseReceiptSubscribe] boolValue];
-    NSString *identifier = [dic objectForKey:kMNPurchaseReceiptIdentifier];
-    if (identifier.length <= 0) identifier = @"com.mn.purchase.receipt.identifier";
++ (instancetype)receiptWithDictionary:(NSDictionary *)json {
+    if ([json objectForKey:kMNPurchaseReceiptContent] == nil) return nil;
     MNPurchaseReceipt *r = MNPurchaseReceipt.new;
-    r.identifier = identifier;
-    r.receipt = receipt;
-    r.restore = restore;
-    r.subscribe = subscribe;
+    r.content = [json objectForKey:kMNPurchaseReceiptContent];
+    r.identifier = [json objectForKey:kMNPurchaseReceiptIdentifier];
+    r.header = [json objectForKey:kMNPurchaseReceiptHeader];
+    r.failCount = [[json objectForKey:kMNPurchaseReceiptFailCount] intValue];
+    r.subscribe = [[json objectForKey:kMNPurchaseReceiptSubscribe] boolValue];
+    r.restore = [[json objectForKey:kMNPurchaseReceiptRestore] boolValue];
     return r;
-    /*
-    NSData *receiptData = [[NSData alloc] initWithContentsOfFile:MNPurchaseReceiptArchivePath];
-    if (receiptData.length <= 0) return nil;
-    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if (@available(iOS 11.0, *)) {
-        return [NSKeyedUnarchiver unarchivedObjectOfClass:self.class fromData:receiptData error:nil];
-    } else {
-        return [NSKeyedUnarchiver unarchiveObjectWithData:receiptData];
-    }
-    #else
-    return [NSKeyedUnarchiver unarchiveObjectWithData:receiptData];
-    #endif
-    */
 }
 
-+ (BOOL)removeLocalReceipt {
-    return [MNKeyChain removeItemForKey:kMNPurchaseReceipt];
-    /*
-    [NSUserDefaults.standardUserDefaults removeObjectForKey:kMNPurchaseReceipt];
-    return YES;
-    */
-    /*
-    if ([NSFileManager.defaultManager fileExistsAtPath:MNPurchaseReceiptArchivePath] == NO) return YES;
-    return [NSFileManager.defaultManager removeItemAtPath:MNPurchaseReceiptArchivePath error:nil];
-    */
++ (NSMutableArray <MNPurchaseReceipt *>*)receipts {
+    static NSMutableArray <MNPurchaseReceipt *>*receiptCache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        receiptCache = @[].mutableCopy;
+        NSData *receiptData = [MNKeyChain dataForKey:kMNPurchaseReceipts];
+        if (receiptData.length) {
+            NSArray *receipts = [NSJSONSerialization JSONObjectWithData:receiptData options:kNilOptions error:nil];
+            [receipts enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                MNPurchaseReceipt *r = [MNPurchaseReceipt receiptWithDictionary:obj];
+                if (r) [receiptCache addObject:r];
+            }];
+        }
+    });
+    return receiptCache;
+}
+
++ (NSArray <MNPurchaseReceipt *>*)localReceipts {
+    return self.receipts.copy;
 }
 
 - (BOOL)saveReceiptToLocal {
-    if (self.receipt.length <= 0) return NO;
-    NSMutableDictionary *dic = @{}.mutableCopy;
-    [dic setObject:self.receipt forKey:kMNPurchaseReceiptString];
-    [dic setObject:@(self.isRestore) forKey:kMNPurchaseReceiptRestore];
-    [dic setObject:@(self.isSubscribe) forKey:kMNPurchaseReceiptSubscribe];
-    if (self.identifier.length) [dic setObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
-    NSData *receiptData = [NSJSONSerialization dataWithJSONObject:dic options:kNilOptions error:nil];
-    if (receiptData.length <= 0) return NO;
-    return [MNKeyChain setData:receiptData forKey:kMNPurchaseReceipt];
-    /*
-    [NSUserDefaults.standardUserDefaults setObject:dic.copy forKey:kMNPurchaseReceipt];
-    [NSUserDefaults.standardUserDefaults synchronize];
-    return YES;
-    */
-    /*
-    NSData *receiptData = NSData.data;
-    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if (@available(iOS 11.0, *)) {
-        receiptData = [NSKeyedArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:nil];
-    } else {
-        receiptData = [NSKeyedArchiver archivedDataWithRootObject:self];
-    }
-    #else
-    receiptData = [NSKeyedArchiver archivedDataWithRootObject:self];
-    #endif
-    return [receiptData writeToFile:MNPurchaseReceiptArchivePath atomically:YES];
-    */
+    if (self.content.length <= 0) return NO;
+    if ([MNPurchaseReceipt containsReceipt:self]) return YES;
+    [MNPurchaseReceipt.receipts addObject:self];
+    return [MNPurchaseReceipt updateLocalReceipts];
 }
 
-+ (BOOL)hasLocalReceipt {
-    return self.localReceipt != nil;
+- (BOOL)removeFromLocal {
+    MNPurchaseReceipt *receipt = [MNPurchaseReceipt receiptForContent:self.content];
+    if (!receipt) return YES;
+    [MNPurchaseReceipt.receipts removeObject:receipt];
+    return [MNPurchaseReceipt updateLocalReceipts];
+}
+
++ (BOOL)removeLocalReceipts {
+    [self.receipts removeAllObjects];
+    return [MNKeyChain removeItemForKey:kMNPurchaseReceipts];
+}
+
++ (BOOL)updateLocalReceipts {
+    if (self.receipts.count <= 0) return [self removeLocalReceipts];
+    NSMutableArray <NSDictionary *>*receipts = @[].mutableCopy;
+    [self.receipts enumerateObjectsUsingBlock:^(MNPurchaseReceipt * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [receipts addObject:[obj jsonValue]];
+    }];
+    NSData *receiptData = [NSJSONSerialization dataWithJSONObject:receipts options:kNilOptions error:nil];
+    if (receiptData.length <= 0) return NO;
+    return [MNKeyChain setData:receiptData forKey:kMNPurchaseReceipts];
+}
+
+#pragma mark - Getter
+- (NSString *)identifier {
+    if (_identifier.length) return _identifier;
+    return @"com.mn.purchase.receipt.identifier";
+}
+
+- (BOOL)isEqualToReceipt:(MNPurchaseReceipt *)receipt {
+    if (!receipt) return NO;
+    return ([self.identifier isEqualToString:receipt.identifier] && [self.content isEqualToString:receipt.content]);
+}
+
+- (NSDictionary *)jsonValue {
+    NSMutableDictionary *dic = @{}.mutableCopy;
+    [dic setObject:self.content forKey:kMNPurchaseReceiptContent];
+    [dic setObject:@(self.failCount).stringValue forKey:kMNPurchaseReceiptFailCount];
+    [dic setObject:@(self.isRestore).stringValue forKey:kMNPurchaseReceiptRestore];
+    [dic setObject:@(self.isSubscribe).stringValue forKey:kMNPurchaseReceiptSubscribe];
+    [dic setObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
+    if (self.header) [dic setObject:self.header forKey:kMNPurchaseReceiptHeader];
+    return dic.copy;
+}
+
++ (BOOL)containsReceipt:(MNPurchaseReceipt *)receipt {
+    if (!receipt) return NO;
+    __block BOOL exists = NO;
+    [self.localReceipts enumerateObjectsUsingBlock:^(MNPurchaseReceipt * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isEqualToReceipt:receipt]) {
+            exists = YES;
+            *stop = YES;
+        }
+    }];
+    return exists;
+}
+
++ (MNPurchaseReceipt *)receiptForContent:(NSString *)content {
+    if (content.length <= 0) return nil;
+    __block MNPurchaseReceipt *receipt;
+    [self.localReceipts enumerateObjectsUsingBlock:^(MNPurchaseReceipt * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.content isEqualToString:content]) {
+            receipt = obj;
+            *stop = YES;
+        }
+    }];
+    return receipt;
 }
 
 #pragma mark - NSSecureCoding
@@ -114,18 +147,39 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeObject:self.receipt forKey:kMNPurchaseReceipt];
-    [coder encodeBool:self.subscribe forKey:kMNPurchaseReceiptSubscribe];
+    [coder encodeObject:self.content forKey:kMNPurchaseReceipts];
+    [coder encodeBool:self.isSubscribe forKey:kMNPurchaseReceiptSubscribe];
+    [coder encodeBool:self.isRestore forKey:kMNPurchaseReceiptRestore];
+    [coder encodeInt:self.failCount forKey:kMNPurchaseReceiptFailCount];
     [coder encodeObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
+    [coder encodeObject:self.header forKey:kMNPurchaseReceiptHeader];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
     if (self = [super init]) {
-        self.receipt = [coder decodeObjectForKey:kMNPurchaseReceipt];
+        self.content = [coder decodeObjectForKey:kMNPurchaseReceipts];
+        self.restore = [coder decodeBoolForKey:kMNPurchaseReceiptRestore];
+        self.failCount = [coder decodeIntForKey:kMNPurchaseReceiptFailCount];
         self.subscribe = [coder decodeBoolForKey:kMNPurchaseReceiptSubscribe];
         self.identifier = [coder decodeObjectForKey:kMNPurchaseReceiptIdentifier];
+        self.header = [coder decodeObjectForKey:kMNPurchaseReceiptHeader];
     }
     return self;
+}
+
+@end
+
+
+@implementation MNPurchaseReceipt (MNPurchaseVerify)
+
+- (int)tryCount {
+    NSNumber *n = objc_getAssociatedObject(self, @"com.mn.purchase.receipt.try.count");
+    if (n) return n.intValue;
+    return 0;
+}
+
+- (void)setTryCount:(int)tryCount {
+    objc_setAssociatedObject(self, @"com.mn.purchase.receipt.try.count", @(tryCount), OBJC_ASSOCIATION_COPY);
 }
 
 @end

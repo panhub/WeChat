@@ -12,11 +12,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MNPurchaseReceipt : NSObject <NSSecureCoding>
 
-/**收据数据*/
-@property (nonatomic, copy, readonly) NSString *receipt;
+/**收据内容*/
+@property (nonatomic, copy, readonly) NSString *content;
 
 /**收据标识<订单号>*/
 @property (nonatomic, copy, nullable) NSString *identifier;
+
+/**收据关联信息*/
+@property (nonatomic, copy, nullable) NSString *header;
+
+/**失败次数*/
+@property (nonatomic, assign) int failCount;
 
 /**是否是订阅*/
 @property (nonatomic, getter=isSubscribe) BOOL subscribe;
@@ -24,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**是否是恢复购买*/
 @property (nonatomic, getter=isRestore) BOOL restore;
 
-/**是否存在本地收据*/
-@property (nonatomic, readonly, class) BOOL hasLocalReceipt;
+/**本地凭证*/
+@property (nonatomic, readonly, class) NSArray <MNPurchaseReceipt *>*localReceipts;
 
 /**
  依据收据数据流实例化
@@ -35,22 +41,55 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)receiptWithData:(NSData *)receiptData;
 
 /**
- 获取本地内购收据
- @return 本地内购收据
+ 依据收据字典实例化
+ @param json 收据数据字典
+ @return 内购收据对象
 */
-+ (nullable instancetype)localReceipt;
++ (nullable instancetype)receiptWithDictionary:(NSDictionary *)json;
 
 /**
  删除本地内购收据
  @return 是否删除成功
 */
-+ (BOOL)removeLocalReceipt;
++ (BOOL)removeLocalReceipts;
+
+/**
+ 更新本地凭据
+ @return 是否成功更新
+*/
++ (BOOL)updateLocalReceipts;
 
 /**
  保存内购收据
  @return 是否保存成功
 */
 - (BOOL)saveReceiptToLocal;
+
+/**
+ 删除凭证
+ @return 是否成功删除
+*/
+- (BOOL)removeFromLocal;
+
+/**
+ 判断是否存在内购凭证
+ @return 是否存在
+*/
++ (BOOL)containsReceipt:(MNPurchaseReceipt *)receipt;
+
+/**
+ 判断两个凭据是否是同一凭据
+ @return 是否相同
+*/
+- (BOOL)isEqualToReceipt:(MNPurchaseReceipt *)receipt;
+
+@end
+
+
+@interface MNPurchaseReceipt (MNPurchaseVerify)
+
+/**尝试验证的次数*/
+@property (nonatomic) int tryCount;
 
 @end
 

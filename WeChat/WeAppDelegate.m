@@ -122,7 +122,8 @@
     [[MNConfiguration configuration] loadDataWithCompletionHandler:nil];
     /// 内购
     MNPurchaseManager.defaultManager.allowsAlertIfNeeded = YES;
-    [[MNPurchaseManager defaultManager] startTransactionObserve];
+    MNPurchaseManager.defaultManager.secretKey = @"062dbdb74e1a4407988fbaf00ae6f98c";
+    [MNPurchaseManager.defaultManager becomeTransactionObserver];
     /// 触发联网提示
     MNNetworkReachability *reachability = [MNNetworkReachability reachability];
     [reachability startMonitoring];

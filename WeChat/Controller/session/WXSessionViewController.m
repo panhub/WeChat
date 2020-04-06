@@ -111,13 +111,22 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger row = indexPath.row;
     [self.view showLoadDialog:@"产品购买中"];
-//    [[MNPurchaseManager defaultManager] restoreCompletedPurchaseWithCompletionHandler:^(MNPurchaseResponse *response) {
-//        [self.view closeDialog];
-//    }];
-    [[MNPurchaseManager defaultManager] startPurchaseProduct:@"1" completionHandler:^(MNPurchaseResponse *response) {
-        [self.view showInfoDialog:response.message];
-    }];
+    if (row == 2 || row == 3) {
+        [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue completionHandler:^(MNPurchaseResponse *response) {
+            [self.view showInfoDialog:response.message];
+        }];
+    }
+    if (row > 4) {
+        [MNPurchaseManager.defaultManager startRestorePurchaseWithCompletionHandler:^(MNPurchaseResponse *response) {
+            [self.view showInfoDialog:response.message];
+        }];
+    } else {
+        [[MNPurchaseManager defaultManager] startPurchaseProduct:@(row + 1).stringValue completionHandler:^(MNPurchaseResponse *response) {
+            [self.view showInfoDialog:response.message];
+        }];
+    }
     return;
     MNTableViewCell *cell = (MNTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
     if (cell.isEdit) {

@@ -31,10 +31,6 @@
     return self;
 }
 
-- (void)startRequestWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler {
-    [[MNPurchaseManager defaultManager] startRequest:self];
-}
-
 #pragma mark - Setter
 - (void)setRequestOutCount:(NSInteger)requestOutCount {
     requestOutCount = MAX(1, requestOutCount);

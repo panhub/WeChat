@@ -29,12 +29,6 @@ typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 */
 - (instancetype)initWithProductIdentifier:(NSString *)identifier;
 
-/**
- 开启产品请求
- @param completionHandler 结束回调
-*/
-- (void)startRequestWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler;
-
 @end
 
 
