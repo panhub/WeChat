@@ -309,7 +309,7 @@
 		201DAF0522E894410063E88A /* WXTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9922E894400063E88A /* WXTestViewController.m */; };
 		201DAF0622E894410063E88A /* WXAppletResultController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9A22E894400063E88A /* WXAppletResultController.m */; };
 		201DAF0722E894410063E88A /* WXMomentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9D22E894400063E88A /* WXMomentViewController.m */; };
-		201DAF0822E894410063E88A /* WXAddMomentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9F22E894400063E88A /* WXAddMomentViewController.m */; };
+		201DAF0822E894410063E88A /* WXNewMomentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9F22E894400063E88A /* WXNewMomentController.m */; };
 		201DAF0922E894410063E88A /* WXMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAEA522E894400063E88A /* WXMapViewController.m */; };
 		201DAF0A22E894410063E88A /* WXCookRecipeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAEA922E894400063E88A /* WXCookRecipeController.m */; };
 		201DAF0B22E894410063E88A /* WXCookViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAEAA22E894400063E88A /* WXCookViewController.m */; };
@@ -1445,10 +1445,10 @@
 		201DAE9722E894400063E88A /* WXAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAlbumViewController.m; sourceTree = "<group>"; };
 		201DAE9922E894400063E88A /* WXTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestViewController.m; sourceTree = "<group>"; };
 		201DAE9A22E894400063E88A /* WXAppletResultController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAppletResultController.m; sourceTree = "<group>"; };
-		201DAE9C22E894400063E88A /* WXAddMomentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAddMomentViewController.h; sourceTree = "<group>"; };
+		201DAE9C22E894400063E88A /* WXNewMomentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXNewMomentController.h; sourceTree = "<group>"; };
 		201DAE9D22E894400063E88A /* WXMomentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMomentViewController.m; sourceTree = "<group>"; };
 		201DAE9E22E894400063E88A /* WXMomentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMomentViewController.h; sourceTree = "<group>"; };
-		201DAE9F22E894400063E88A /* WXAddMomentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAddMomentViewController.m; sourceTree = "<group>"; };
+		201DAE9F22E894400063E88A /* WXNewMomentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNewMomentController.m; sourceTree = "<group>"; };
 		201DAEA022E894400063E88A /* WXFindViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXFindViewController.h; sourceTree = "<group>"; };
 		201DAEA122E894400063E88A /* WXAppletViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppletViewController.h; sourceTree = "<group>"; };
 		201DAEA222E894400063E88A /* WXTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestViewController.h; sourceTree = "<group>"; };
@@ -4244,8 +4244,8 @@
 			children = (
 				201DAE9E22E894400063E88A /* WXMomentViewController.h */,
 				201DAE9D22E894400063E88A /* WXMomentViewController.m */,
-				201DAE9C22E894400063E88A /* WXAddMomentViewController.h */,
-				201DAE9F22E894400063E88A /* WXAddMomentViewController.m */,
+				201DAE9C22E894400063E88A /* WXNewMomentController.h */,
+				201DAE9F22E894400063E88A /* WXNewMomentController.m */,
 				20E4712C22EC5A4C00BD125A /* WXMomentRemindController.h */,
 				20E4712B22EC5A4C00BD125A /* WXMomentRemindController.m */,
 			);
@@ -7008,7 +7008,7 @@
 				BF7B523723E543C6003DA959 /* WXShakeSetingCell.m in Sources */,
 				200FBF4B222157B8002B7763 /* UITextField+MNHelper.m in Sources */,
 				201DB05522E8953C0063E88A /* WXUserInfoValueCell1.m in Sources */,
-				201DAF0822E894410063E88A /* WXAddMomentViewController.m in Sources */,
+				201DAF0822E894410063E88A /* WXNewMomentController.m in Sources */,
 				200FBEDC222157B8002B7763 /* MNOperation.m in Sources */,
 				208B81F8232E37C50009A147 /* MNAssetSelectCell.m in Sources */,
 				20A92A8522F737E100868FBE /* WXAllEmoticonCell.m in Sources */,

@@ -1,24 +1,24 @@
 //
-//  WXAddMomentViewController.m
+//  WXNewMomentController.m
 //  MNChat
 //
 //  Created by Vincent on 2019/5/9.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "WXAddMomentViewController.h"
+#import "WXNewMomentController.h"
 #import "WXAddMomentCollectionView.h"
 #import "WXAddMomentTableView.h"
 #import "WXMoment.h"
 
-@interface WXAddMomentViewController ()<MNTextViewHandler, WXAddMomentCollectionViewDelegate>
+@interface WXNewMomentController ()<MNTextViewHandler, WXAddMomentCollectionViewDelegate>
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) MNEmojiTextView *textView;
 @property (nonatomic, strong) WXAddMomentTableView *tableView;
 @property (nonatomic, strong) WXAddMomentCollectionView *collectionView;
 @end
 
-@implementation WXAddMomentViewController
+@implementation WXNewMomentController
 - (void)createView {
     [super createView];
     self.navigationBar.translucent = NO;

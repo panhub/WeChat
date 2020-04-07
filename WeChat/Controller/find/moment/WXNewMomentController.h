@@ -1,5 +1,5 @@
 //
-//  WXAddMomentViewController.h
+//  WXNewMomentController.h
 //  MNChat
 //
 //  Created by Vincent on 2019/5/9.
@@ -8,6 +8,6 @@
 
 #import "MNExtendViewController.h"
 
-@interface WXAddMomentViewController : MNExtendViewController
+@interface WXNewMomentController : MNExtendViewController
 
 @end

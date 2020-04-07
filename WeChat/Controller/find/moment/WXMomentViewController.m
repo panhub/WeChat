@@ -7,7 +7,7 @@
 //
 
 #import "WXMomentViewController.h"
-#import "WXAddMomentViewController.h"
+#import "WXNewMomentController.h"
 #import "WXContactsSelectController.h"
 #import "WXUserInfoViewController.h"
 #import "WXMapViewController.h"
@@ -496,7 +496,7 @@
 }
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
-    WXAddMomentViewController *vc = [WXAddMomentViewController new];
+    WXNewMomentController *vc = [WXNewMomentController new];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
