@@ -374,7 +374,7 @@
         [self.collection insertAssetAtFront:model];
     }
     self.collection = self.collection;
-    if (self.configuration.allowsWritToAlbum) [MNAssetHelper writeContent:@[content] toAlbum:self.collection.localizedTitle completion:nil];
+    if (self.configuration.allowsWritToAlbum) [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.localizedTitle completion:nil];
     [capturingController.navigationController popViewControllerAnimated:YES];
 }
 

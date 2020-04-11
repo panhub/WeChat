@@ -135,9 +135,9 @@
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
     [self.view showWeChatDialog];
-    [MNAssetHelper writeLivePhotoWithImage:[NSURL fileURLWithPath:self.livePhoto.imagePath] video:[NSURL fileURLWithPath:self.livePhoto.videoPath] completion:^(BOOL success, NSError *error) {
+    [MNAssetHelper writeLivePhotoWithImage:[NSURL fileURLWithPath:self.livePhoto.imagePath] video:[NSURL fileURLWithPath:self.livePhoto.videoPath] completion:^(NSString * _Nullable identifier, NSError *_Nullable error) {
         dispatch_async_main(^{
-            if (success) {
+            if (identifier.length <= 0) {
                 @weakify(self);
                 [self.view showCompletedDialog:@"已保存至系统相册" completionHandler:^{
                     @strongify(self);

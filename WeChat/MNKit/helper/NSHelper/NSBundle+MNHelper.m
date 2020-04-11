@@ -62,7 +62,9 @@ NSString * NSBundleVersion (void) {
 
 #pragma mark - 项目工程名
 + (NSString *)displayName {
-    return [[self bundleInfo] objectForKey:@"CFBundleDisplayName"];
+    NSString *displayName = [[self bundleInfo] objectForKey:@"CFBundleDisplayName"];
+    if (!displayName) displayName = [[self bundleInfo] objectForKey:@"CFBundleName"];
+    return displayName;
 }
 
 NSString * NSBundleDisplayName (void) {

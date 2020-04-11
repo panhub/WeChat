@@ -123,8 +123,8 @@ NSString * const WXQRCodeMetadataPrefix = @"com.wx.qrcode.metadata.prefix";
         if (buttonIndex == 0) {
             [self createQRCodeWithColor:UIColorRandom()];
         } else {
-            [MNAssetHelper writeImages:@[self.imageView.image] toAlbum:nil completion:^(NSArray <NSString *>*identifier, NSError *error) {
-                if (error) {
+            [MNAssetHelper writeImageToAlbum:self.imageView.image completionHandler:^(NSString * _Nullable identifier, NSError * _Nullable error) {
+                if (error || identifier.length <= 0) {
                     [self.view showInfoDialog:@"保存失败"];
                 } else {
                     MNAlertView *alertView = [MNAlertView alertViewWithTitle:@"提示" image:self.imageView.image message:@"已成功保存二维码" handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil];

@@ -520,119 +520,83 @@ static MNAssetHelper *_helper;
 #endif
 
 #pragma mark - Write
-+ (void)writeImages:(NSArray <UIImage *>*)images toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *error))completion {
-    if (images.count <= 0) {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片不存在"}]);
++ (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
+{
+    if (!image || (![image isKindOfClass:UIImage.class] && ![image isKindOfClass:NSData.class])) {
+        if (completionHandler) completionHandler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片不存在"}]);
+        return;
+    }
+    [self writeAssets:@[image] toAlbum:nil completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+        if (completionHandler) completionHandler(identifiers ? identifiers.firstObject : nil, error);
+    }];
+}
+
++ (void)writeVideoToAlbum:(id)videoPath completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
+{
+    if (!videoPath || (![videoPath isKindOfClass:NSString.class] && ![videoPath isKindOfClass:NSURL.class])) {
+        if (completionHandler) completionHandler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"视频文件不存在"}]);
+        return;
+    }
+    NSString *filePath = [videoPath isKindOfClass:NSString.class] ? videoPath : ((NSURL *)videoPath).path;
+    if ([NSFileManager.defaultManager fileExistsAtPath:filePath] == NO) {
+        if (completionHandler) completionHandler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"视频文件不存在"}]);
+        return;
+    }
+    [self writeAssets:@[videoPath] toAlbum:nil completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+        if (completionHandler) completionHandler(identifiers ? identifiers.firstObject : nil, error);
+    }];
+}
+
++ (void)writeAssets:(NSArray <id>*)assets toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *error))completion {
+    if (assets.count <= 0) {
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"文件不存在"}]);
         return;
     }
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
         if (allowed) {
             NSMutableArray <NSString *>*identifiers = @[].mutableCopy;
+            NSMutableArray <PHObjectPlaceholder *>*placeholders = @[].mutableCopy;
             [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-                PHAssetCollectionChangeRequest *collectionRequest = [self creationRequestForAssetCollectionWithTitle:albumName];
-                NSMutableArray <PHObjectPlaceholder *>*assets = @[].mutableCopy;
-                [images enumerateObjectsUsingBlock:^(UIImage * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    PHAssetChangeRequest *assetRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:obj];
-                    PHObjectPlaceholder *placeholder = [assetRequest placeholderForCreatedAsset];
-                    [identifiers addObject:placeholder.localIdentifier];
+                [assets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    PHObjectPlaceholder *placeholder;
+                    if ([obj isKindOfClass:NSString.class]) obj = [NSURL fileURLWithPath:(NSString *)obj];
+                    if ([obj isKindOfClass:NSData.class]) obj = [UIImage imageWithData:(NSData *)obj];
+                    if (!obj || ([obj isKindOfClass:NSURL.class] && [NSFileManager.defaultManager fileExistsAtPath:((NSURL*)obj).path] == NO)) return;
+                    if ([obj isKindOfClass:NSURL.class]) {
+                        placeholder = [[PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:(NSURL *)obj] placeholderForCreatedAsset];
+                    } else if ([obj isKindOfClass:UIImage.class]) {
+                        placeholder = [[PHAssetChangeRequest creationRequestForAssetFromImage:(UIImage *)obj] placeholderForCreatedAsset];
+                    }
+                    if (placeholder) {
+                        [identifiers addObject:placeholder.localIdentifier];
+                        [placeholders addObject:placeholder];
+                    }
                 }];
-                [collectionRequest addAssets:assets.copy];
+                if (placeholders.count) {
+                    PHAssetCollectionChangeRequest *collectionRequest = [self creationRequestForAssetCollectionWithTitle:albumName];
+                    if (collectionRequest) {
+                        [collectionRequest addAssets:placeholders];
+                    }
+                }
             } completionHandler:^(BOOL success, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (completion) {
-                        if (error) {
-                            completion(nil, error);
-                        } else {
-                            completion(identifiers.copy, nil);
-                        }
+                        completion(success ? identifiers : nil, success ? nil : error);
                     }
                 });
             }];
         } else {
-            if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
+            });
         }
     }];
 }
 
-+ (void)writeVideos:(NSArray <NSURL *>*)URLs toAlbum:(NSString *)albumName completion:(void(^)(NSArray<NSString *>*, NSError *))completion {
-    if (URLs.count <= 0) {
-        if (completion) {
-            completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"视频文件不存在"}]);
-        }
-        return;
-    }
-    [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
-        if (allowed) {
-            NSMutableArray <NSString *>*identifiers = @[].mutableCopy;
-            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-                PHAssetCollectionChangeRequest *collectionRequest = [self creationRequestForAssetCollectionWithTitle:albumName];
-                NSMutableArray <PHObjectPlaceholder *>*assets = @[].mutableCopy;
-                [URLs enumerateObjectsUsingBlock:^(NSURL * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    PHAssetChangeRequest *assetRequest = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:obj];
-                    PHObjectPlaceholder *placeholder = [assetRequest placeholderForCreatedAsset];
-                    [identifiers addObject:placeholder.localIdentifier];
-                }];
-                [collectionRequest addAssets:assets.copy];
-            } completionHandler:^(BOOL success, NSError * _Nullable error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (completion) {
-                        if (error) {
-                            completion(nil, error);
-                        } else {
-                            completion(identifiers, nil);
-                        }
-                    }
-                });
-            }];
-        } else {
-            if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
-        }
-    }];
-}
-
-+ (void)writeContent:(id)content toAlbum:(NSString *)albumName completion:(void(^)(NSString *, NSError *))completion {
-    if ([content isKindOfClass:UIImage.class]) {
-        [self writeImages:@[content] toAlbum:albumName completion:^(NSArray<NSString *> *identifiers, NSError *error) {
-            NSString *identifier = identifiers.count > 0 ? identifiers.firstObject : nil;
-            if (completion) completion(identifier, error);
-        }];
-    } else if ([content isKindOfClass:NSString.class] || [content isKindOfClass:NSURL.class]) {
-        if ([content isKindOfClass:NSString.class]) content = [NSURL fileURLWithPath:content];
-        [self writeVideos:@[content] toAlbum:albumName completion:^(NSArray<NSString *> *identifiers, NSError *error) {
-            NSString *identifier = identifiers.count > 0 ? identifiers.firstObject : nil;
-            if (completion) completion(identifier, error);
-        }];
-    } else {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"文件类型不匹配"}]);
-    }
-}
-
-#if __has_include(<Photos/PHLivePhoto.h>)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability"
-+ (void)writeLivePhotoWithImage:(NSURL *)imageURL video:(NSURL *)videoURL completion:(void(^)(BOOL success, NSError *error))completion {
-    if (![NSFileManager.defaultManager fileExistsAtPath:imageURL.path isDirectory:nil] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path isDirectory:nil]) {
-        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"LivePhoto文件不存在"}]);
-        return;
-    }
-    [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
-        if (allowed) {
-            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
-                [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:nil];
-                [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
-            } completionHandler:completion];
-        } else {
-            if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
-        }
-    }];
-}
-#pragma clang diagnostic pop
-#endif
-
-+ (PHAssetCollectionChangeRequest  *)creationRequestForAssetCollectionWithTitle:(NSString *)title {
-    if (title.length <= 0) return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:[NSBundle displayName]];
-    /// 从用户相簿集合查找
++ (PHAssetCollectionChangeRequest *)creationRequestForAssetCollectionWithTitle:(NSString *)title {
+    if (!title) return nil;
+    if (title.length <= 0) title = [[NSBundle mainBundle] infoDictionary][(__bridge NSString*)kCFBundleNameKey];
+    // 从用户相簿集合查找
     __block PHAssetCollection *collection;
     PHFetchResult<PHAssetCollection *>*fetchResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
     [fetchResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -647,4 +611,34 @@ static MNAssetHelper *_helper;
     return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:title];
 }
 
+#if __has_include(<Photos/PHLivePhoto.h>)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
++ (void)writeLivePhotoWithImage:(NSURL *)imageURL video:(NSURL *)videoURL completion:(void(^)(NSString *, NSError *))completion {
+    if (![NSFileManager.defaultManager fileExistsAtPath:imageURL.path] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path]) {
+        if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"LivePhoto文件不存在"}]);
+        return;
+    }
+    [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
+        if (allowed) {
+            __block NSString *identifier;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+                [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:nil];
+                [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
+                identifier = [[request placeholderForCreatedAsset] localIdentifier];
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) completion(success ? identifier : nil, success ? nil : error);
+                });
+            }];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
+            });
+        }
+    }];
+}
+#pragma clang diagnostic pop
+#endif
 @end

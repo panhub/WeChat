@@ -102,8 +102,8 @@
 - (void)saveImagesToAlbum {
     if (self.subImages.count > 0) {
         [self.view showWeChatDialog];
-        [MNAssetHelper writeImages:self.subImages toAlbum:nil completion:^(NSArray<NSString *> *identifiers, NSError *error) {
-            if (error) {
+        [MNAssetHelper writeAssets:self.subImages toAlbum:nil completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+            if (identifiers.count <= 0) {
                 [self.view showInfoDialog:error.localizedDescription];
             } else {
                 [self.view showCompletedDialog:@"已保存至系统相册"];
