@@ -1,12 +1,13 @@
 //
-//  KeyboardViewController.m
+//  NumberKeyboardController.m
 //  NumberKeyboard
 //
 //  Created by Vicent on 2020/3/7.
 //  Copyright © 2020 Vincent. All rights reserved.
 //
 
-#import "KeyboardViewController.h"
+#import "NumberKeyboardController.h"
+#import "NumberKeyboardView.h"
 #import "MNLayoutConstraint.h"
 #import "UIView+MNLayout.h"
 #import "UIColor+MNHelper.h"
@@ -17,16 +18,19 @@
 #define NKHorSeparatorTag   300
 #define NKVerSeparatorTag   400
 
-@interface KeyboardViewController ()
-@property (nonatomic, strong) UIButton *nextKeyboardButton;
-@property (nonatomic, strong) UIButton *deleteKeyboardButton;
+@interface NumberKeyboardController ()
+@property (nonatomic, strong) UIButton *switchKeyButton;
+@property (nonatomic, strong) UIButton *deleteKeyButton;
 @end
 
-@implementation KeyboardViewController
+@implementation NumberKeyboardController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.exclusiveTouch = YES;
+    self.view.multipleTouchEnabled = NO;
+    self.view.userInteractionEnabled = YES;
     self.view.backgroundColor = UIColorWithSingleRGB(240.f);
     
     NSArray <NSString *>*keys = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @(NKNextButtonTag).stringValue, @"0", @(NKDeleteButtonTag).stringValue];
@@ -34,7 +38,7 @@
         UIButton *keyButton = [UIButton buttonWithType:UIButtonTypeCustom];
         keyButton.tag = obj.integerValue;
         keyButton.enabled = YES;
-        keyButton.userInteractionEnabled = NO;
+        keyButton.userInteractionEnabled = YES;
         [keyButton setTitleColor:UIColor.darkTextColor forState:UIControlStateNormal];
         keyButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:22.f];
         if (keyButton.tag != NKNextButtonTag && keyButton.tag != NKDeleteButtonTag) {
@@ -49,14 +53,13 @@
         keyButton.translatesAutoresizingMaskIntoConstraints = NO;
         [keyButton addTarget:self action:@selector(keyboardButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         if (keyButton.tag == NKNextButtonTag) {
-            //[keyButton addTarget:self action:@selector(handleInputModeListFromView:withEvent:) forControlEvents:UIControlEventAllTouchEvents];
             [keyButton setImage:[UIImage imageNamed:@"keyboard_switch"] forState:UIControlStateNormal];
             [keyButton setImage:[UIImage imageNamed:@"keyboard_switch"] forState:UIControlStateHighlighted];
-            self.nextKeyboardButton = keyButton;
+            self.switchKeyButton = keyButton;
         } else if (keyButton.tag == NKDeleteButtonTag) {
             [keyButton setImage:[UIImage imageNamed:@"keyboard_delete"] forState:UIControlStateNormal];
             [keyButton setImage:[UIImage imageNamed:@"keyboard_delete_highlight"] forState:UIControlStateHighlighted];
-            self.deleteKeyboardButton = keyButton;
+            self.deleteKeyButton = keyButton;
         }
         [self.view addSubview:keyButton];
     }];
@@ -78,10 +81,10 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self updateButtonConstraints];
+    [self updateKeyButtonConstraints];
 }
 
-- (void)updateButtonConstraints {
+- (void)updateKeyButtonConstraints {
     
     if (self.view.constraints.count) return;
     
@@ -101,6 +104,7 @@
     
     [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (![obj isKindOfClass:UIButton.class]) return;
+        obj.userInteractionEnabled = YES;
         NSInteger index = obj.tag;
         if (index == 0) index = 11;
         if (index == NKNextButtonTag) index = 10;
@@ -108,6 +112,7 @@
         index --;
         CGFloat left = x + (w + xm)*(index%rows);
         CGFloat top = y + (h + ym)*(index/rows);
+        //obj.frame = CGRectMake(left, top, w, h);
         obj.layout.leftOffsetToView(self.view, left).topOffsetToView(self.view, top).widthEqual(w).heightEqual(h);
         if (obj.tag == NKNextButtonTag) {
             UIButton *keyButton = (UIButton *)obj;
@@ -127,31 +132,24 @@
     }
 }
 
-- (void)viewWillLayoutSubviews
-{
-    self.nextKeyboardButton.hidden = !self.needsInputModeSwitchKey;
-    [super viewWillLayoutSubviews];
-}
-
 - (void)textWillChange:(id<UITextInput>)textInput {
     // The app is about to change the document's contents. Perform any preparation here.
 }
 
 - (void)textDidChange:(id<UITextInput>)textInput {
     // The app has just changed the document's contents, the document context has been updated.
-    
     UIColor *textColor = nil;
     if (self.textDocumentProxy.keyboardAppearance == UIKeyboardAppearanceDark) {
         textColor = [UIColor whiteColor];
     } else {
         textColor = [UIColor blackColor];
     }
-    [self.nextKeyboardButton setTitleColor:textColor forState:UIControlStateNormal];
+    [self.switchKeyButton setTitleColor:textColor forState:UIControlStateNormal];
 }
 
 #pragma mark - 键盘按钮点击
 - (void)keyboardButtonTouchUpInside:(UIButton *)keyButton {
-    NSLog(@"");
+    NSLog(@"keyboardButtonTouchUpInside");
 }
 
 @end

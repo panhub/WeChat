@@ -774,6 +774,7 @@
 		E20E79AE234C8CFD00B1896F /* CAAnimation+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E20E79AD234C8CFD00B1896F /* CAAnimation+MNHelper.m */; };
 		E25FD006234A28FE00B5D19F /* CALayer+MNAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */; };
 		E27AE8C0234C6602003225B6 /* MNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = E27AE8BF234C6602003225B6 /* MNUtilities.m */; };
+		E8055BEF244EE8380078EA7C /* NumberKeyboardView.m in Sources */ = {isa = PBXBuildFile; fileRef = E8055BEE244EE8380078EA7C /* NumberKeyboardView.m */; };
 		E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */; };
 		E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBB3222157B7002B7763 /* UIColor+MNHelper.m */; };
 		E810D47E2414038B0052D0F4 /* KeyboardAsset.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */; };
@@ -794,7 +795,7 @@
 		E89D2EAA2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E89D2EAB2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E89D2EAC2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
-		E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F200C22413721C008F20BB /* KeyboardViewController.m */; };
+		E8F200C32413721C008F20BB /* NumberKeyboardController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F200C22413721C008F20BB /* NumberKeyboardController.m */; };
 		E8F200C72413721C008F20BB /* NumberKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E8F200BF2413721C008F20BB /* NumberKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
 		E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
@@ -2466,6 +2467,8 @@
 		E25FD005234A28FE00B5D19F /* CALayer+MNAnimation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MNAnimation.m"; sourceTree = "<group>"; };
 		E27AE8BE234C6602003225B6 /* MNUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNUtilities.h; sourceTree = "<group>"; };
 		E27AE8BF234C6602003225B6 /* MNUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNUtilities.m; sourceTree = "<group>"; };
+		E8055BED244EE8380078EA7C /* NumberKeyboardView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NumberKeyboardView.h; sourceTree = "<group>"; };
+		E8055BEE244EE8380078EA7C /* NumberKeyboardView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NumberKeyboardView.m; sourceTree = "<group>"; };
 		E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+NKHelper.h"; sourceTree = "<group>"; };
 		E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+NKHelper.m"; sourceTree = "<group>"; };
 		E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = KeyboardAsset.xcassets; sourceTree = "<group>"; };
@@ -2484,8 +2487,8 @@
 		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
 		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
 		E8F200BF2413721C008F20BB /* NumberKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NumberKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		E8F200C12413721C008F20BB /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		E8F200C22413721C008F20BB /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
+		E8F200C12413721C008F20BB /* NumberKeyboardController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NumberKeyboardController.h; sourceTree = "<group>"; };
+		E8F200C22413721C008F20BB /* NumberKeyboardController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NumberKeyboardController.m; sourceTree = "<group>"; };
 		E8F200C42413721C008F20BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
 		E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
@@ -6128,8 +6131,10 @@
 			isa = PBXGroup;
 			children = (
 				E8F200C42413721C008F20BB /* Info.plist */,
-				E8F200C12413721C008F20BB /* KeyboardViewController.h */,
-				E8F200C22413721C008F20BB /* KeyboardViewController.m */,
+				E8F200C12413721C008F20BB /* NumberKeyboardController.h */,
+				E8F200C22413721C008F20BB /* NumberKeyboardController.m */,
+				E8055BED244EE8380078EA7C /* NumberKeyboardView.h */,
+				E8055BEE244EE8380078EA7C /* NumberKeyboardView.m */,
 				E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */,
 				E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */,
 				E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */,
@@ -7085,7 +7090,8 @@
 			files = (
 				E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */,
 				E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */,
-				E8F200C32413721C008F20BB /* KeyboardViewController.m in Sources */,
+				E8055BEF244EE8380078EA7C /* NumberKeyboardView.m in Sources */,
+				E8F200C32413721C008F20BB /* NumberKeyboardController.m in Sources */,
 				E8F200CC241372E1008F20BB /* UIView+MNLayout.m in Sources */,
 				E8F200CB241372C8008F20BB /* MNLayoutConstraint.m in Sources */,
 			);

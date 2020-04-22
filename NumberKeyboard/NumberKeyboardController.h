@@ -1,5 +1,5 @@
 //
-//  KeyboardViewController.h
+//  NumberKeyboardController.h
 //  NumberKeyboard
 //
 //  Created by Vicent on 2020/3/7.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface KeyboardViewController : UIInputViewController
+@interface NumberKeyboardController : UIInputViewController
 
 @end

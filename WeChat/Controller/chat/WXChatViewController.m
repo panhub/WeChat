@@ -56,7 +56,7 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
 
 - (void)createView {
     [super createView];
-
+    
     self.navigationBar.translucent = NO;
     self.navigationBar.backgroundColor = VIEW_COLOR;
     self.navigationBar.shadowColor = UIColorWithAlpha([UIColor darkTextColor], .1f);
