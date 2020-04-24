@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "MNPurchaseResponse.h"
 
-typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
+NS_ASSUME_NONNULL_BEGIN
+
+typedef void(^_Nullable MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 
 @interface MNPurchaseRequest : NSObject
 
@@ -17,10 +19,10 @@ typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 @property (nonatomic) NSInteger requestOutCount;
 
 /**请求结束回调*/
-@property (nonatomic, copy) MNPurchaseRequestHandler completionHandler;
+@property (nonatomic, copy, nullable) MNPurchaseRequestHandler completionHandler;
 
 /**产品标识*/
-@property (nonatomic, copy) NSString *productIdentifier;
+@property (nonatomic, copy, nullable) NSString *productIdentifier;
 
 /**
  依据产品标识构造
@@ -45,3 +47,4 @@ typedef void(^MNPurchaseRequestHandler)(MNPurchaseResponse *response);
 
 @end
 
+NS_ASSUME_NONNULL_END

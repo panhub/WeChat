@@ -35,7 +35,7 @@
     dispatch_semaphore_t _semaphore;
 }
 @property (nonatomic, strong) MNPurchaseRequest *request;
-@property (nonatomic, strong) __kindof MNURLDataRequest *(^serverVerifyHandler)(MNPurchaseReceipt *);
+@property (nonatomic, strong) void (^receiptCheckHandler)(MNPurchaseReceipt *, void(^)(MNPurchaseResponseCode));
 @end
 
 static MNPurchaseManager *_manager;
@@ -62,7 +62,7 @@ static MNPurchaseManager *_manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _manager = [super init];
-        _manager.verifyTryCount = 3;
+        _manager.checkTryCount = 3;
         _manager.receiptMaxFailCount = 3;
         _semaphore = dispatch_semaphore_create(1);
         //062dbdb74e1a4407988fbaf00ae6f98c
@@ -295,9 +295,15 @@ static MNPurchaseManager *_manager;
 - (void)verifyReceipt:(MNPurchaseReceipt *)receipt {
     if (!receipt) return;
     #if DEBUG
-    // 默认先验证正式环境, 返回环境错误再验证沙箱环境
-    [self verifyReceiptToItunes:receipt sandbox:NO];
+    if (self.isUseServerCheckReceipt) {
+        // 向服务端验证支付凭证
+        [self verifyReceiptToServer:receipt];
+    } else {
+        // 默认先验证正式环境, 返回环境错误再验证沙箱环境
+        [self verifyReceiptToItunes:receipt sandbox:NO];
+    }
     #else
+    // 正式版本, 向服务端验证支付凭证
     [self verifyReceiptToServer:receipt];
     #endif
 }
@@ -335,23 +341,20 @@ static MNPurchaseManager *_manager;
 
 - (void)verifyReceiptToServer:(MNPurchaseReceipt *)receipt {
     // 向服务器验证凭证<地址, 参数自定>
-    __weak typeof(self) weakself = self;
+    if (self.receiptCheckHandler == nil && self.delegate == nil) return;
     receipt.tryCount ++;
-    MNURLDataRequest *request;
-    if (self.serverVerifyHandler) request = self.serverVerifyHandler(receipt);
-    if (!request) request = MNURLDataRequest.new;
-    request.method = MNURLHTTPMethodPost;
-    request.timeoutInterval = 15.f;
-    request.cachePolicy = MNURLDataCacheNever;
-    [request loadData:^{
-        
-    } completion:^(MNURLResponse *response) {
-        if (response.code == MNURLResponseCodeSucceed) {
+    __weak typeof(self) weakself = self;
+    void(^checkResultHandler)(MNPurchaseResponseCode) = ^(MNPurchaseResponseCode code){
+        if (code == MNPurchaseResponseCodeSucceed) {
             [weakself completeVerifyReceipt:receipt];
         } else {
-            [weakself finishVerifyReceipt:receipt withCode:(NSInteger)(response.code)];
+            [weakself finishVerifyReceipt:receipt withCode:code];
         }
-    }];
+    };
+    if (self.receiptCheckHandler) self.receiptCheckHandler(receipt, [checkResultHandler copy]);
+    if ([self.delegate respondsToSelector:@selector(purchaseManagerShouldCheckReceipt:resultHandler:)]) {
+        [self.delegate purchaseManagerShouldCheckReceipt:receipt resultHandler:[checkResultHandler copy]];
+    }
 }
 
 - (void)completeVerifyReceipt:(MNPurchaseReceipt *)receipt {
@@ -369,7 +372,7 @@ static MNPurchaseManager *_manager;
 }
 
 - (void)finishVerifyReceipt:(MNPurchaseReceipt *)receipt withCode:(MNPurchaseResponseCode)code {
-    if (receipt.tryCount >= self.verifyTryCount) {
+    if (receipt.tryCount >= self.checkTryCount) {
         receipt.failCount ++;
         if (receipt.isRestore || receipt.failCount >= self.receiptMaxFailCount) {
             // 恢复购买凭据并未缓存本地, 这里只是为了删除正常凭据
@@ -442,13 +445,13 @@ static MNPurchaseManager *_manager;
 }
 
 #pragma mark - Setter
-- (void)setVerifyTryCount:(int)verifyTryCount {
-    verifyTryCount = MAX(1, verifyTryCount);
-    _verifyTryCount = verifyTryCount;
+- (void)setCheckTryCount:(int)checkTryCount {
+    checkTryCount = MAX(1, checkTryCount);
+    _checkTryCount = checkTryCount;
 }
 
-- (void)setPurchaseReceiptServerVerify:(__kindof MNURLDataRequest *(^)(MNPurchaseReceipt *))serverVerifyHandler {
-    self.serverVerifyHandler = [serverVerifyHandler copy];
+- (void)setPurchaseReceiptCheckHandler:(void(^)(MNPurchaseReceipt *, void(^)(MNPurchaseResponseCode)))receiptCheckHandler {
+    self.receiptCheckHandler = [receiptCheckHandler copy];
 }
 
 #pragma mark - dealloc

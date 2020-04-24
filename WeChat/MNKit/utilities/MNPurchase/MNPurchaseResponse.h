@@ -29,6 +29,8 @@ typedef NS_ENUM(NSInteger, MNPurchaseResponseCode) {
     MNPurchaseResponseCodeInternalError = 21100
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MNPurchaseResponse : NSObject
 
 /**错误信息*/
@@ -53,3 +55,4 @@ typedef NS_ENUM(NSInteger, MNPurchaseResponseCode) {
 
 @end
 
+NS_ASSUME_NONNULL_END

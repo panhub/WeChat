@@ -9,7 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "MNPurchaseRequest.h"
 #import "MNPurchaseReceipt.h"
-@class MNURLDataRequest;
+@class MNURLDataRequest, MNPurchaseManager;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol MNPurchaseDelegate <NSObject>
+@optional
+- (void)purchaseManagerShouldCheckReceipt:(MNPurchaseReceipt *)receipt resultHandler:(void(^)(MNPurchaseResponseCode))resultHandler;
+@end
 
 @interface MNPurchaseManager : NSObject
 
@@ -17,19 +24,28 @@
 @property (nonatomic, readonly) BOOL canPayment;
 
 /**验证请求失败次数*/
-@property (nonatomic) int verifyTryCount;
+@property (nonatomic) int checkTryCount;
 
 /**凭据验证 最大失败次数*/
 @property (nonatomic) int receiptMaxFailCount;
 
 /**后台生成共享秘钥, 订阅所需*/
-@property (nonatomic, copy) NSString *secretKey;
+@property (nonatomic, copy, nullable) NSString *secretKey;
+
+/**事件代理*/
+@property (nonatomic, weak, nullable) id<MNPurchaseDelegate> delegate;
+
+/**使用服务端验证凭证*/
+@property (nonatomic, getter=isUseServerCheckReceipt) BOOL useServerCheckReceipt;
 
 /**使用弹窗提示错误信息*/
-@property (nonatomic, copy) NSDictionary <NSString *, NSString *>*receiptHeader;
+@property (nonatomic, copy, nullable) NSDictionary <NSString *, NSString *>*receiptHeader;
 
 /**使用弹窗提示错误信息<几个重要错误>*/
 @property (nonatomic, getter=isAllowsAlertIfNeeded) BOOL allowsAlertIfNeeded;
+
+/**便于传值*/
+@property (nonatomic, strong, nullable) id userInfo;
 
 /**
  内购管理者实例化入口
@@ -68,10 +84,11 @@
 - (void)startRestorePurchaseWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler;
 
 /**
- 设置收据验证回调
- @param serverVerifyHandler 结束回调
+ 设置收据验证回调<优先级高于代理>
+ @param receiptCheckHandler 服务端验证凭据回调
 */
-- (void)setPurchaseReceiptServerVerify:(__kindof MNURLDataRequest *(^)(MNPurchaseReceipt *))serverVerifyHandler;
+- (void)setPurchaseReceiptCheckHandler:(void(^_Nullable)(MNPurchaseReceipt *, void(^)(MNPurchaseResponseCode)))receiptCheckHandler;
 
 @end
 
+NS_ASSUME_NONNULL_END
