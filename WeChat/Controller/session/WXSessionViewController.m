@@ -114,7 +114,7 @@
     NSInteger row = indexPath.row;
     if (row == 2 || row == 3) {
         [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
-            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+            if (![self.view updateDialogMessage:request.purchaseStateString]) {
                 [self.view showActivityDialog:request.purchaseStateString];
             }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
@@ -123,7 +123,7 @@
     }
     if (row > 4) {
         [MNPurchaseManager.defaultManager startRestorePurchase:^(MNPurchaseRequest * _Nonnull request) {
-            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+            if (![self.view updateDialogMessage:request.purchaseStateString]) {
                 [self.view showActivityDialog:request.purchaseStateString];
             }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
@@ -131,7 +131,7 @@
         }];
     } else {
         [MNPurchaseManager.defaultManager startPurchaseProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
-            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+            if (![self.view updateDialogMessage:request.purchaseStateString]) {
                 [self.view showActivityDialog:request.purchaseStateString];
             }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {

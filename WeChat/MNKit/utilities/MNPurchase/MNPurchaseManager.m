@@ -296,7 +296,7 @@ static MNPurchaseManager *_manager;
         [self saveReceiptToLocal:receipt];
     }
     // 更新状态
-    if (self.request && productIdentifier && [productIdentifier isEqualToString:self.request.productIdentifier]) {
+    if (self.request.productIdentifier.length && productIdentifier.length && [productIdentifier isEqualToString:self.request.productIdentifier]) {
         self.request.state = MNPurchaseRequestStateSubmitting;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.request.startHandler) self.request.startHandler(self.request);
