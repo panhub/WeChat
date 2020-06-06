@@ -447,7 +447,7 @@ static MNPurchaseManager *_manager;
         MNPurchaseRequest *request = self.request;
         if (request && ( !receipt || request.isRestore || [request.productIdentifier isEqualToString:receipt.productIdentifier])) {
             // 为了避免恢复购买多次验证触发方法
-            if (receipt && request.isRestore && (self.currentRestoreIndex < self.restoreCode - 1)) {
+            if (receipt && request.isRestore && (self.currentRestoreIndex < self.totalRestoreCount - 1)) {
                 self.currentRestoreIndex ++;
                 if (responseCode == MNPurchaseResponseCodeSucceed) self.restoreCode = responseCode;
             } else {
