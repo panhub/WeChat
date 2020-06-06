@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *transactionIdentifier;
 
 /**收据关联信息*/
-@property (nonatomic, copy, nullable) id<NSCopying> userInfo;
+@property (nonatomic, copy, nullable) id userInfo;
 
 /**失败次数*/
 @property (nonatomic) int failCount;

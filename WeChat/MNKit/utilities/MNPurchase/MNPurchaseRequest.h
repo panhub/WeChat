@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *productIdentifier;
 
 /**自定信息, 会保存至凭据中*/
-@property (nonatomic, copy, nullable) id<NSCopying> userInfo;
+@property (nonatomic, copy, nullable) id userInfo;
 
 /**内购状态*/
 @property (nonatomic) MNPurchaseRequestState state;
