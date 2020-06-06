@@ -114,20 +114,26 @@
     NSInteger row = indexPath.row;
     if (row == 2 || row == 3) {
         [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
-            [self.view showActivityDialog:@"订阅中"];
+            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+                [self.view showActivityDialog:request.purchaseStateString];
+            }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];
     }
     if (row > 4) {
         [MNPurchaseManager.defaultManager startRestorePurchase:^(MNPurchaseRequest * _Nonnull request) {
-            [self.view showActivityDialog:@"恢复购买中"];
+            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+                [self.view showActivityDialog:request.purchaseStateString];
+            }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];
     } else {
         [MNPurchaseManager.defaultManager startPurchaseProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
-            [self.view showActivityDialog:@"购买中"];
+            if ([self.view updateDialogMessage:request.purchaseStateString]) {
+                [self.view showActivityDialog:request.purchaseStateString];
+            }
         } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];

@@ -9,10 +9,17 @@
 #import <Foundation/Foundation.h>
 @class MNPurchaseRequest, MNPurchaseResponse;
 
-NS_ASSUME_NONNULL_BEGIN
+typedef NS_ENUM(NSInteger, MNPurchaseRequestState) {
+    MNPurchaseRequestStateUnknown = 0,
+    MNPurchaseRequestStatePurchasing = 1,
+    MNPurchaseRequestStateSubmitting = 2,
+    MNPurchaseRequestStateCompleted = 3
+};
 
 typedef void(^_Nullable MNPurchaseStartHandler)(MNPurchaseRequest *_Nonnull request);
 typedef void(^_Nullable MNPurchaseFinishHandler)(MNPurchaseResponse *_Nonnull response);
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MNPurchaseRequest : NSObject
 
@@ -30,6 +37,12 @@ typedef void(^_Nullable MNPurchaseFinishHandler)(MNPurchaseResponse *_Nonnull re
 
 /**自定信息, 会保存至凭据中*/
 @property (nonatomic, copy, nullable) id<NSCopying> userInfo;
+
+/**内购状态*/
+@property (nonatomic) MNPurchaseRequestState state;
+
+/**内购状态描述*/
+@property (nonatomic, readonly) NSString *purchaseStateString;
 
 /**
  依据产品标识构造

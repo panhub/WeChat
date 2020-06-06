@@ -19,6 +19,7 @@
     if (self) {
         self.requestMaxCount = 3;
         self.productIdentifier = @"";
+        self.state = MNPurchaseRequestStateUnknown;
     }
     return self;
 }
@@ -37,8 +38,12 @@
     _requestMaxCount = requestMaxCount;
 }
 
-@end
+#pragma mark - Getter
+- (NSString *)purchaseStateString {
+    return @[@"准备购买", (self.isRestore ? @"恢复购买中" : (self.isSubscribe ? @"正在订阅项目" : @"项目购买中")), @"正在检查订单", @"已停止购买"][self.state];
+}
 
+@end
 
 
 @implementation MNPurchaseRequest (MNPurchasing)

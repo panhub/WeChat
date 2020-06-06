@@ -136,8 +136,11 @@ static MNPurchaseManager *_manager;
     }
     // 保存请求并开始恢复购买
     request.productIdentifier = nil;
+    request.state = MNPurchaseRequestStatePurchasing;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (request.startHandler) request.startHandler(request);
+    });
     self.request = request;
-    if (request.startHandler) request.startHandler(request);
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
@@ -163,6 +166,10 @@ static MNPurchaseManager *_manager;
     // 开启检测
     [self becomeTransactionObserver];
     // 保存请求并开始
+    request.state = MNPurchaseRequestStatePurchasing;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (request.startHandler) request.startHandler(request);
+    });
     self.request = request;
     if (request.startHandler) request.startHandler(request);
     [self startProductRequest];
@@ -287,6 +294,13 @@ static MNPurchaseManager *_manager;
     } else {
         // 将凭证保存沙盒
         [self saveReceiptToLocal:receipt];
+    }
+    // 更新状态
+    if (self.request && productIdentifier && [productIdentifier isEqualToString:self.request.productIdentifier]) {
+        self.request.state = MNPurchaseRequestStateSubmitting;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.request.startHandler) self.request.startHandler(self.request);
+        });
     }
     // 验证收据
     [self submitReceipt:receipt];
@@ -458,6 +472,7 @@ static MNPurchaseManager *_manager;
                 self.currentRestoreIndex = 0;
                 self.restoreCode = MNPurchaseResponseCodeFailed;
                 self.request = nil;
+                request.state = MNPurchaseRequestStateCompleted;
                 MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
                 response.request = request;
                 response.receipt = receipt;
