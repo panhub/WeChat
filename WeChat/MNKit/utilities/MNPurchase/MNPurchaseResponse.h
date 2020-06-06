@@ -7,8 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+@class MNPurchaseReceipt, MNPurchaseRequest;
 
 typedef NS_ENUM(NSInteger, MNPurchaseResponseCode) {
+    MNPurchaseResponseCodeUnknown = -1,
     MNPurchaseResponseCodeFailed = 0,
     MNPurchaseResponseCodeSucceed = 1,
     MNPurchaseResponseCodeCancelled = 2,
@@ -38,6 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**错误码*/
 @property (nonatomic, readonly) MNPurchaseResponseCode code;
+
+/**凭据*/
+@property (nonatomic, weak, nullable) MNPurchaseReceipt *receipt;
+
+/**请求*/
+@property (nonatomic, weak, nullable) MNPurchaseRequest *request;
 
 /**
  依据响应码初始化

@@ -112,18 +112,23 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger row = indexPath.row;
-    [self.view showLoadDialog:@"产品购买中"];
     if (row == 2 || row == 3) {
-        [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue completionHandler:^(MNPurchaseResponse *response) {
+        [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
+            [self.view showActivityDialog:@"订阅中"];
+        } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];
     }
     if (row > 4) {
-        [MNPurchaseManager.defaultManager startRestorePurchaseWithCompletionHandler:^(MNPurchaseResponse *response) {
+        [MNPurchaseManager.defaultManager startRestorePurchase:^(MNPurchaseRequest * _Nonnull request) {
+            [self.view showActivityDialog:@"恢复购买中"];
+        } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];
     } else {
-        [[MNPurchaseManager defaultManager] startPurchaseProduct:@(row + 1).stringValue completionHandler:^(MNPurchaseResponse *response) {
+        [MNPurchaseManager.defaultManager startPurchaseProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
+            [self.view showActivityDialog:@"购买中"];
+        } completionHandler:^(MNPurchaseResponse * _Nonnull response) {
             [self.view showInfoDialog:response.message];
         }];
     }

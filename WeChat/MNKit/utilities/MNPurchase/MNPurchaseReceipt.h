@@ -10,25 +10,31 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MNPurchaseReceipt : NSObject <NSSecureCoding>
+@interface MNPurchaseReceipt : NSObject <NSSecureCoding, NSCopying>
 
 /**收据内容*/
 @property (nonatomic, copy, readonly) NSString *content;
 
-/**收据标识<订单号>*/
-@property (nonatomic, copy, nullable) NSString *identifier;
+/**产品标识*/
+@property (nonatomic, copy, nullable) NSString *productIdentifier;
+
+/**交易标识*/
+@property (nonatomic, copy, nullable) NSString *transactionIdentifier;
 
 /**收据关联信息*/
-@property (nonatomic, copy, nullable) NSString *header;
+@property (nonatomic, copy, nullable) id<NSCopying> userInfo;
 
 /**失败次数*/
-@property (nonatomic, assign) int failCount;
+@property (nonatomic) int failCount;
 
 /**是否是订阅*/
 @property (nonatomic, getter=isSubscribe) BOOL subscribe;
 
 /**是否是恢复购买*/
 @property (nonatomic, getter=isRestore) BOOL restore;
+
+/**判断是否是本地凭据*/
+@property (nonatomic, readonly) BOOL isLocalReceipt;
 
 /**本地凭证*/
 @property (nonatomic, readonly, class) NSArray <MNPurchaseReceipt *>*localReceipts;
@@ -60,6 +66,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)updateLocalReceipts;
 
 /**
+ 强制更新本地凭据
+ @param receipts 凭据内容<null 则删除本地凭据>
+ @return 是否更新成功
+ */
++ (BOOL)updateLocalReceiptCompulsory:(NSArray <MNPurchaseReceipt *>*_Nullable)receipts;
+
+/**
  保存内购收据
  @return 是否保存成功
 */
@@ -86,10 +99,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-@interface MNPurchaseReceipt (MNPurchaseVerify)
+@interface MNPurchaseReceipt (MNPurchaseSubmiting)
 
 /**尝试验证的次数*/
-@property (nonatomic) int tryCount;
+@property (nonatomic) int submitCount;
 
 @end
 

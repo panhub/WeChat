@@ -7,22 +7,29 @@
 //  内购产品请求
 
 #import <Foundation/Foundation.h>
-#import "MNPurchaseResponse.h"
+@class MNPurchaseRequest, MNPurchaseResponse;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^_Nullable MNPurchaseRequestHandler)(MNPurchaseResponse *response);
+typedef void(^_Nullable MNPurchaseStartHandler)(MNPurchaseRequest *_Nonnull request);
+typedef void(^_Nullable MNPurchaseFinishHandler)(MNPurchaseResponse *_Nonnull response);
 
 @interface MNPurchaseRequest : NSObject
 
 /**请求产品信息失败后的尝试次数*/
-@property (nonatomic) NSInteger requestOutCount;
+@property (nonatomic) NSInteger requestMaxCount;
+
+/**请求开始回调*/
+@property (nonatomic, copy, nullable) MNPurchaseStartHandler startHandler;
 
 /**请求结束回调*/
-@property (nonatomic, copy, nullable) MNPurchaseRequestHandler completionHandler;
+@property (nonatomic, copy, nullable) MNPurchaseFinishHandler completionHandler;
 
 /**产品标识*/
 @property (nonatomic, copy, nullable) NSString *productIdentifier;
+
+/**自定信息, 会保存至凭据中*/
+@property (nonatomic, copy, nullable) id<NSCopying> userInfo;
 
 /**
  依据产品标识构造

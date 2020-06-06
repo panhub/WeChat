@@ -17,7 +17,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.requestOutCount = 3;
+        self.requestMaxCount = 3;
         self.productIdentifier = @"";
     }
     return self;
@@ -32,9 +32,9 @@
 }
 
 #pragma mark - Setter
-- (void)setRequestOutCount:(NSInteger)requestOutCount {
-    requestOutCount = MAX(1, requestOutCount);
-    _requestOutCount = requestOutCount;
+- (void)setRequestMaxCount:(NSInteger)requestMaxCount {
+    requestMaxCount = MAX(1, requestMaxCount);
+    _requestMaxCount = requestMaxCount;
 }
 
 @end

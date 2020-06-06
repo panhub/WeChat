@@ -778,10 +778,6 @@
 		E810D45A2413D4860052D0F4 /* UIImage+NKHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */; };
 		E810D45B2413D4B50052D0F4 /* UIColor+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBB3222157B7002B7763 /* UIColor+MNHelper.m */; };
 		E810D47E2414038B0052D0F4 /* KeyboardAsset.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */; };
-		E8153057243181E20009C0A9 /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E815304E243181E20009C0A9 /* MNPurchaseManager.m */; };
-		E8153058243181E20009C0A9 /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = E815304F243181E20009C0A9 /* MNPurchaseResponse.m */; };
-		E815305A243181E20009C0A9 /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */; };
-		E815305B243181E20009C0A9 /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E8153056243181E20009C0A9 /* MNPurchaseRequest.m */; };
 		E81CD975240F94F10063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD976240F94F20063B8F8 /* UIView+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB8F222157B7002B7763 /* UIView+MNLayout.m */; };
 		E81CD978240F98260063B8F8 /* UIView+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBB9D222157B7002B7763 /* UIView+MNHelper.m */; };
@@ -790,6 +786,10 @@
 		E81CD97C240F9A830063B8F8 /* CALayer+MNLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC5222157B7002B7763 /* CALayer+MNLayout.m */; };
 		E81CD97E240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */; };
 		E81CD97F240F9A890063B8F8 /* CALayer+MNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 200FBBC2222157B7002B7763 /* CALayer+MNHelper.m */; };
+		E82000ED248B6ADA0033A770 /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E82000E5248B6AD90033A770 /* MNPurchaseManager.m */; };
+		E82000EE248B6ADA0033A770 /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = E82000E6248B6AD90033A770 /* MNPurchaseResponse.m */; };
+		E82000EF248B6ADA0033A770 /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = E82000EB248B6AD90033A770 /* MNPurchaseReceipt.m */; };
+		E82000F0248B6ADA0033A770 /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E82000EC248B6AD90033A770 /* MNPurchaseRequest.m */; };
 		E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 200FC0D022215926002B7763 /* libc++.tbd */; };
 		E840D4C1240D4F81001553B9 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077A6602286C73D000EFB85 /* ExternalAccessory.framework */; };
 		E89D2EAA2412001A00A973C8 /* MNLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */; };
@@ -2472,15 +2472,15 @@
 		E810D4582413D4860052D0F4 /* UIImage+NKHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+NKHelper.h"; sourceTree = "<group>"; };
 		E810D4592413D4860052D0F4 /* UIImage+NKHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+NKHelper.m"; sourceTree = "<group>"; };
 		E810D47D2414038B0052D0F4 /* KeyboardAsset.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = KeyboardAsset.xcassets; sourceTree = "<group>"; };
-		E815304E243181E20009C0A9 /* MNPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
-		E815304F243181E20009C0A9 /* MNPurchaseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
-		E8153050243181E20009C0A9 /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
-		E8153051243181E20009C0A9 /* MNPurchaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
-		E8153052243181E20009C0A9 /* MNPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
-		E8153054243181E20009C0A9 /* MNPurchaseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
-		E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
-		E8153056243181E20009C0A9 /* MNPurchaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
+		E82000E5248B6AD90033A770 /* MNPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
+		E82000E6248B6AD90033A770 /* MNPurchaseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
+		E82000E7248B6AD90033A770 /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
+		E82000E8248B6AD90033A770 /* MNPurchaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
+		E82000E9248B6AD90033A770 /* MNPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
+		E82000EA248B6AD90033A770 /* MNPurchaseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
+		E82000EB248B6AD90033A770 /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
+		E82000EC248B6AD90033A770 /* MNPurchaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
 		E89D2EA82412001900A973C8 /* MNLayoutConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MNLayoutConstraint.h; sourceTree = "<group>"; };
 		E89D2EA92412001900A973C8 /* MNLayoutConstraint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNLayoutConstraint.m; sourceTree = "<group>"; };
@@ -2697,7 +2697,7 @@
 		200FB9DE222157B7002B7763 /* utilities */ = {
 			isa = PBXGroup;
 			children = (
-				E815304C243181E20009C0A9 /* MNPurchase */,
+				E82000E4248B6AD90033A770 /* MNPurchase */,
 				E89D2EA12411FC0900A973C8 /* MNLayoutConstraint */,
 				BF605BFE23BE081A0022F124 /* MNAssetExport */,
 				BFA28ADE23A405B6003CB264 /* MNLivePhoto */,
@@ -6103,17 +6103,17 @@
 			path = crop;
 			sourceTree = "<group>";
 		};
-		E815304C243181E20009C0A9 /* MNPurchase */ = {
+		E82000E4248B6AD90033A770 /* MNPurchase */ = {
 			isa = PBXGroup;
 			children = (
-				E8153052243181E20009C0A9 /* MNPurchaseManager.h */,
-				E815304E243181E20009C0A9 /* MNPurchaseManager.m */,
-				E8153050243181E20009C0A9 /* MNPurchaseReceipt.h */,
-				E8153055243181E20009C0A9 /* MNPurchaseReceipt.m */,
-				E8153051243181E20009C0A9 /* MNPurchaseRequest.h */,
-				E8153056243181E20009C0A9 /* MNPurchaseRequest.m */,
-				E8153054243181E20009C0A9 /* MNPurchaseResponse.h */,
-				E815304F243181E20009C0A9 /* MNPurchaseResponse.m */,
+				E82000E9248B6AD90033A770 /* MNPurchaseManager.h */,
+				E82000E5248B6AD90033A770 /* MNPurchaseManager.m */,
+				E82000E7248B6AD90033A770 /* MNPurchaseReceipt.h */,
+				E82000EB248B6AD90033A770 /* MNPurchaseReceipt.m */,
+				E82000E8248B6AD90033A770 /* MNPurchaseRequest.h */,
+				E82000EC248B6AD90033A770 /* MNPurchaseRequest.m */,
+				E82000EA248B6AD90033A770 /* MNPurchaseResponse.h */,
+				E82000E6248B6AD90033A770 /* MNPurchaseResponse.m */,
 			);
 			path = MNPurchase;
 			sourceTree = "<group>";
@@ -6511,10 +6511,10 @@
 				2055D8E122E021A40012E43E /* SDWebImagePrefetcher.m in Sources */,
 				200FBEF1222157B8002B7763 /* MNEmojiKeyboard.m in Sources */,
 				2055D68722E007180012E43E /* YYTextDebugOption.m in Sources */,
+				E82000F0248B6ADA0033A770 /* MNPurchaseRequest.m in Sources */,
 				200FBED4222157B8002B7763 /* MNMediaCacheWorker.m in Sources */,
 				BF605C0F23BE081B0022F124 /* MNAssetExporter+MNExportMetadata.m in Sources */,
 				200FBF55222157B8002B7763 /* NSArray+MNSafely.m in Sources */,
-				E815305B243181E20009C0A9 /* MNPurchaseRequest.m in Sources */,
 				208B81F4232E37C50009A147 /* MNAsset.m in Sources */,
 				201DB09122E8953C0063E88A /* WXMineInfoListCell.m in Sources */,
 				200FC009222157B8002B7763 /* MJRefreshComponent.m in Sources */,
@@ -6572,7 +6572,6 @@
 				201DB0A922E8953C0063E88A /* WXCookRecipeHeaderView.m in Sources */,
 				201DB05322E8953C0063E88A /* WXContactsSectionHeaderView.m in Sources */,
 				2055D68022E007180012E43E /* YYTextContainerView.m in Sources */,
-				E815305A243181E20009C0A9 /* MNPurchaseReceipt.m in Sources */,
 				201DB08322E8953C0063E88A /* WXBankCardAlertViewCell.m in Sources */,
 				200FBEF3222157B8002B7763 /* MNEmojiPreview.m in Sources */,
 				2055D68F22E007180012E43E /* YYTextAttribute.m in Sources */,
@@ -6604,7 +6603,7 @@
 				200FBE97222157B8002B7763 /* MNKeyChain.m in Sources */,
 				2055D6AF22E007180012E43E /* CALayer+YYAdd.m in Sources */,
 				201DB06222E8953C0063E88A /* WXMessageCell.m in Sources */,
-				E8153057243181E20009C0A9 /* MNPurchaseManager.m in Sources */,
+				E82000ED248B6ADA0033A770 /* MNPurchaseManager.m in Sources */,
 				2055D6B422E007180012E43E /* YYTransaction.m in Sources */,
 				201DB0A522E8953C0063E88A /* WXMomentMoreView.m in Sources */,
 				200FBF73222157B8002B7763 /* MNEmptyView.m in Sources */,
@@ -6709,6 +6708,7 @@
 				2055D6A022E007180012E43E /* NSArray+YYAdd.m in Sources */,
 				201DAEFE22E894410063E88A /* WXPayViewController.m in Sources */,
 				2055D6A822E007180012E43E /* NSObject+YYAddForARC.m in Sources */,
+				E82000EF248B6ADA0033A770 /* MNPurchaseReceipt.m in Sources */,
 				200FBEE2222157B8002B7763 /* MNFileManager.m in Sources */,
 				200FBEF5222157B8002B7763 /* MNEmojiDeleteButton.m in Sources */,
 				200FC003222157B8002B7763 /* MJRefreshStateHeader.m in Sources */,
@@ -6738,7 +6738,7 @@
 				201DB09C22E8953C0063E88A /* WXAddMomentCollectionViewCell.m in Sources */,
 				201DB09D22E8953C0063E88A /* WXAddMomentTableViewCell.m in Sources */,
 				20CEFC27224906080044BF95 /* MNDotDialog.m in Sources */,
-				E8153058243181E20009C0A9 /* MNPurchaseResponse.m in Sources */,
+				E82000EE248B6ADA0033A770 /* MNPurchaseResponse.m in Sources */,
 				BFA6FC84237E85AC00D9BAD8 /* MNCropView.m in Sources */,
 				200362B7224B05AA00205C19 /* MNSearchBar.m in Sources */,
 				200FBE98222157B8002B7763 /* MNDatabase.m in Sources */,

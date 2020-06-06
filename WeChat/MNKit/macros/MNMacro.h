@@ -90,6 +90,8 @@
 
 #define MNKIT_STATIC_INLINE  static inline
 
+#define MN_IS_BREAK_DEVICE  UIDevice.isBreakDevice
+
 #ifndef weakify
 #if __has_feature(objc_arc)
 #define weakify(var) \

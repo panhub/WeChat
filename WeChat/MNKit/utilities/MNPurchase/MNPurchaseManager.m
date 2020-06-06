@@ -16,11 +16,14 @@
 #define Lock()  dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER)
 #define Unlock() dispatch_semaphore_signal(_semaphore)
 
-@interface SKProductsRequest (MNHelper)
+NSNotificationName const MNPurchaseFinishNotificationName = @"com.mn.purchase.finish.notification.name";
+NSNotificationName const MNPurchaseSubmitLocalNotificationName = @"com.mn.purchase.submit.local.notification.name";
+
+@interface SKProductsRequest (MNProductContent)
 @property (nonatomic, copy) NSString *productIdentifier;
 @end
 
-@implementation SKProductsRequest (MNHelper)
+@implementation SKProductsRequest (MNProductContent)
 - (void)setProductIdentifier:(NSString *)productIdentifier {
     objc_setAssociatedObject(self, "com.mn.product.request.identifier", productIdentifier, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
@@ -34,8 +37,10 @@
 {
     dispatch_semaphore_t _semaphore;
 }
+@property (nonatomic) NSInteger totalRestoreCount;
+@property (nonatomic) NSInteger currentRestoreIndex;
+@property (nonatomic) MNPurchaseResponseCode restoreCode;
 @property (nonatomic, strong) MNPurchaseRequest *request;
-@property (nonatomic, strong) void (^receiptCheckHandler)(MNPurchaseReceipt *, void(^)(MNPurchaseResponseCode));
 @end
 
 static MNPurchaseManager *_manager;
@@ -62,10 +67,14 @@ static MNPurchaseManager *_manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _manager = [super init];
-        _manager.checkTryCount = 3;
         _manager.receiptMaxFailCount = 3;
+        _manager.receiptMaxSubmitCount = 3;
+#ifdef DEBUG
+#if DEBUG
+        _manager.useItunesSubmitReceipt = YES;
+#endif
+#endif
         _semaphore = dispatch_semaphore_create(1);
-        //062dbdb74e1a4407988fbaf00ae6f98c
     });
     return _manager;
 }
@@ -73,32 +82,44 @@ static MNPurchaseManager *_manager;
 - (void)becomeTransactionObserver {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [self verifyLocalReceipts];
         [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+        [self submitLocalReceipts];
     });
 }
 
-- (void)startPurchaseProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler {
+- (void)startPurchaseProduct:(NSString *)productId
+                startHandler:(MNPurchaseStartHandler)startHandler
+           completionHandler:(MNPurchaseFinishHandler)completionHandler
+{
     MNPurchaseRequest *request = [[MNPurchaseRequest alloc] initWithProductIdentifier:productId];
     request.restore = NO;
     request.subscribe = NO;
+    request.startHandler = startHandler;
     request.completionHandler = completionHandler;
     [self startRequest:request];
 }
 
-- (void)startSubscribeProduct:(NSString *)productId completionHandler:(MNPurchaseRequestHandler)completionHandler {
+- (void)startSubscribeProduct:(NSString *)productId
+                 startHandler:(MNPurchaseStartHandler)startHandler
+            completionHandler:(MNPurchaseFinishHandler)completionHandler
+{
     MNPurchaseRequest *request = [[MNPurchaseRequest alloc] initWithProductIdentifier:productId];
     request.restore = NO;
     request.subscribe = YES;
+    request.startHandler = startHandler;
     request.completionHandler = completionHandler;
     [self startRequest:request];
 }
 
-- (void)startRestorePurchaseWithCompletionHandler:(MNPurchaseRequestHandler)completionHandler {
+- (void)startRestorePurchase:(MNPurchaseStartHandler)startHandler
+           completionHandler:(MNPurchaseFinishHandler)completionHandler
+{
     // 创建恢复购买请求
     MNPurchaseRequest *request = MNPurchaseRequest.new;
+    request.startHandler = startHandler;
     request.completionHandler = completionHandler;
     request.restore = YES;
+    request.subscribe = NO;
     [self startRestore:request];
 }
 
@@ -116,6 +137,7 @@ static MNPurchaseManager *_manager;
     // 保存请求并开始恢复购买
     request.productIdentifier = nil;
     self.request = request;
+    if (request.startHandler) request.startHandler(request);
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
@@ -124,18 +146,25 @@ static MNPurchaseManager *_manager;
         [self startRestore:request];
         return;
     }
-    // 开启检测
-    [self becomeTransactionObserver];
+    if (self.request) return;
     // 检查是否满足内购要求
-    if (self.request || request.productIdentifier.length <= 0) return;
+    if (request.productIdentifier.length <= 0) {
+        if (request.completionHandler) {
+            request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeRequestError]);
+        }
+        return;
+    }
     if (self.canPayment == NO) {
         if (request.completionHandler) {
             request.completionHandler([MNPurchaseResponse responseWithCode:MNPurchaseResponseCodeCannotPayment]);
         }
         return;
     }
+    // 开启检测
+    [self becomeTransactionObserver];
     // 保存请求并开始
     self.request = request;
+    if (request.startHandler) request.startHandler(request);
     [self startProductRequest];
 }
 
@@ -170,7 +199,7 @@ static MNPurchaseManager *_manager;
 
 - (void)productsRequestDidFail:(SKProductsRequest *)reqs {
     if ([reqs.productIdentifier isEqualToString:self.request.productIdentifier]) {
-        if (self.request.requestCount >= self.request.requestOutCount) {
+        if (self.request.requestCount >= self.request.requestMaxCount) {
             [self finishPurchaseWithReceipt:nil code:MNPurchaseResponseCodeRequestError];
         } else {
             [self startProductRequest];
@@ -186,10 +215,10 @@ static MNPurchaseManager *_manager;
                 case SKPaymentTransactionStateRestored:
                 {
                     if ([self.request.productIdentifier isEqualToString:transaction.payment.productIdentifier] && self.request.isRestore == NO) {
-                        // 不允许重复购买
+                        // 不允许重复购买, 正常情况不会触发
                         [self finishTransaction:transaction];
                     } else {
-                        // 恢复购买
+                        // 恢复购买完成
                         [self completeTransaction:transaction];
                     }
                 } break;
@@ -209,7 +238,13 @@ static MNPurchaseManager *_manager;
 }
 
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
-    if ([queue.transactions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.transactionState == %@", @(SKPaymentTransactionStateRestored)]].count <= 0 && self.request.isRestore) {
+    if (self.request.isRestore == NO) return;
+    NSArray<SKPaymentTransaction *> *transactions = [queue.transactions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.transactionState == %@", @(SKPaymentTransactionStateRestored)]];
+    // 记录恢复购买的个数并重置结果
+    self.currentRestoreIndex = 0;
+    self.totalRestoreCount = transactions.count;
+    self.restoreCode = MNPurchaseResponseCodeFailed;
+    if (transactions.count <= 0) {
         [self finishPurchaseWithReceipt:nil code:MNPurchaseResponseCodeRestoreNone];
     }
 }
@@ -225,6 +260,10 @@ static MNPurchaseManager *_manager;
     NSString *productIdentifier = transaction.payment.productIdentifier;
     NSString *transactionIdentifier = transaction.originalTransaction.transactionIdentifier ? : transaction.transactionIdentifier;
     NSData *receiptData = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+    SKPaymentTransactionState transactionState = transaction.transactionState;
+    // 无论验证是否通过都结束此次内购操作,否则会出现虚假凭证信息一直验证不通过,每次进入程序都得输入苹果账号;
+    // 收据已保存,下次开启支付前会检查收据,再次验证
+    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     //NSData *receiptData = transaction.transactionReceipt;
     MNPurchaseReceipt *receipt = [MNPurchaseReceipt receiptWithData:receiptData];
     if (!receipt) {
@@ -234,29 +273,23 @@ static MNPurchaseManager *_manager;
         }
         return;
     }
-    NSMutableDictionary *header = @{}.mutableCopy;
-    if (productIdentifier) [header setObject:productIdentifier forKey:@"productIdentifier"];
-    if (transactionIdentifier) [header setObject:transactionIdentifier forKey:@"transactionIdentifier"];
-    [self.receiptHeader enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull obj, BOOL * _Nonnull stop) {
-        [header setObject:obj forKey:key];
-    }];
-    receipt.identifier = productIdentifier;
-    receipt.header = [header.copy componentsJoinedByString:@"&"];
+    receipt.productIdentifier = productIdentifier;
+    receipt.transactionIdentifier = transactionIdentifier;
+    if (productIdentifier && self.request && [productIdentifier isEqualToString:self.request.productIdentifier]) {
+        receipt.userInfo = self.request.userInfo;
+    }
     // 订阅或非消耗商品再次购买都会有originalTransaction
-    if (self.request.isSubscribe) receipt.subscribe = YES;
+    if (self.request && self.request.isSubscribe) receipt.subscribe = YES;
     // 这里不保存恢复购买凭据, 验证失败再次手动恢复即可
-    if (self.request.isRestore || transaction.transactionState == SKPaymentTransactionStateRestored) {
+    if ((self.request && self.request.isRestore) || transactionState == SKPaymentTransactionStateRestored) {
         // 标记恢复购买凭据,
         receipt.restore = YES;
     } else {
         // 将凭证保存沙盒
         [self saveReceiptToLocal:receipt];
     }
-    // 无论验证是否通过都结束此次内购操作,否则会出现虚假凭证信息一直验证不通过,每次进入程序都得输入苹果账号;
-    // 收据已保存,下次开启支付前会检查收据,再次验证
-    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     // 验证收据
-    [self verifyReceipt:receipt];
+    [self submitReceipt:receipt];
 }
 
 - (void)finishTransaction:(SKPaymentTransaction *)transaction {
@@ -283,33 +316,33 @@ static MNPurchaseManager *_manager;
 }
 
 #pragma mark - 验证收据
-- (void)verifyLocalReceipts {
+- (void)submitLocalReceipts {
     NSArray <MNPurchaseReceipt *>*receipts = MNPurchaseReceipt.localReceipts;
     if (receipts.count <= 0) return;
-    [self showAlertWithMessage:@"~正在验证本地凭据~"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(purchaseManagerStartSubmitLocalReceipts:)]) {
+            [self.delegate purchaseManagerStartSubmitLocalReceipts:receipts.copy];
+        }
+        [NSNotificationCenter.defaultCenter postNotificationName:MNPurchaseSubmitLocalNotificationName object:receipts.copy];
+    });
     [receipts enumerateObjectsUsingBlock:^(MNPurchaseReceipt * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [self verifyReceipt:obj];
+        [self submitReceipt:obj];
     }];
 }
 
-- (void)verifyReceipt:(MNPurchaseReceipt *)receipt {
+- (void)submitReceipt:(MNPurchaseReceipt *)receipt {
     if (!receipt) return;
-    #if DEBUG
-    if (self.isUseServerCheckReceipt) {
-        // 向服务端验证支付凭证
-        [self verifyReceiptToServer:receipt];
-    } else {
+    if (self.isUseItunesSubmitReceipt) {
         // 默认先验证正式环境, 返回环境错误再验证沙箱环境
-        [self verifyReceiptToItunes:receipt sandbox:NO];
+        [self submitReceiptToItunes:receipt sandbox:NO];
+    } else {
+        // 向服务端验证支付凭证
+        [self submitReceiptToServer:receipt];
     }
-    #else
-    // 正式版本, 向服务端验证支付凭证
-    [self verifyReceiptToServer:receipt];
-    #endif
 }
 
-- (void)verifyReceiptToItunes:(MNPurchaseReceipt *)receipt sandbox:(BOOL)isSandbox {
-    receipt.tryCount ++;
+- (void)submitReceiptToItunes:(MNPurchaseReceipt *)receipt sandbox:(BOOL)isSandbox {
+    receipt.submitCount ++;
     NSString *url = isSandbox ? MNReceiptVerifySandbox : MNReceiptVerifyItunes;
     NSString *body = [NSString stringWithFormat:@"{\"receipt-data\":\"%@\"",receipt.content];
     body = receipt.isSubscribe ? [NSString stringWithFormat:@"%@,\"password\":\"%@\"}", body, self.secretKey] : [NSString stringWithFormat:@"%@}",body];
@@ -319,102 +352,124 @@ static MNPurchaseManager *_manager;
     __weak typeof(self) weakself = self;
     NSURLSessionDataTask *dataTask = [NSURLSession.sharedSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (data.length <= 0 || error) {
-            [weakself finishVerifyReceipt:receipt withCode:MNPurchaseResponseCodeVerifyError];
+            [weakself finishReceipt:receipt withCode:MNPurchaseResponseCodeVerifyError];
             return;
         }
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         if (!json || error) {
-            [weakself finishVerifyReceipt:receipt withCode:MNPurchaseResponseCodeVerifyError];
+            [weakself finishReceipt:receipt withCode:MNPurchaseResponseCodeVerifyError];
             return;
         }
         NSInteger status = [[json objectForKey:@"status"] integerValue];
         if (status == MNPurchaseResponseCodeServerError || status == MNPurchaseResponseCodeSandboxError) {
-            [weakself verifyReceiptToItunes:receipt sandbox:!isSandbox];
+            [weakself submitReceiptToItunes:receipt sandbox:!isSandbox];
         } else if (status == 0) {
-            [weakself completeVerifyReceipt:receipt];
+            [weakself finishReceipt:receipt withCode:MNPurchaseResponseCodeSucceed];
         } else {
-            [weakself finishVerifyReceipt:receipt withCode:status];
+            [weakself finishReceipt:receipt withCode:status];
         }
     }];
     [dataTask resume];
 }
 
-- (void)verifyReceiptToServer:(MNPurchaseReceipt *)receipt {
+- (void)submitReceiptToServer:(MNPurchaseReceipt *)receipt {
     // 向服务器验证凭证<地址, 参数自定>
-    if (self.receiptCheckHandler == nil && self.delegate == nil) return;
-    receipt.tryCount ++;
+    receipt.submitCount ++;
     __weak typeof(self) weakself = self;
     void(^checkResultHandler)(MNPurchaseResponseCode) = ^(MNPurchaseResponseCode code){
         if (code == MNPurchaseResponseCodeSucceed) {
-            [weakself completeVerifyReceipt:receipt];
+            [weakself finishReceipt:receipt withCode:MNPurchaseResponseCodeSucceed];
         } else {
-            [weakself finishVerifyReceipt:receipt withCode:code];
+            [weakself finishReceipt:receipt withCode:code];
         }
     };
-    if (self.receiptCheckHandler) self.receiptCheckHandler(receipt, [checkResultHandler copy]);
-    if ([self.delegate respondsToSelector:@selector(purchaseManagerShouldCheckReceipt:resultHandler:)]) {
-        [self.delegate purchaseManagerShouldCheckReceipt:receipt resultHandler:[checkResultHandler copy]];
+    if ([self.delegate respondsToSelector:@selector(purchaseManagerNeedSubmitReceipt:resultHandler:)]) {
+        [self.delegate purchaseManagerNeedSubmitReceipt:receipt.copy resultHandler:[checkResultHandler copy]];
     }
 }
 
-- (void)completeVerifyReceipt:(MNPurchaseReceipt *)receipt {
-    [self removeLocalReceipt:receipt];
-    if (receipt.failCount > 0) {
-        [self showAlertWithMessage:@"~本地凭据验证成功~"];
-    } else if (receipt.isRestore) {
-        [self showAlertWithMessage:@"恢复购买成功"];
-    } else if (receipt.isSubscribe) {
-        [self showAlertWithMessage:@"订阅成功"];
-    } else {
-        [self showAlertWithMessage:@"购买成功"];
-    }
-    [self finishPurchaseWithReceipt:receipt code:MNPurchaseResponseCodeSucceed];
-}
-
-- (void)finishVerifyReceipt:(MNPurchaseReceipt *)receipt withCode:(MNPurchaseResponseCode)code {
-    if (receipt.tryCount >= self.checkTryCount) {
-        receipt.failCount ++;
-        if (receipt.isRestore || receipt.failCount >= self.receiptMaxFailCount) {
-            // 恢复购买凭据并未缓存本地, 这里只是为了删除正常凭据
-            [self removeLocalReceipt:receipt];
-            if (receipt.isRestore) {
-                [self showAlertWithMessage:@"恢复购买验证失败\n如有疑问请联系客服"];
-            } else if ([self.request.productIdentifier isEqualToString:receipt.identifier]) {
-                [self showAlertWithMessage:@"购买凭据验证失败\n如有疑问请联系客服"];
-            }
-        } else {
-            [self updateLocalReceipts];
-            // 判断不是本地验证结果, 提示验证失败
-            if (receipt.failCount == 1 && [self.request.productIdentifier isEqualToString:receipt.identifier]) {
-                [self showAlertWithMessage:[NSString stringWithFormat:@"%@凭据验证失败\n下次打开应用将重新验证", receipt.isSubscribe ? @"订阅" : @"购买"]];
+- (void)finishReceipt:(MNPurchaseReceipt *)receipt withCode:(MNPurchaseResponseCode)code {
+    if (code == MNPurchaseResponseCodeSucceed) {
+        // 校验成功
+        [self removeLocalReceipt:receipt];
+        [self finishPurchaseWithReceipt:receipt code:MNPurchaseResponseCodeSucceed];
+    } else if (receipt.submitCount >= self.receiptMaxSubmitCount) {
+        // 校验失败, 判断是否删除凭据, 恢复购买不参与本地缓存, 重新恢复购买即可
+        if (receipt.isRestore == NO) {
+            receipt.failCount ++;
+            if (receipt.failCount >= self.receiptMaxFailCount) {
+                // 已超过最大验证尝试次数, 删除本地凭据, 提示失败
+                [self removeLocalReceipt:receipt];
+                if ([self.request.productIdentifier isEqualToString:receipt.productIdentifier]) {
+                    [self showAlertWithMessage:@"购买凭据验证失败\n如有疑问请联系客服"];
+                }
+            } else {
+                // 判断不是本地验证结果, 提示验证失败
+                [self updateLocalReceipts];
+                if (receipt.failCount == 1 && [self.request.productIdentifier isEqualToString:receipt.productIdentifier]) {
+                    [self showAlertWithMessage:[NSString stringWithFormat:@"%@凭据验证失败\n下次打开应用将重新验证", receipt.isSubscribe ? @"订阅" : @"购买"]];
+                }
             }
         }
         [self finishPurchaseWithReceipt:receipt code:code];
     } else {
-        [self verifyReceipt:receipt];
+        // 检查次数再次尝试校验
+        [self submitReceipt:receipt];
     }
 }
 
 - (void)showAlertWithMessage:(NSString *)message {
     if (self.isAllowsAlertIfNeeded == NO) return;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:nil
+                                    message:message
+                                   delegate:nil
+                          cancelButtonTitle:@"确定"
+                          otherButtonTitles:nil] show];
     });
 }
 
 #pragma mark - Finish Purchase
 - (void)finishPurchaseWithReceipt:(MNPurchaseReceipt *)receipt code:(MNPurchaseResponseCode)responseCode {
-    // 本地凭据无论成功失败, 拒绝回调
-    if (receipt && receipt.failCount > 1) return;
-    // 加锁保证多份恢复购买凭据重复回调
+    // 加锁保证通道
     Lock();
-    MNPurchaseRequest *request = self.request;
-    if (request && ( !receipt || receipt.isRestore || [request.productIdentifier isEqualToString:receipt.identifier])) {
-        MNPurchaseManager.defaultManager.request = nil;
-        MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
+    if (receipt && receipt.failCount > 0) {
+        // 本地凭据
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (request.completionHandler) request.completionHandler(response);
+            MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
+            response.receipt = receipt;
+            if ([self.delegate respondsToSelector:@selector(purchaseManagerDidFinishSubmitReceipt:response:)]) {
+                [self.delegate purchaseManagerDidFinishSubmitReceipt:receipt response:response];
+            }
+            [NSNotificationCenter.defaultCenter postNotificationName:MNPurchaseFinishNotificationName object:response];
         });
+    } else {
+        MNPurchaseRequest *request = self.request;
+        if (request && ( !receipt || request.isRestore || [request.productIdentifier isEqualToString:receipt.productIdentifier])) {
+            // 为了避免恢复购买多次验证触发方法
+            if (receipt && request.isRestore && (self.currentRestoreIndex < self.restoreCode - 1)) {
+                self.currentRestoreIndex ++;
+                if (responseCode == MNPurchaseResponseCodeSucceed) self.restoreCode = responseCode;
+            } else {
+                if (receipt && request.isRestore && responseCode != MNPurchaseResponseCodeSucceed) {
+                    responseCode = self.restoreCode;
+                }
+                self.totalRestoreCount = 0;
+                self.currentRestoreIndex = 0;
+                self.restoreCode = MNPurchaseResponseCodeFailed;
+                self.request = nil;
+                MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
+                response.request = request;
+                response.receipt = receipt;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (request.completionHandler) request.completionHandler(response);
+                    if ([self.delegate respondsToSelector:@selector(purchaseManagerDidFinishSubmitReceipt:response:)]) {
+                        [self.delegate purchaseManagerDidFinishSubmitReceipt:receipt response:response];
+                    }
+                    [NSNotificationCenter.defaultCenter postNotificationName:MNPurchaseFinishNotificationName object:response];
+                });
+            }
+        }
     }
     Unlock();
 }
@@ -438,20 +493,35 @@ static MNPurchaseManager *_manager;
     Unlock();
 }
 
+- (BOOL)removeAllLocalReceipts {
+    Lock();
+    BOOL success = [MNPurchaseReceipt removeLocalReceipts];
+    Unlock();
+    return success;
+}
+
+- (BOOL)updateLocalReceiptCompulsory:(NSArray <MNPurchaseReceipt *>*)receipts {
+    Lock();
+    BOOL success = [MNPurchaseReceipt updateLocalReceiptCompulsory:receipts];
+    Unlock();
+    return success;
+}
+
 #pragma mark - Getter
 - (BOOL)canPayment {
-    if (UIDevice.isBreakDevice) return NO;
+#ifdef TARGET_IPHONE_SIMULATOR
+    if (TARGET_IPHONE_SIMULATOR) return NO;
+#endif
+#ifndef MN_IS_BREAK_DEVICE
+    if (MN_IS_BREAK_DEVICE) return NO;
+#endif
     return [SKPaymentQueue canMakePayments];
 }
 
 #pragma mark - Setter
-- (void)setCheckTryCount:(int)checkTryCount {
-    checkTryCount = MAX(1, checkTryCount);
-    _checkTryCount = checkTryCount;
-}
-
-- (void)setPurchaseReceiptCheckHandler:(void(^)(MNPurchaseReceipt *, void(^)(MNPurchaseResponseCode)))receiptCheckHandler {
-    self.receiptCheckHandler = [receiptCheckHandler copy];
+- (void)setReceiptMaxSubmitCount:(int)receiptMaxSubmitCount {
+    receiptMaxSubmitCount = MAX(1, receiptMaxSubmitCount);
+    _receiptMaxSubmitCount = receiptMaxSubmitCount;
 }
 
 #pragma mark - dealloc

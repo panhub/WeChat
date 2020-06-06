@@ -19,7 +19,7 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #endif
 
-@interface WeAppDelegate ()
+@interface WeAppDelegate ()<MNPurchaseDelegate>
 @property (nonatomic, strong) WXTabBarController *tabBarController;
 @end
 
@@ -121,7 +121,11 @@
     /// 加载公共数据
     [[MNConfiguration configuration] loadDataWithCompletionHandler:nil];
     /// 内购
+    MNPurchaseManager.defaultManager.delegate = self;
+    MNPurchaseManager.defaultManager.receiptMaxFailCount = 3;
+    MNPurchaseManager.defaultManager.receiptMaxSubmitCount = 3;
     MNPurchaseManager.defaultManager.allowsAlertIfNeeded = YES;
+    MNPurchaseManager.defaultManager.useItunesSubmitReceipt = YES;
     MNPurchaseManager.defaultManager.secretKey = @"062dbdb74e1a4407988fbaf00ae6f98c";
     [MNPurchaseManager.defaultManager becomeTransactionObserver];
     /// 触发联网提示
@@ -138,6 +142,17 @@
             }
         });
     }];
+}
+
+#pragma mark - MNPurchaseDelegate
+- (void)purchaseManagerStartSubmitLocalReceipts:(NSArray <MNPurchaseReceipt *>*)receipts {
+    [UIAlertView showAlertWithTitle:nil message:[NSString stringWithFormat:@"本地订单校验中(%@)", @(receipts.count)] cancelButtonTitle:@"确定"];
+}
+
+- (void)purchaseManagerDidFinishSubmitReceipt:(MNPurchaseReceipt *)receipt response:(MNPurchaseResponse *)response {
+    if (receipt.isLocalReceipt) {
+        [UIAlertView showAlertWithTitle:nil message:@"本地凭据验证失败" cancelButtonTitle:@"确定"];
+    }
 }
 
 #pragma mark - 开放平台配置信息
