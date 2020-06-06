@@ -40,7 +40,7 @@
 
 #pragma mark - Getter
 - (NSString *)purchaseStateString {
-    return @[@"准备购买", (self.isRestore ? @"恢复购买中" : (self.isSubscribe ? @"正在订阅项目" : @"项目购买中")), @"正在检查订单", @"已停止购买"][self.state];
+    return @[@"准备购买", (self.isRestore ? @"恢复购买中" : (self.isSubscribe ? @"正在订阅项目" : @"项目购买中")), @"正在校验订单", @"已停止购买"][self.state];
 }
 
 @end

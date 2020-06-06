@@ -49,6 +49,10 @@
         {
             msg = @"消耗型商品购买后不可恢复";
         } break;
+        case MNPurchaseResponseCodeRestoreError:
+        {
+            msg = @"恢复购买失败";
+        } break;
         case MNPurchaseResponseCodeRestoreNone:
         {
             msg = @"未发现可恢复购买产品";

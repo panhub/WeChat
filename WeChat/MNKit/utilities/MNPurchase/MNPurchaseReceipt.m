@@ -182,10 +182,6 @@
     return receipt;
 }
 
-- (BOOL)isLocalReceipt {
-    return self.failCount > 0;
-}
-
 #pragma mark - NSSecureCoding
 + (BOOL)supportsSecureCoding {
     return YES;

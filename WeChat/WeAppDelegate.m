@@ -150,8 +150,8 @@
 }
 
 - (void)purchaseManagerDidFinishSubmitReceipt:(MNPurchaseReceipt *)receipt response:(MNPurchaseResponse *)response {
-    if (receipt.isLocalReceipt) {
-        [UIAlertView showAlertWithTitle:nil message:@"本地凭据验证失败" cancelButtonTitle:@"确定"];
+    if (receipt.isLocal) {
+        [UIAlertView showAlertWithTitle:nil message:response.code == MNPurchaseResponseCodeSucceed ? @"本地凭据验证成功" : @"本地凭据验证失败" cancelButtonTitle:@"确定"];
     }
 }
 

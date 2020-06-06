@@ -250,7 +250,7 @@ static MNPurchaseManager *_manager;
     // 记录恢复购买的个数并重置结果
     self.currentRestoreIndex = 0;
     self.totalRestoreCount = transactions.count;
-    self.restoreCode = MNPurchaseResponseCodeFailed;
+    self.restoreCode = MNPurchaseResponseCodeRestoreError;
     if (transactions.count <= 0) {
         [self finishPurchaseWithReceipt:nil code:MNPurchaseResponseCodeRestoreNone];
     }
@@ -264,6 +264,7 @@ static MNPurchaseManager *_manager;
 
 #pragma mark - Payment Transaction
 - (void)completeTransaction:(SKPaymentTransaction *)transaction {
+    // 本地验证不会触发
     NSString *productIdentifier = transaction.payment.productIdentifier;
     NSString *transactionIdentifier = transaction.originalTransaction.transactionIdentifier ? : transaction.transactionIdentifier;
     NSData *receiptData = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
@@ -282,7 +283,7 @@ static MNPurchaseManager *_manager;
     }
     receipt.productIdentifier = productIdentifier;
     receipt.transactionIdentifier = transactionIdentifier;
-    if (productIdentifier && self.request && [productIdentifier isEqualToString:self.request.productIdentifier]) {
+    if (self.request.productIdentifier.length && productIdentifier.length && [productIdentifier isEqualToString:self.request.productIdentifier]) {
         receipt.userInfo = self.request.userInfo;
     }
     // 订阅或非消耗商品再次购买都会有originalTransaction
@@ -403,6 +404,9 @@ static MNPurchaseManager *_manager;
 }
 
 - (void)finishReceipt:(MNPurchaseReceipt *)receipt withCode:(MNPurchaseResponseCode)code {
+    // 判断是否是本地凭据
+    if (receipt && !receipt.isRestore) receipt.local = receipt.failCount > 0;
+    // 判断是否继续校验
     if (code == MNPurchaseResponseCodeSucceed) {
         // 校验成功
         [self removeLocalReceipt:receipt];
@@ -412,11 +416,9 @@ static MNPurchaseManager *_manager;
         if (receipt.isRestore == NO) {
             receipt.failCount ++;
             if (receipt.failCount >= self.receiptMaxFailCount) {
-                // 已超过最大验证尝试次数, 删除本地凭据, 提示失败
+                // 已超过最大验证尝试次数, 删除凭据, 提示失败
                 [self removeLocalReceipt:receipt];
-                if ([self.request.productIdentifier isEqualToString:receipt.productIdentifier]) {
-                    [self showAlertWithMessage:@"购买凭据验证失败\n如有疑问请联系客服"];
-                }
+                [self showAlertWithMessage:[NSString stringWithFormat:@"%@凭据验证失败\n如有疑问请联系客服", receipt.isLocal ? @"本地" : (receipt.isSubscribe ? @"订阅" : @"购买")]];
             } else {
                 // 判断不是本地验证结果, 提示验证失败
                 [self updateLocalReceipts];
@@ -447,7 +449,7 @@ static MNPurchaseManager *_manager;
 - (void)finishPurchaseWithReceipt:(MNPurchaseReceipt *)receipt code:(MNPurchaseResponseCode)responseCode {
     // 加锁保证通道
     Lock();
-    if (receipt && receipt.failCount > 0) {
+    if (receipt && receipt.isLocal) {
         // 本地凭据
         dispatch_async(dispatch_get_main_queue(), ^{
             MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];
@@ -470,7 +472,7 @@ static MNPurchaseManager *_manager;
                 }
                 self.totalRestoreCount = 0;
                 self.currentRestoreIndex = 0;
-                self.restoreCode = MNPurchaseResponseCodeFailed;
+                self.restoreCode = MNPurchaseResponseCodeRestoreError;
                 self.request = nil;
                 request.state = MNPurchaseRequestStateCompleted;
                 MNPurchaseResponse *response = [MNPurchaseResponse responseWithCode:responseCode];

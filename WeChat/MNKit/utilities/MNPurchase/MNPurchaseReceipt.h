@@ -33,8 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**是否是恢复购买*/
 @property (nonatomic, getter=isRestore) BOOL restore;
 
-/**判断是否是本地凭据*/
-@property (nonatomic, readonly) BOOL isLocalReceipt;
+/**是否是本地凭据*/
+@property (nonatomic, getter=isLocal) BOOL local;
 
 /**本地凭证*/
 @property (nonatomic, readonly, class) NSArray <MNPurchaseReceipt *>*localReceipts;
