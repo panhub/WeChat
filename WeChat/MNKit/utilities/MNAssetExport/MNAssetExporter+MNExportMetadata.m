@@ -106,24 +106,40 @@ MNMetadataKey const MNMetadataKeyDuration = @"duration";
                 AVMetadataKey key = item.commonKey;
                 id value = item.value;
                 if ([key isEqualToString:AVMetadataCommonKeyTitle]){
-                    //NSString *title = (NSString *)value;
-                    [dictionary setObject:value forKey:MNMetadataKeyTitle];
+                    if ([value isKindOfClass:NSData.class]) {
+                        [dictionary setObject:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] forKey:MNMetadataKeyTitle];
+                    } else if ([value isKindOfClass:NSString.class]) {
+                        [dictionary setObject:value forKey:MNMetadataKeyTitle];
+                    }
                 } else if ([key isEqualToString:AVMetadataCommonKeyArtist]){
-                    //NSString *artist = (NSString *)value;
-                    [dictionary setObject:value forKey:MNMetadataKeyArtist];
+                    if ([value isKindOfClass:NSData.class]) {
+                        [dictionary setObject:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] forKey:MNMetadataKeyArtist];
+                    } else if ([value isKindOfClass:NSString.class]) {
+                        [dictionary setObject:value forKey:MNMetadataKeyArtist];
+                    }
                 } else if ([key isEqualToString:AVMetadataCommonKeyAuthor]) {
-                    //NSString *author = (NSString *)value;
-                    [dictionary setObject:value forKey:MNMetadataKeyAuthor];
+                    if ([value isKindOfClass:NSData.class]) {
+                        [dictionary setObject:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] forKey:MNMetadataKeyAuthor];
+                    } else if ([value isKindOfClass:NSString.class]) {
+                        [dictionary setObject:value forKey:MNMetadataKeyAuthor];
+                    }
                 } else if ([key isEqualToString:AVMetadataCommonKeyAlbumName]) {
-                    //NSString *albumName = (NSString *)value;
-                    [dictionary setObject:value forKey:MNMetadataKeyAlbumName];
+                    if ([value isKindOfClass:NSData.class]) {
+                        [dictionary setObject:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] forKey:MNMetadataKeyAlbumName];
+                    } else if ([value isKindOfClass:NSString.class]) {
+                        [dictionary setObject:value forKey:MNMetadataKeyAlbumName];
+                    }
                 } else if ([key isEqualToString:AVMetadataCommonKeyCreationDate]) {
-                    [dictionary setObject:value forKey:MNMetadataKeyCreationDate];
+                    if ([value isKindOfClass:NSData.class]) {
+                        [dictionary setObject:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] forKey:MNMetadataKeyCreationDate];
+                    } else if ([value isKindOfClass:NSString.class]) {
+                        [dictionary setObject:value forKey:MNMetadataKeyCreationDate];
+                    }
                 } else if ([key isEqualToString:AVMetadataCommonKeyArtwork]) {
-                    NSDictionary *artwork = (NSDictionary *)value;
-                    NSData *data = [artwork objectForKey:@"data"];
-                    UIImage *image = [UIImage imageWithData:data];
-                    if (image) [dictionary setObject:image forKey:MNMetadataKeyArtwork];
+                    if ([value isKindOfClass:NSData.class]) {
+                        UIImage *image = [UIImage imageWithData:value];
+                        if (image) [dictionary setObject:image forKey:MNMetadataKeyArtwork];
+                    }
                 }
             }];
         }];

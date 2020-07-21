@@ -9,6 +9,19 @@
 #import "WXSong.h"
 
 @implementation WXSong
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.title = @"未知歌曲";
+        self.albumName = @"未知专辑";
+        self.artist = @"未知艺术家";
+        self.type = @"未知类型";
+        self.artwork = [UIImage imageNamed:@"music_artwork_default"];
+    }
+    return self;
+}
+
 + (instancetype)fetchRandomSong {
     NSArray<NSString *>*paths = [NSBundle pathsForResourcesOfType:@"mp3" inDirectory:[[WeChatBundle resourcePath] stringByAppendingPathComponent:@"music"]];
     return [WXSong songWithFileAtPath:paths.randomObject];
@@ -55,18 +68,33 @@
             id value = item.value;
             AVMetadataKey key = item.commonKey;
             if ([key isEqualToString:AVMetadataCommonKeyTitle]) {
-                song.title = [NSString replacingBlankCharacter:value withCharacter:@"未知歌曲"];
+                if ([value isKindOfClass:NSData.class]) {
+                    song.title = [NSString replacingBlankCharacter:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] withCharacter:@"未知歌曲"];
+                } else if ([value isKindOfClass:NSString.class]) {
+                    song.title = [NSString replacingBlankCharacter:value withCharacter:@"未知歌曲"];
+                }
             } else if ([key isEqualToString:AVMetadataCommonKeyAlbumName]) {
-                song.albumName = [NSString replacingBlankCharacter:value withCharacter:@"未知专辑"];
+                if ([value isKindOfClass:NSData.class]) {
+                    song.albumName = [NSString replacingBlankCharacter:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] withCharacter:@"未知专辑"];
+                } else if ([value isKindOfClass:NSString.class]) {
+                    song.albumName = [NSString replacingBlankCharacter:value withCharacter:@"未知专辑"];
+                }
             } else if ([key isEqualToString:AVMetadataCommonKeyArtist]) {
-                song.artist = [NSString replacingBlankCharacter:value withCharacter:@"未知艺术家"];
+                if ([value isKindOfClass:NSData.class]) {
+                    song.artist = [NSString replacingBlankCharacter:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] withCharacter:@"未知艺术家"];
+                } else if ([value isKindOfClass:NSString.class]) {
+                    song.artist = [NSString replacingBlankCharacter:value withCharacter:@"未知艺术家"];
+                }
             } else if ([key isEqualToString:AVMetadataCommonKeyType]) {
-                song.type = [NSString replacingBlankCharacter:value withCharacter:@"未知类型"];
+                if ([value isKindOfClass:NSData.class]) {
+                    song.type = [NSString replacingBlankCharacter:[[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding] withCharacter:@"未知类型"];
+                } else if ([value isKindOfClass:NSString.class]) {
+                    song.type = [NSString replacingBlankCharacter:value withCharacter:@"未知类型"];
+                }
             } else if ([key isEqualToString:AVMetadataCommonKeyArtwork]) {
-                if (value) {
-                    song.artwork = [UIImage imageWithData:kTransform(NSData *, value)];
-                } else {
-                    song.artwork = [UIImage imageNamed:@"music_artwork_default"];
+                if ([value isKindOfClass:NSData.class]) {
+                    UIImage *image = [UIImage imageWithData:value];
+                    if (image) song.artwork = image;
                 }
             }
         }

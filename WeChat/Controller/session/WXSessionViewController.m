@@ -111,6 +111,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    /*
     NSInteger row = indexPath.row;
     if (row == 2 || row == 3) {
         [MNPurchaseManager.defaultManager startSubscribeProduct:@(row + 1).stringValue startHandler:^(MNPurchaseRequest * _Nonnull request) {
@@ -139,6 +140,7 @@
         }];
     }
     return;
+    */
     MNTableViewCell *cell = (MNTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
     if (cell.isEdit) {
         [cell endEditingUsingAnimation];

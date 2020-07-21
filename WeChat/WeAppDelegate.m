@@ -20,81 +20,13 @@
 #endif
 
 @interface WeAppDelegate ()<MNPurchaseDelegate>
+@property (nonatomic, strong) MNNetworkReachability *reachability;
 @property (nonatomic, strong) WXTabBarController *tabBarController;
 @end
 
 @implementation WeAppDelegate
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-    //famous.default
-    /*
-    NSString *gifPath = [[MNBundle.mainBundle pathForResource:@"emotion" ofType:nil] stringByAppendingPathComponent:[@"动态表情" stringByAppendingPathComponent:[@"01" stringByAppendingPathExtension:@"gif"]]];
-    NSData *gifData = [NSData dataWithContentsOfFile:gifPath];
-    UIImage *image = [UIImage animatedImageWithData:gifData];
-    NSData *d = [NSData dataWithAnimatedImage:image];
-    NSString *file = MNCachePathAppending([MNFileHandle fileNameWithExtension:@"gif"]);
-    if ([d writeToFile:file atomically:YES]) {
-        NSData *gd = [NSData dataWithContentsOfFile:file];
-        UIImage *di = [UIImage animatedImageWithData:gd];
-        NSLog(@"");
-    }
-    */
-    /*
-    NSMutableArray *array = @[].mutableCopy;
-    [[NSFileManager.defaultManager subpathsAtPath:[MNBundle.mainBundle pathForResource:@"famous.default" ofType:nil]] enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSMutableDictionary *dic = @{}.mutableCopy;
-        NSString *n = obj.stringByDeletingPathExtension;
-        NSString *e = obj.pathExtension;
-        [dic setObject:n forKey:@"img"];
-        [dic setObject:e forKey:@"extension"];
-        [dic setObject:@(1) forKey:@"type"];
-        [dic setObject:@"描述" forKey:@"desc"];
-        [array addObject:dic];
-    }];
-    NSMutableDictionary *dic = @{}.mutableCopy;
-    [dic setObject:@"网络表情包" forKey:@"desc"];
-    [dic setObject:@"动态表情" forKey:@"name"];
-    [dic setObject:@"default" forKey:@"img"];
-    [dic setObject:@(1) forKey:@"state"];
-    [dic setObject:@(1) forKey:@"type"];
-    [dic setObject:@"famous.default" forKey:@"uuid"];
-    [dic setObject:array.copy forKey:@"emotions"];
-    NSString *ppp = MNCachePathAppending([MNFileHandle fileNameWithExtension:@"plist"]);
-    if ([dic writeToFile:ppp atomically:YES]) {
-        NSLog(@"%@", ppp);
-    }
-    */
-    /*
-    NSString *path = [[MNBundle mainBundle] pathForResource:@"emotions" ofType:@"plist" inDirectory:@"plist"];
-    NSDictionary *dic = [[NSDictionary alloc] initWithContentsOfFile:path];
-    NSMutableArray *mu = @[].mutableCopy;
-    NSArray *array = dic[@"emotions"];
-    [array enumerateObjectsUsingBlock:^(NSDictionary *_Nonnull dic, NSUInteger i, BOOL * _Nonnull s) {
-        NSMutableDictionary *d = dic.mutableCopy;
-        [d setObject:@"png" forKey:@"extension"];
-        [mu addObject:d.copy];
-    }];
-    NSMutableDictionary *dics = dic.mutableCopy;
-    [dics setObject:mu.copy forKey:@"emotions"];
-    NSString *ppp = MNCachePathAppending([MNFileHandle fileNameWithExtension:@"plist"]);
-    if ([dics writeToFile:ppp atomically:YES]) {
-        NSLog(@"%@", ppp);
-    }
-    */
-    // emoticon_favorites
-    // emoticon_packet
-    // keyboard_add
-    /*
-    UIImageView *imageview = [UIImageView imageViewWithFrame:CGRectMake(0.f, 0.f, 120.f, 120.f) image:[UIImage imageNamed:@"wx_mine_select_avatar"].templateImage];
-    imageview.contentMode = UIViewContentModeScaleAspectFit;
-    imageview.clipsToBounds = YES;
-    imageview.tintColor = THEME_COLOR;
-    UIImage *image = [UIImage imageWithLayer:imageview.layer];
-    NSString *file = MNCachePathAppending([MNFileHandle fileNameWithExtension:@"png"]);
-    if ([MNFileHandle writeImage:image toFile:file error:nil]) {
-        NSLog(@"");
-    }
-    */
     /// 初始化数据
     [self initialization];
     /// 创建主Window
@@ -121,6 +53,7 @@
     /// 加载公共数据
     [[MNConfiguration configuration] loadDataWithCompletionHandler:nil];
     /// 内购
+    /*
     MNPurchaseManager.defaultManager.delegate = self;
     MNPurchaseManager.defaultManager.receiptMaxFailCount = 3;
     MNPurchaseManager.defaultManager.receiptMaxSubmitCount = 3;
@@ -128,9 +61,11 @@
     MNPurchaseManager.defaultManager.useItunesSubmitReceipt = YES;
     MNPurchaseManager.defaultManager.secretKey = @"062dbdb74e1a4407988fbaf00ae6f98c";
     [MNPurchaseManager.defaultManager becomeTransactionObserver];
+    */
     /// 触发联网提示
     MNNetworkReachability *reachability = [MNNetworkReachability reachability];
     [reachability startMonitoring];
+    self.reachability = reachability;
     /// 截屏通知
     [self handNotification:UIApplicationUserDidTakeScreenshotNotification eventHandler:^(NSNotification *notify) {
         dispatch_after_main(.8f, ^{
