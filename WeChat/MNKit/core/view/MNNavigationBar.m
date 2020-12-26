@@ -47,9 +47,9 @@ const CGFloat kNavItemMargin = 13.f;
         [self addSubview:self.rightBarItem];
         [self addSubview:self.titleView];
 
-        CGFloat margin = self.height_mn - .2f;
+        CGFloat margin = self.height_mn - MN_SEPARATOR_HEIGHT;
         margin = MAX(MN_STATUS_BAR_HEIGHT, margin);
-        UIImageView *shadowView = [[UIImageView alloc]initWithFrame:CGRectMake(0.f, margin, self.width_mn, .2f)];
+        UIImageView *shadowView = [[UIImageView alloc]initWithFrame:CGRectMake(0.f, margin, self.width_mn, MN_SEPARATOR_HEIGHT)];
         shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         shadowView.clipsToBounds = YES;
         shadowView.contentMode = UIViewContentModeScaleAspectFill;

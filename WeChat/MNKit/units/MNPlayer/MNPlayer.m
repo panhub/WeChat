@@ -21,6 +21,8 @@
 @property (nonatomic, weak) id observer;
 /**当前播放索引*/
 @property (nonatomic) NSUInteger playIndex;
+/**记录原会话类型*/
+@property (nonatomic, copy) AVAudioSessionCategory sessionCategory;
 /**待播数组*/
 @property (nonatomic, strong) NSMutableArray <NSURL *>*URLs;
 /**播放缓存*/
@@ -62,8 +64,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     _state = MNPlayerStateUnknown;
     _URLs = [NSMutableArray arrayWithCapacity:1];
     _caches = [NSMutableDictionary dictionaryWithCapacity:1];
-    [self setSessionCategoryActive:YES];
-    
+    _sessionCategory = AVAudioSession.sharedInstance.category;
     /*
      AVPlayer存在于AVFoundation中,它更加接近于底层,所以灵活性也更强,AVPlayer本身并不能显示视频,而且它也不像MPMoviePlayerController有一个view属性.如果AVPlayer要显示必须创建一个播放器层AVPlayerLayer用于展示,播放器层继承于CALayer,有了AVPlayerLayer之添加到控制器视图的layer中即可。要使用AVPlayer首先了解一下几个常用的类和它的属性/方法(源自网络);
      AVAsset: 主要用于获取多媒体信息，是一个抽象类，不能直接使用
@@ -83,8 +84,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
      通常情况下, 我们通过AVPlayer的一个rate(播放速率)来间接得到播放状态, rate==0则暂停, 不为0则正在播放中.
      AVPlayer并没有直接提供下一曲和上一曲的的功能, 但是我们可以通过上面的replaceCurrentItemWithPlayerItem:方法, 将AVPlayer对象的Item替换掉, 之后让它播放, 就可以达到这个效果.
      */
-    AVPlayer *player = [AVPlayer new];
-    _player = player;
+    _player = [AVPlayer new];
     /**添加周期性监听*/
     self.observeTime = CMTimeMake(1, 1);
 }
@@ -222,7 +222,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 }
 
 - (void)play {
-    if ([self setSessionCategoryActive:YES] == NO) {
+    if ([self makePlaySessionActive] == NO) {
         [self playerDidInterruptionWithMessage:@"设置会话类型失败"];
         return;
     }
@@ -538,7 +538,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     [self.URLs addObjectsFromArray:playURLs.copy];
 }
 
-- (BOOL)setSessionCategoryActive:(BOOL)active {
+- (BOOL)makePlaySessionActive {
     //设置会话类型,关闭其他声音,可后台播放(主要是音频)(注意工程选项卡 Capabilities - Background Modes 需要打开)
     /** 设置会话类型
      后台播放:
@@ -553,7 +553,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         [[AVAudioSession sharedInstance] setCategory:category error:&error];
         if (error) return NO;
     }
-    [[AVAudioSession sharedInstance] setActive:active withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    [[AVAudioSession sharedInstance] setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
     return error == nil;
 }
 
@@ -639,8 +639,10 @@ static void MNPlaySoundCompleteHandler(SystemSoundID soundID,void *clientData){
     [self removeAllURLs];
     if (_observer) [_player removeTimeObserver:_observer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[AVAudioSession sharedInstance] setActive:NO error:nil];
-    MNDeallocLog;
+    if (self.sessionCategory && ![AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) {
+        [AVAudioSession.sharedInstance setCategory:self.sessionCategory error:nil];
+        [AVAudioSession.sharedInstance setActive:YES error:nil];
+    }
 }
 
 @end

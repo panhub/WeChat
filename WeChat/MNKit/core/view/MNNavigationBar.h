@@ -13,8 +13,10 @@
 #import "MNNavBarTitleView.h"
 @class MNNavigationBar;
 
-UIKIT_EXTERN const CGFloat kNavItemSize; //导航按钮默认大小
-UIKIT_EXTERN const CGFloat kNavItemMargin;  //导航按钮间隔
+/**导航按钮默认大小*/
+UIKIT_EXTERN const CGFloat kNavItemSize;
+/**导航按钮间隔*/
+UIKIT_EXTERN const CGFloat kNavItemMargin;
 
 @protocol MNNavigationBarDelegate <NSObject>
 @optional
