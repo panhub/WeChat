@@ -119,9 +119,6 @@ NSString * WechatPhoneGenerater (void) {
 
 #pragma mark - Table
 - (void)asyncLoadTable {
-    /// 注册表
-    [MNDatabase createTable:WXUsersTableName class:NSClassFromString(@"WXUser") completion:nil];
-    
     /// 联系人表
     [MNDatabase createTable:WXContactsTableName class:NSClassFromString(@"WXUser") completion:nil];
     /// 会话表
@@ -163,7 +160,6 @@ NSString * WechatPhoneGenerater (void) {
     [self asyncLoadSessions:nil];
 }
 
-#pragma mark - NSNotification
 /// 更新用户信息
 - (void)needUpdateContactsInfoNotification:(NSNotification *)notification {
     WXUser *user = notification.object;
@@ -326,7 +322,8 @@ NSString * WechatPhoneGenerater (void) {
             phone = [phone stringByReplacingOccurrencesOfString:@")" withString:@""];
             phone = [phone stringByReplacingOccurrencesOfString:@"-" withString:@""];
             user.phone = phone;
-            if (obj.thumbnailImageData) user.avatarData = obj.thumbnailImageData;
+            NSData *avatarData = obj.thumbnailImageData ? : obj.imageData;
+            if (avatarData) user.avatarString = [avatarData base64EncodedString];
             [self.contacts addObject:user];
             [MNDatabase insertToTable:WXContactsTableName model:user completion:nil];
         }];
@@ -428,7 +425,7 @@ NSString * WechatPhoneGenerater (void) {
         /// 查找会话列表
         [MNDatabase selectRowsModelFromTable:WXSessionTableName class:[WXSession class] completion:^(NSArray<id> * _Nonnull rows) {
             /// 倒序添加
-            [self.sessions addObjectsFromArray:[rows reversedArray]];
+            [self.sessions addObjectsFromArray:rows.reversedArray];
             [self bringSubsessionToFront];
             [self asyncSessionToSandbox];
             dispatch_async_main(^{

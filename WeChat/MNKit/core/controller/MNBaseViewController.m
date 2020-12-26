@@ -115,7 +115,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self->_appear = YES;
-    [self reloadDataIfNeeded];
     if ([self isChildViewController]) return;
     [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle] animated:YES];
 }
@@ -123,6 +122,7 @@
 #pragma mark - viewDidAppear
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self reloadDataIfNeeded];
     if ([self isChildViewController]) return;
     [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle] animated:YES];
     if ([self transitionAnimationStyle] == MNControllerTransitionStyleModal) return;

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 @class WXUser , WXSession, WXBankCard, WXSong;
 
+typedef NSString * WXTableName;
+
 typedef void(^WXContactsUpdateHandler)(NSArray <WXUser *>*contacts);
 
 typedef void(^WXSessionUpdateHandler)(NSArray <WXSession *>*sessions);

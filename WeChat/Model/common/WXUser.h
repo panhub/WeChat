@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, WechatGender) {
 
 #pragma mark - 登录体系
 /**
- 用户登录uid
+ 用户标识
  */
 @property (nonatomic, copy) NSString *uid;
 /**

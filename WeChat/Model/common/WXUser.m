@@ -67,7 +67,6 @@ static WXUser *_userInfo;
     WXUser *user = [WXUser shareInfo];
     if (handler) handler(user);
     [WXUser setUserInfoToKeychain:user.JsonValue];
-    [MNDatabase updateTable:WXUsersTableName where:@{sql_field(user.uid):user.uid}.componentString model:user completion:nil];
 }
 
 + (instancetype)userWithInfo:(NSDictionary *)info {

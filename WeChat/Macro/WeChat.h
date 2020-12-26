@@ -12,9 +12,6 @@
 /// 数据分隔符
 #define WXDataSeparatedSign  @"^***^"
 
-/// 用户注册表
-#define WXUsersTableName  @"t_users"
-
 /// 微信会话更新通知
 #define WXSessionUpdateNotificationName  @"com.wx.session.update.notification.name"
 /// 微信联系人更新通知
