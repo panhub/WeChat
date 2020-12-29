@@ -59,7 +59,7 @@
 
 - (void)setHistory:(WXShakeHistory *)history {
     _history = history;
-    self.imgView.image = history.thumbnailImage;
+    self.imgView.image = history.image;
     self.titleLabel.text = history.title;
     [self.titleLabel sizeToFit];
     self.titleLabel.width_mn = MIN(self.titleLabel.width_mn, self.signatureView.right_mn - self.titleLabel.left_mn);

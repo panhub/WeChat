@@ -41,7 +41,6 @@ static WXUser *_userInfo;
     _phone = [NSDictionary stringValueWithDictionary:userInfo forKey:kPath(self.phone) def:@""];
     _nickname = [NSDictionary stringValueWithDictionary:userInfo forKey:kPath(self.nickname) def:self.username];
     _signature = [NSDictionary stringValueWithDictionary:userInfo forKey:kPath(self.signature) def:@""];
-    _avatarData = [NSDictionary dataValueWithDictionary:userInfo forKey:kPath(self.avatarData)];
     _gender = (WechatGender)[NSDictionary integerValueWithDictionary:userInfo forKey:kPath(self.gender)];
     _password = [NSDictionary stringValueWithDictionary:userInfo forKey:kPath(self.password) def:@""];
     _avatarString = [NSDictionary stringValueWithDictionary:userInfo forKey:kPath(self.avatarString) def:@""];
@@ -83,7 +82,6 @@ static WXUser *_userInfo;
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeObject:self.uid forKey:kPath(self.uid)];
-    [coder encodeObject:self.avatarData forKey:kPath(self.avatarData)];
     [coder encodeObject:self.avatarString forKey:kPath(self.avatarString)];
     [coder encodeObject:self.username forKey:kPath(self.username)];
     [coder encodeObject:self.password forKey:kPath(self.password)];
@@ -105,7 +103,6 @@ static WXUser *_userInfo;
 - (instancetype)initWithCoder:(NSCoder *)coder {
     if (self = [super init]) {
         self.uid = [coder decodeObjectForKey:kPath(self.uid)];
-        self.avatarData = [coder decodeObjectForKey:kPath(self.avatarData)];
         self.avatarString = [coder decodeObjectForKey:kPath(self.avatarString)];
         self.username = [coder decodeObjectForKey:kPath(self.username)];
         self.password = [coder decodeObjectForKey:kPath(self.password)];

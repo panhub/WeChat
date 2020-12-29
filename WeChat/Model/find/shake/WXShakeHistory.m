@@ -16,7 +16,7 @@
 
 @implementation WXShakeHistory
 {
-    UIImage *_thumbnailImage;
+    UIImage *_image;
 }
 
 - (instancetype)initWithUser:(WXUser *)user {
@@ -27,10 +27,8 @@
         self.signature = user.signature;
         self.date = [NSDate timestamps];
         self.gender = user.gender;
-        self.thumbnailData = user.avatarData;
-        NSMutableDictionary *dic = kTransform(NSDictionary *, user.JsonValue).mutableCopy;
-        [dic removeObjectForKey:kPath(user.avatarData)];
-        self.extend = dic.JsonData;
+        self.imageData = user.avatar.PNGData;
+        self.extend = kTransform(NSDictionary *, user.JsonValue).JsonData;
     }
     return self;
 }
@@ -42,7 +40,7 @@
         self.subtitle = song.artist;
         self.date = [NSDate timestamps];
         self.gender = WechatGenderUnknown;
-        self.thumbnailData = song.artwork.PNGData;
+        self.imageData = song.artwork.PNGData;
         self.extend = song.title.JsonData;
     }
     return self;
@@ -54,16 +52,16 @@
     history.gender = WechatGenderUnknown;
     history.date = [NSDate timestamps];
     history.title = @"看电视，玩微信摇电视";
-    history.thumbnailData = [UIImage imageNamed:@"shake_tv"].PNGData;
+    history.imageData = [UIImage imageNamed:@"shake_tv"].PNGData;
     return history;
 }
 
 #pragma mark - Getter
-- (UIImage *)thumbnailImage {
-    if (!_thumbnailImage && _thumbnailData.length) {
-        _thumbnailImage = [UIImage imageWithData:_thumbnailData];
+- (UIImage *)image {
+    if (!_image && _imageData.length) {
+        _image = [UIImage imageWithData:_imageData];
     }
-    return _thumbnailImage;
+    return _image;
 }
 
 @end

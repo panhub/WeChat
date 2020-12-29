@@ -32,10 +32,6 @@ typedef NS_ENUM(NSInteger, WechatGender) {
  */
 @property (nonatomic, copy) NSString *avatarString;
 /**
- 头像数据
- */
-@property (nonatomic, strong) NSData *avatarData;
-/**
  头像
  */
 @property (nonatomic, strong, readonly) UIImage *avatar;

@@ -67,7 +67,7 @@
                 if (image) {
                     [WXUser performReplacingHandler:^(WXUser *userInfo) {
                         [userInfo setValue:image forKey:kPath(userInfo.avatar)];
-                        [userInfo setValue:image.PNGData forKey:kPath(userInfo.avatarData)];
+                        [userInfo setValue:image.PNGData.base64EncodedString forKey:kPath(userInfo.avatarString)];
                     }];
                     [self.headerView updateUserInfo];
                 } else {

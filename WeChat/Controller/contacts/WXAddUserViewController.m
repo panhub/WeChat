@@ -282,11 +282,11 @@
     }
     user.uid = [NSDate shortTimestamps];
     if (self.headerView.headButton.selected) {
-        [user setValue:[self.headerView.headButton backgroundImageForState:UIControlStateSelected] forKey:@"avatar"];
+        [user setValue:[self.headerView.headButton backgroundImageForState:UIControlStateSelected] forKey:kPath(user.avatar)];
     } else {
-        [user setValue:[WechatHelper avatar] forKey:@"avatar"];
+        [user setValue:[WechatHelper avatar] forKey:kPath(user.avatar)];
     }
-    user.avatarData = user.avatar.PNGData;
+    user.avatarString = user.avatar.PNGData.base64EncodedString;
     if ([[WechatHelper helper] insertUserToContacts:user]) {
         [self.view closeDialog];
         dispatch_after_main(.1f, ^{

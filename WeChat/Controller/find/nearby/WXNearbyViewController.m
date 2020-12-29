@@ -109,8 +109,7 @@
     WXShakeHistory *history = self.dataArray[indexPath.row];
     WXUser *user = [WXUser userWithInfo:history.extend.JsonValue];
     if (user) {
-        user.avatarData = history.thumbnailData;
-        [user setValue:history.thumbnailImage forKey:kPath(user.avatar)];
+        [user setValue:history.image forKey:kPath(user.avatar)];
         WXUserInfoViewController *vc = [[WXUserInfoViewController alloc] initWithUser:user];
         [self.navigationController pushViewController:vc animated:YES];
     } else {

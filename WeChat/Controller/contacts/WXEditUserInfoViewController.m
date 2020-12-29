@@ -241,9 +241,9 @@
     } else {
         _user.gender = [model7.value isEqualToString:@"男"] ? WechatGenderMale : WechatGenderFemale;
     }
-    if (self.headerView.headButton.selected) {
+    if (self.headerView.headButton.isSelected) {
         UIImage *headImage = [self.headerView.headButton backgroundImageForState:UIControlStateSelected];
-        _user.avatarData = headImage.JPEGData;
+        _user.avatarString = headImage.JPEGData.base64EncodedString;
         [_user setValue:headImage forKey:@"avatar"];
     }
     /// 通知用户数据刷新

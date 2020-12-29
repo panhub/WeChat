@@ -27,9 +27,9 @@ typedef NS_ENUM(NSInteger, WXShakeHistoryType) {
 /**历史类型*/
 @property (nonatomic) WXShakeHistoryType type;
 /**缩略图*/
-@property (nonatomic, copy) NSData *thumbnailData;
-/**缩略图*/
-@property (nonatomic, copy, readonly) UIImage *thumbnailImage;
+@property (nonatomic, strong, readonly) UIImage *image;
+/**缩略图数据*/
+@property (nonatomic, copy) NSData *imageData;
 /**标题*/
 @property (nonatomic, copy) NSString *title;
 /**副标题*/

@@ -639,10 +639,10 @@ NSString * WechatPhoneGenerater (void) {
         NSMutableArray <NSDictionary *>*array = @[].mutableCopy;
         [sessions enumerateObjectsUsingBlock:^(WXSession * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             WXUser *user = obj.user; 
-            if (user.name.length <= 0 || user.avatarData.length <= 0) return;
+            if (user.name.length <= 0 || user.avatarString.length <= 0) return;
             [array addObject:@{WXShareSessionIdentifier:obj.identifier,
                                         WXShareSessionName:user.name,
-                                        WXShareSessionAvatar:user.avatarData}];
+                                        WXShareSessionAvatar:user.avatarString}];
         }];
         NSUserDefaults *UserDefaults = [[NSUserDefaults alloc] initWithSuiteName:WXShareExtensionSandboox];
         [UserDefaults setObject:array.copy forKey:WXShareExtensionSession];
