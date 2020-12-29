@@ -47,8 +47,8 @@ static WXTabBarController *_tabBarController;
     // Do any additional setup after loading the view.
     self.tabView.translucent = YES;
     self.tabView.backgroundColor = [UIColor whiteColor];
-    self.tabView.itemSize = CGSizeMake(48.f, 38.f);
-    self.tabView.itemOffset = UIOffsetMake(0.f, 1.f);
+    self.tabView.itemSize = CGSizeMake(48.f, 36.f);
+    self.tabView.itemOffset = UIOffsetZero;
     self.tabView.shadowColor = [UIColor.darkGrayColor colorWithAlphaComponent:.13f];
     [MNTabBarItem appearanceWhenContainedIn:WXTabBarController.class, nil].badgeAlignment = MNTabBadgeAlignmentLeft;
     [MNTabBarItem appearanceWhenContainedIn:WXTabBarController.class, nil].badgeOffset = UIOffsetMake(-2.f, 2.f);

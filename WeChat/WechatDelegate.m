@@ -27,6 +27,7 @@
 @implementation WechatDelegate
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [self registNotification];
     /// 初始化数据
     [self initialization];
     /// 创建主Window
@@ -42,7 +43,18 @@
     return YES;
 }
 
-#pragma mark - 加载数据
+#pragma mark - 加载数据/注册通知
+- (void)registNotification {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(makeWechatAndVisible)
+                                               name:LOGIN_NOTIFY_NAME
+                                             object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(makeLoginAndVisible)
+                                               name:LOGOUT_NOTIFY_NAME
+                                             object:nil];
+}
+
 - (void)initialization {
     /// 高德地图
     [self AMapSetting];
