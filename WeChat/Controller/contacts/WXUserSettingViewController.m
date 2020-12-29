@@ -199,7 +199,7 @@
         NSArray <WXMessage *>*msgs = [WXMessage createCardMsg:self.user text:text isMine:YES session:session];
         if (msgs.count <= 0) return;
         if (![MNDatabase.database updateTable:WXSessionTableName where:@{sql_field(session.identifier):session.identifier}.componentString model:session]) return;
-        @PostNotify(WXSessionReloadNotificationName, nil);
+        @PostNotify(WXSessionTableReloadNotificationName, nil);
         isSucceed = YES;
     } completionHandler:^{
         @strongify(vc);

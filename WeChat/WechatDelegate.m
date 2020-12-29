@@ -242,7 +242,7 @@
         }
     }];
     dispatch_async_main(^{
-        @PostNotify(WXSessionReloadNotificationName, nil);
+        @PostNotify(WXSessionTableReloadNotificationName, nil);
     });
 }
 

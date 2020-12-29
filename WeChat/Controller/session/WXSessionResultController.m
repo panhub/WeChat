@@ -45,7 +45,7 @@
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(needReloadSessionNotification:)
-                                                 name:WXSessionReloadNotificationName
+                                                 name:WXSessionTableReloadNotificationName
                                                object:nil];
 }
 

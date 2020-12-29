@@ -12,11 +12,6 @@
 /// 数据分隔符
 #define WXDataSeparatedSign  @"^***^"
 
-/// 微信会话更新通知
-#define WXSessionUpdateNotificationName  @"com.wx.session.update.notification.name"
-/// 微信联系人更新通知
-#define WXContactsUpdateNotificationName  @"com.wx.contacts.update.notification.name"
-
 /// 微信联系人列表名
 #define WXContactsTableName  @"t_contacts"
 /// 微信联系人信息更改通知
@@ -25,6 +20,8 @@
 #define WXUserAddNotificationName  @"com.wx.user.add.notification.name"
 /// 微信联系人删除通知
 #define WXUserDeleteNotificationName  @"com.wx.user.delete.notification.name"
+/// 微信联系人数据重载通知
+#define WXContactsDataReloadNotificationName  @"com.wx.contacts.data.reload.notification.name"
 
 /// 微信会话列表名
 #define WXSessionTableName  @"t_sessions"
@@ -32,12 +29,14 @@
 #define WXSessionAddNotificationName  @"com.wx.session.add.notification.name"
 /// 微信删除会话通知
 #define WXSessionDeleteNotificationName  @"com.wx.session.delete.notification.name"
-/// 微信会话更新通知
+/// 微信指定会话更新通知
 #define WXSessionUpdateNotificationName  @"com.wx.session.update.notification.name"
 /// 微信会话置顶通知
 #define WXSessionBringFrontNotificationName  @"com.wx.session.front.notification.name"
-/// 微信会话列表刷新通知
-#define WXSessionReloadNotificationName  @"com.wx.session.reload.notification.name"
+/// 微信会话列表刷新数据通知
+#define WXSessionTableReloadNotificationName  @"com.wx.session.table.reload.notification.name"
+/// 微信会话数据重载通知
+#define WXSessionDataReloadNotificationName  @"com.wx.session.data.reload.notification.name"
 /// 微信表情 移除/删除 通知
 #define WXEmoticonStateDidChangeNotificationName  @"com.wx.emoticon.change.notification.name"
 

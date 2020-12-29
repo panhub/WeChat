@@ -695,7 +695,7 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
 #pragma mark - dealloc
 - (void)dealloc {
     if (self.viewModel.dataSource.count > 0) {
-        @PostNotify(WXSessionReloadNotificationName, nil);
+        @PostNotify(WXSessionTableReloadNotificationName, nil);
     } else {
         @PostNotify(WXSessionDeleteNotificationName, self.viewModel.session);
     }

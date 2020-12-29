@@ -148,7 +148,8 @@ NSString * WechatPhoneGenerater (void) {
     [self.sessions removeAllObjects];
     /// 刷新数据
     [self asyncSessionToSandbox];
-    @PostNotify(WXSessionUpdateNotificationName, self.sessions);
+    /// 通知更新会话
+    @PostNotify(WXSessionDataReloadNotificationName, self.sessions);
     /// 删除聊天, 朋友圈相关数据
     [WechatHelper.helper.cache removeAllObjectsWithCompletion:nil];
     [MNDatabase deleteRowFromTable:WXSessionTableName where:nil completion:nil];
@@ -178,7 +179,7 @@ NSString * WechatPhoneGenerater (void) {
     if ([self containsUser:user]) return;
     if (![MNDatabase.database insertToTable:WXContactsTableName model:user]) return;
     [self.contacts addObject:user];
-    @PostNotify(WXContactsTableName, self.contacts);
+    @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
 }
 
 /// 删除用户
@@ -189,7 +190,7 @@ NSString * WechatPhoneGenerater (void) {
     if ([self.contacts containsObject:user]) {
         [self.contacts removeObject:user];
         dispatch_async_main(^{
-            @PostNotify(WXContactsTableName, self.contacts);
+            @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
         });
     }
     /// 更新数据库, 删除与之相关的会话
@@ -224,7 +225,7 @@ NSString * WechatPhoneGenerater (void) {
     /// 回调刷新列表
     [self asyncSessionToSandbox];
     dispatch_async_main(^{
-        @PostNotify(WXSessionUpdateNotificationName, self.sessions);
+        @PostNotify(WXSessionDataReloadNotificationName, self.sessions);
     });
 }
 
@@ -245,7 +246,7 @@ NSString * WechatPhoneGenerater (void) {
     [self.sessions removeObject:session];
     [self asyncSessionToSandbox];
     dispatch_async_main(^{
-        @PostNotify(WXSessionUpdateNotificationName, self.sessions);
+        @PostNotify(WXSessionDataReloadNotificationName, self.sessions);
     });
 }
 
@@ -277,7 +278,7 @@ NSString * WechatPhoneGenerater (void) {
         }
         [self asyncSessionToSandbox];
         dispatch_async_main(^{
-            @PostNotify(WXSessionUpdateNotificationName, self.sessions);
+            @PostNotify(WXSessionDataReloadNotificationName, self.sessions);
         });
     }
 }
@@ -298,7 +299,7 @@ NSString * WechatPhoneGenerater (void) {
         if (rows.count > 0) {
             [self.contacts addObjectsFromArray:rows];
             dispatch_async_main(^{
-                @PostNotify(WXContactsTableName, self.contacts);
+                @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
             });
         } else {
             dispatch_async(self.queue, ^{
@@ -329,16 +330,16 @@ NSString * WechatPhoneGenerater (void) {
         }];
         if (self.contacts.count > 0) {
             dispatch_async_main(^{
-                @PostNotify(WXContactsTableName, self.contacts);
+                @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
             });
         }
     }];
 }
 
 #pragma mark - 生成联系人
-- (void)createContacts:(NSUInteger)count completion:(WXContactsUpdateHandler)completion {
+- (void)createContacts:(NSUInteger)count completion:(void(^)(BOOL))completion {
     if (count <= 0) {
-        if (completion) completion(nil);
+        if (completion) completion(NO);
         return;
     }
     dispatch_async(self.queue, ^{
@@ -351,8 +352,8 @@ NSString * WechatPhoneGenerater (void) {
         }
         [self.contacts addObjectsFromArray:contacts];
         dispatch_async_main(^{
-            @PostNotify(WXContactsTableName, self.contacts);
-            if (completion) completion(contacts);
+            @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
+            if (completion) completion(YES);
         });
     });
 }
@@ -395,7 +396,7 @@ NSString * WechatPhoneGenerater (void) {
     if ([self containsUser:user]) return YES;
     if (![MNDatabase.database insertToTable:WXContactsTableName model:user]) return NO;
     [self.contacts addObject:user];
-    @PostNotify(WXContactsTableName, self.contacts);
+    @PostNotify(WXContactsDataReloadNotificationName, self.contacts);
     return YES;
 }
 
@@ -429,7 +430,7 @@ NSString * WechatPhoneGenerater (void) {
             [self bringSubsessionToFront];
             [self asyncSessionToSandbox];
             dispatch_async_main(^{
-                @PostNotify(WXSessionUpdateNotificationName, self.sessions);
+                @PostNotify(WXSessionDataReloadNotificationName, self.sessions);
             });
         }];
         dispatch_async_main(^{

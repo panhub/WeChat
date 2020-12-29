@@ -157,7 +157,7 @@ NSNotificationName const WXChatTableDeleteNotificationName = @"com.wx.chat.table
             [self reloadList];
             self.session.unread_count = v.text.unsignedIntegerValue;
             @PostNotify(WXSessionUpdateNotificationName, self.session);
-            @PostNotify(WXSessionReloadNotificationName, self.session);
+            @PostNotify(WXSessionTableReloadNotificationName, self.session);
         };
         [self.navigationController pushViewController:vc animated:YES];
     } else {
@@ -186,7 +186,7 @@ NSNotificationName const WXChatTableDeleteNotificationName = @"com.wx.chat.table
     } else {
         self.session.remind = isOn;
         @PostNotify(WXSessionUpdateNotificationName, self.session);
-        @PostNotify(WXSessionReloadNotificationName, self.session);
+        @PostNotify(WXSessionTableReloadNotificationName, self.session);
     }
 }
 

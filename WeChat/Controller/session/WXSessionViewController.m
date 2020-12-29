@@ -69,13 +69,6 @@
     self.updater = searchResultController;
     self.searchResultController = searchResultController;
     
-    /// 刷新会话列表
-    @weakify(self);
-    [self handNotification:WXSessionReloadNotificationName eventHandler:^(id sender) {
-        @strongify(self);
-        @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
-    }];
-    
     /// 首次加载, 手动刷新列表
     [self setNeedsReloadList];
 }
@@ -86,11 +79,17 @@
 
 - (void)handEvents {
     @weakify(self);
-    [self handNotification:WXSessionUpdateNotificationName eventHandler:^(NSNotification *_Nonnull notify) {
+    /// 会话加载通知
+    [self handNotification:WXSessionDataReloadNotificationName eventHandler:^(NSNotification *_Nonnull notify) {
         @strongify(self);
         NSArray<WXSession *> *sessions = notify.object;
         [self.dataArray removeAllObjects];
         [self.dataArray addObjectsFromArray:sessions];
+        @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
+    }];
+    /// 刷新会话列表
+    [self handNotification:WXSessionTableReloadNotificationName eventHandler:^(id sender) {
+        @strongify(self);
         @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
     }];
 }
@@ -158,7 +157,7 @@
         conversation.unread_count = conversation.unread_count ? 0 : 1;
         @PostNotify(WXSessionUpdateNotificationName, conversation);
         dispatch_after_main(.4f, ^{
-            @PostNotify(WXSessionReloadNotificationName, conversation);
+            @PostNotify(WXSessionTableReloadNotificationName, conversation);
         });
         return nil;
     }

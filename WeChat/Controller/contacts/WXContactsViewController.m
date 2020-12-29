@@ -99,12 +99,18 @@
 }
 
 - (void)handEvents {
+    /// 联系人数据重载通知
     @weakify(self);
-    [self handNotification:WXContactsUpdateNotificationName eventHandler:^(NSNotification *_Nonnull notify) {
+    [self handNotification:WXContactsDataReloadNotificationName eventHandler:^(NSNotification *_Nonnull notify) {
         @strongify(self);
         NSArray<WXUser *> *contacts = notify.object;
         if (self.dataArray.count > 0) [self.dataArray removeObjectsInRange:NSMakeRange(1, self.dataArray.count - 1)];
         [self.dataArray addObjectsFromArray:[MNAddressBook localizedIndexedContacts:[contacts copy] sortKey:@"name"]];
+        @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
+    }];
+    /// 联系人信息更新通知
+    [self handNotification:WXUserUpdateNotificationName eventHandler:^(id sender) {
+        @strongify(self);
         @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
     }];
 }
@@ -125,12 +131,6 @@
         WXUserInfoViewController *vc = [[WXUserInfoViewController alloc] initWithUser:user];
         [self.navigationController pushViewController:vc animated:YES];
     };
-    
-    // 好友信息更新回调
-    [self handNotification:WXUserUpdateNotificationName eventHandler:^(id sender) {
-        @strongify(self);
-        @condition(self.isAppear, [self reloadList], [self setNeedsReloadList]);
-    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -303,8 +303,8 @@
                 NSString *count = [sheet buttonTitleOfIndex:index];
                 count = [count stringByReplacingOccurrencesOfString:@"个联系人" withString:@""];
                 if (count.length <= 0) return;
-                [[WechatHelper helper] createContacts:[count unsignedIntegerValue] completion:^(NSArray<WXUser *> *contacts) {
-                    if (contacts.count > 0) {
+                [[WechatHelper helper] createContacts:[count unsignedIntegerValue] completion:^(BOOL result) {
+                    if (result) {
                         [self.view closeDialog];
                     } else {
                         [self.view showInfoDialog:@"添加用户失败"];

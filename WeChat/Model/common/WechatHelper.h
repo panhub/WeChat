@@ -9,12 +9,6 @@
 #import <Foundation/Foundation.h>
 @class WXUser , WXSession, WXBankCard, WXSong;
 
-typedef NSString * WXTableName;
-
-typedef void(^WXContactsUpdateHandler)(NSArray <WXUser *>*contacts);
-
-typedef void(^WXSessionUpdateHandler)(NSArray <WXSession *>*sessions);
-
 FOUNDATION_EXPORT NSString * WechatPhoneGenerater (void);
 
 @interface WechatHelper : NSObject
@@ -94,7 +88,7 @@ FOUNDATION_EXPORT NSString * WechatPhoneGenerater (void);
  @param count 指定数量
  @param completion 生成回调
  */
-- (void)createContacts:(NSUInteger)count completion:(WXContactsUpdateHandler)completion;
+- (void)createContacts:(NSUInteger)count completion:(void(^)(BOOL))completion;
 
 /**
  判断uid是否有效
