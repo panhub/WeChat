@@ -214,32 +214,29 @@
 }
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
-    [self.menuView show];
-}
-
-#pragma mark - MNMenuView
-- (MNMenuView *)menuView {
-    if (!_menuView) {
-        @weakify(self);
-        MNMenuView *menuView = [MNMenuView menuWithAlignment:MNMenuAlignmentVertical createdHandler:^(MNMenuView * _Nonnull menuView, NSUInteger idx, UIButton * _Nonnull item) {
-            @strongify(self);
-            if (item.tag == 0) {
-                WXAddUserViewController *vc = [WXAddUserViewController new];
-                [self.navigationController pushViewController:vc animated:YES];
-            } else if (item.tag == 1) {
-                WXScanViewController *vc = [WXScanViewController new];
-                [self.navigationController pushViewController:vc animated:YES];
-            }
-        } titles:@"添加朋友", @"扫一扫", @"収付款", nil];
-        menuView.configuration.animationType = MNMenuAnimationZoom;
-        menuView.configuration.animationDuration = MNMenuArrowUp;
-        menuView.configuration.arrowOffset = UIOffsetMake(40.f, 3.f);
-        menuView.configuration.contentInsets = UIEdgeInsetsZero;
-        menuView.configuration.animationDuration = .25f;
-        menuView.targetView = self.navigationBar.rightBarItem;
-        _menuView = menuView;
-    }
-    return _menuView;
+    @weakify(self);
+    MNMenuView *menuView = [MNMenuView menuWithAlignment:MNMenuAlignmentVertical createdHandler:^(MNMenuView * _Nonnull menuView, NSUInteger idx, UIButton * _Nonnull item) {
+        item.width_mn += 40.f;
+        item.separator.width = item.width;
+    } titles:@"添加朋友", @"扫一扫", @"収付款", nil];
+    menuView.configuration.animationType = MNMenuAnimationZoom;
+    menuView.configuration.animationDuration = MNMenuArrowUp;
+    menuView.configuration.arrowOffset = UIOffsetMake(32.f, 3.f);
+    menuView.configuration.contentInsets = UIEdgeInsetsZero;
+    menuView.configuration.animationDuration = .25f;
+    menuView.configuration.contentRadius = 5.f;
+    menuView.targetView = self.navigationBar.rightBarItem;
+    menuView.clickedHandler = ^(MNMenuView * _Nonnull menuView, UIView * _Nonnull item) {
+        @strongify(self);
+        if (item.tag == 0) {
+            WXAddUserViewController *vc = [WXAddUserViewController new];
+            [self.navigationController pushViewController:vc animated:YES];
+        } else if (item.tag == 1) {
+            WXScanViewController *vc = [WXScanViewController new];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    };
+    [menuView show];
 }
 
 #pragma mark -
