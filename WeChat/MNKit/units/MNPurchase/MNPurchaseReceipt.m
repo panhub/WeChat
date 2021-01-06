@@ -14,6 +14,7 @@
 #define kMNPurchaseReceiptUserInfo    @"userInfo"
 #define kMNPurchaseReceiptContent    @"content"
 #define kMNPurchaseReceiptIdentifier    @"identifier"
+#define kMNPurchaseReceiptFailCount    @"failCount"
 #define kMNPurchaseReceiptProductIdentifier    @"productIdentifier"
 #define kMNPurchaseReceiptTransactionDate      @"transactionDate"
 #define kMNPurchaseReceiptApplicationUsername      @"applicationUsername"
@@ -57,6 +58,7 @@
     receipt.content = content;
     receipt.userInfo = [json objectForKey:kMNPurchaseReceiptUserInfo];
     receipt.price = [[json objectForKey:kMNPurchaseReceiptPrice] doubleValue];
+    receipt.failCount = [[json objectForKey:kMNPurchaseReceiptFailCount] intValue];
     receipt.identifier = [json objectForKey:kMNPurchaseReceiptIdentifier];
     receipt.transactionDate = [json objectForKey:kMNPurchaseReceiptTransactionDate];
     receipt.productIdentifier = [json objectForKey:kMNPurchaseReceiptProductIdentifier];
@@ -141,6 +143,26 @@
     if (![NSUserDefaults.standardUserDefaults synchronize]) [NSUserDefaults.standardUserDefaults synchronize];
 }
 
+- (BOOL)update {
+    MNPurchaseReceipt *receipt = [MNPurchaseReceipt receiptForIdentifier:self.identifier];
+    if (!receipt) return NO;
+    receipt.local = self.isLocal;
+    receipt.price = self.price;
+    receipt.restore = self.isRestore;
+    receipt.content = self.content;
+    receipt.userInfo = self.userInfo;
+    receipt.identifier = self.identifier;
+    receipt.failCount = self.failCount;
+    receipt.checkoutCount = self.checkoutCount;
+    receipt.transactionDate = self.transactionDate;
+    receipt.productIdentifier = self.productIdentifier;
+    receipt.transactionIdentifier = self.transactionIdentifier;
+    receipt.applicationUsername = self.applicationUsername;
+    receipt.originalTransactionDate = self.originalTransactionDate;
+    receipt.originalTransactionIdentifier = self.originalTransactionIdentifier;
+    return [MNPurchaseReceipt updateReceipts];
+}
+
 + (BOOL)updateReceipts {
     if (MN_PURCHASE_RECEIPT.count <= 0) {
         [self removeAllReceipts];
@@ -194,6 +216,7 @@
     if (self.content) [dic setObject:self.content forKey:kMNPurchaseReceiptContent];
     if (self.identifier) [dic setObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
     if (self.userInfo) [dic setObject:self.userInfo forKey:kMNPurchaseReceiptUserInfo];
+    [dic setObject:[NSNumber numberWithInt:self.failCount] forKey:kMNPurchaseReceiptFailCount];
     [dic setObject:[[NSNumber numberWithDouble:self.price] stringValue] forKey:kMNPurchaseReceiptPrice];
     if (self.productIdentifier) [dic setObject:self.productIdentifier forKey:kMNPurchaseReceiptProductIdentifier];
     if (self.transactionIdentifier) [dic setObject:self.transactionIdentifier forKey:kMNPurchaseReceiptTransactionIdentifier];
@@ -232,6 +255,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeDouble:self.price forKey:kMNPurchaseReceiptPrice];
+    [coder encodeInt:self.failCount forKey:kMNPurchaseReceiptFailCount];
     [coder encodeObject:self.content forKey:kMNPurchaseReceiptContent];
     [coder encodeObject:self.userInfo forKey:kMNPurchaseReceiptUserInfo];
     [coder encodeObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
@@ -246,6 +270,7 @@
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
     if (self = [super init]) {
         self.price = [coder decodeDoubleForKey:kMNPurchaseReceiptPrice];
+        self.failCount = [coder decodeIntForKey:kMNPurchaseReceiptFailCount];
         self.content = [coder decodeObjectForKey:kMNPurchaseReceiptContent];
         self.userInfo = [coder decodeObjectForKey:kMNPurchaseReceiptUserInfo];
         self.identifier = [coder decodeObjectForKey:kMNPurchaseReceiptIdentifier];
@@ -268,6 +293,7 @@
     receipt.content = _content;
     receipt.userInfo = _userInfo;
     receipt.identifier = _identifier;
+    receipt.failCount = _failCount;
     receipt.checkoutCount = _checkoutCount;
     receipt.transactionDate = _transactionDate;
     receipt.productIdentifier = _productIdentifier;

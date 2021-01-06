@@ -49,6 +49,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**校验订单最大次数*/
 @property (nonatomic) int maxCheckoutCount;
 
+/**
+ 订单最大失败次数
+ 超过失败次数的就会删除不再保存本地
+ 默认0 不限制
+ */
+@property (nonatomic) int maxFailCount;
+
 /**此时是否支持内购*/
 @property (nonatomic, readonly) BOOL canPayment;
 
@@ -61,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**事件代理*/
 @property (nonatomic, weak, nullable) id<MNPurchaseDelegate> delegate;
 
-/**使用服务端验证收据*/
+/**自行验证收据*/
 @property (nonatomic, getter=isCheckoutToItunes) BOOL checkoutToItunes;
 
 /**便于传值*/

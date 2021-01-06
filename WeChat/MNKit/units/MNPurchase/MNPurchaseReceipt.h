@@ -30,6 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**收据内容*/
 @property (nonatomic, copy, readonly) NSString *content;
 
+/**失败次数 切勿私自修改*/
+@property (nonatomic) int failCount;
+
 /**产品标识*/
 @property (nonatomic, copy) NSString *productIdentifier;
 
@@ -86,6 +89,12 @@ NS_ASSUME_NONNULL_BEGIN
  删除本地内购收据
 */
 + (void)removeAllReceipts;
+
+/**
+ 更新本地收据信息
+ @return 是否成功更新
+*/
+- (BOOL)update;
 
 /**
  更新本地收据

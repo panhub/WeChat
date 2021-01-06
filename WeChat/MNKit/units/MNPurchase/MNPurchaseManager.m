@@ -91,6 +91,7 @@ static MNPurchaseManager *_manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _manager = [super init];
+        _manager.maxFailCount = 3;
         _manager.maxRequestCount = 2;
         _manager.maxCheckoutCount = 2;
         _manager.receipts = @[].mutableCopy;
@@ -468,9 +469,14 @@ static MNPurchaseManager *_manager;
         [self finishPurchase:receipt responseCode:MNPurchaseResponseCodeSucceed];
     } else if (receipt.checkoutCount >= self.maxCheckoutCount) {
         // 校验失败, 回调失败结果
-        if (code == MNPurchaseResponseCodeReceiptInvalid && !receipt.isRestore) {
-            [self removeReceipt:receipt];
-            [self finishTransactionWithIdentifier:receipt.transactionIdentifier];
+        if (self.request && ([receipt.identifier isEqualToString:self.request.identifier] || receipt.isLocal)) {
+            if ((self.maxFailCount > 0 && (receipt.failCount + 1) >= self.maxFailCount) || code == MNPurchaseResponseCodeReceiptInvalid) {
+                [self removeReceipt:receipt];
+                [self finishTransactionWithIdentifier:receipt.transactionIdentifier];
+            } else {
+                receipt.failCount ++;
+                [self updateReceipt:receipt];
+            }
         }
         NSLog(@"⚠️⚠️⚠️⚠️⚠️ 订单验证失败 ⚠️⚠️⚠️⚠️⚠️");
         [self finishPurchase:receipt responseCode:code];
@@ -537,6 +543,16 @@ static MNPurchaseManager *_manager;
         [MNPurchaseReceipt removeAllReceipts];
     });
 }
+
+#pragma mark - 更新收据
+- (BOOL)updateReceipt:(MNPurchaseReceipt *)receipt {
+    __block BOOL result = NO;
+    dispatch_sync(MN_PURCHASE_SERIAL_QUEUE, ^{
+        result = [receipt update];
+    });
+    return result;
+}
+
 
 #pragma mark - Setter
 - (void)setMaxCheckoutCount:(int)maxCheckoutCount {
