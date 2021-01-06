@@ -180,7 +180,7 @@ static MNAssetHelper *_helper;
     switch (asset.mediaType) {
         case PHAssetMediaTypeImage:
         {
-            if ([[[asset valueForKey:@"filename"] lowercaseString] containsString:@"gif"]) {
+            if ([[[((NSString *)[asset valueForKey:@"filename"]) pathExtension] lowercaseString] containsString:@"gif"]) {
                 type = MNAssetTypeGif;
             } else if (@available(iOS 9.1, *)) {
                 if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive)) {

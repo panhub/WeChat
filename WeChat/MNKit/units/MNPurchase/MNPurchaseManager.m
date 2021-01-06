@@ -9,6 +9,7 @@
 #import "MNPurchaseManager.h"
 #if __has_include(<StoreKit/StoreKit.h>)
 #import <StoreKit/StoreKit.h>
+#import <objc/runtime.h>
 #import "MNPurchaseCheckout.h"
 
 NSNotificationName const MNPurchaseFinishNotificationName = @"com.mn.purchase.finish.notification.name";
