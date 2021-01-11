@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, MNPurchaseResponseCode) {
     MNPurchaseResponseCodeNetworkError = 9,
     MNPurchaseResponseCodePaymentInvalid = 10,
     MNPurchaseResponseCodeCheckoutNone = 11,
+    MNPurchaseResponseCodeNotLogin = 12,
     MNPurchaseResponseCodeReceiptInvalid = 107,
     MNPurchaseResponseCodeJSONError = 21000,
     MNPurchaseResponseCodeDataError = 21002,

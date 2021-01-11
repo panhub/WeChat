@@ -92,6 +92,10 @@
         {
             msg = @"未发现本地订单";
         } break;
+        case MNPurchaseResponseCodeNotLogin:
+        {
+            msg = @"未登录 无法校验订单";
+        } break;
         case MNPurchaseResponseCodeReceiptInvalid:
         {
             msg = @"支付收据无效";

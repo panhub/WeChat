@@ -15,6 +15,7 @@
 #define kMNPurchaseReceiptContent    @"content"
 #define kMNPurchaseReceiptIdentifier    @"identifier"
 #define kMNPurchaseReceiptFailCount    @"failCount"
+#define kMNPurchaseReceiptSubscribe    @"subscribe"
 #define kMNPurchaseReceiptProductIdentifier    @"productIdentifier"
 #define kMNPurchaseReceiptTransactionDate      @"transactionDate"
 #define kMNPurchaseReceiptApplicationUsername      @"applicationUsername"
@@ -60,6 +61,7 @@
     receipt.price = [[json objectForKey:kMNPurchaseReceiptPrice] doubleValue];
     receipt.failCount = [[json objectForKey:kMNPurchaseReceiptFailCount] intValue];
     receipt.identifier = [json objectForKey:kMNPurchaseReceiptIdentifier];
+    receipt.subscribe = [[json objectForKey:kMNPurchaseReceiptSubscribe] boolValue];
     receipt.transactionDate = [json objectForKey:kMNPurchaseReceiptTransactionDate];
     receipt.productIdentifier = [json objectForKey:kMNPurchaseReceiptProductIdentifier];
     receipt.transactionIdentifier = [json objectForKey:kMNPurchaseReceiptTransactionIdentifier];
@@ -153,6 +155,7 @@
     receipt.userInfo = self.userInfo;
     receipt.identifier = self.identifier;
     receipt.failCount = self.failCount;
+    receipt.subscribe = self.isSubscribe;
     receipt.checkoutCount = self.checkoutCount;
     receipt.transactionDate = self.transactionDate;
     receipt.productIdentifier = self.productIdentifier;
@@ -216,6 +219,7 @@
     if (self.content) [dic setObject:self.content forKey:kMNPurchaseReceiptContent];
     if (self.identifier) [dic setObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
     if (self.userInfo) [dic setObject:self.userInfo forKey:kMNPurchaseReceiptUserInfo];
+    [dic setObject:[NSNumber numberWithBool:self.isSubscribe] forKey:kMNPurchaseReceiptSubscribe];
     [dic setObject:[NSNumber numberWithInt:self.failCount] forKey:kMNPurchaseReceiptFailCount];
     [dic setObject:[[NSNumber numberWithDouble:self.price] stringValue] forKey:kMNPurchaseReceiptPrice];
     if (self.productIdentifier) [dic setObject:self.productIdentifier forKey:kMNPurchaseReceiptProductIdentifier];
@@ -256,6 +260,7 @@
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeDouble:self.price forKey:kMNPurchaseReceiptPrice];
     [coder encodeInt:self.failCount forKey:kMNPurchaseReceiptFailCount];
+    [coder encodeBool:self.isSubscribe forKey:kMNPurchaseReceiptSubscribe];
     [coder encodeObject:self.content forKey:kMNPurchaseReceiptContent];
     [coder encodeObject:self.userInfo forKey:kMNPurchaseReceiptUserInfo];
     [coder encodeObject:self.identifier forKey:kMNPurchaseReceiptIdentifier];
@@ -273,6 +278,7 @@
         self.failCount = [coder decodeIntForKey:kMNPurchaseReceiptFailCount];
         self.content = [coder decodeObjectForKey:kMNPurchaseReceiptContent];
         self.userInfo = [coder decodeObjectForKey:kMNPurchaseReceiptUserInfo];
+        self.subscribe = [coder decodeBoolForKey:kMNPurchaseReceiptSubscribe];
         self.identifier = [coder decodeObjectForKey:kMNPurchaseReceiptIdentifier];
         self.transactionDate = [coder decodeObjectForKey:kMNPurchaseReceiptTransactionDate];
         self.productIdentifier = [coder decodeObjectForKey:kMNPurchaseReceiptProductIdentifier];
@@ -294,6 +300,7 @@
     receipt.userInfo = _userInfo;
     receipt.identifier = _identifier;
     receipt.failCount = _failCount;
+    receipt.subscribe = _subscribe;
     receipt.checkoutCount = _checkoutCount;
     receipt.transactionDate = _transactionDate;
     receipt.productIdentifier = _productIdentifier;

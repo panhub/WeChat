@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**是否是恢复购买*/
 @property (nonatomic, getter=isRestore) BOOL restore;
 
+/**是否是订阅收据*/
+@property (nonatomic, getter=isSubscribe) BOOL subscribe;
+
 /**关联信息*/
 @property (nonatomic, copy, nullable) id userInfo;
 

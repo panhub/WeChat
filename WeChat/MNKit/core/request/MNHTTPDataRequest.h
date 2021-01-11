@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, getter=hasMore) BOOL more;
 /**根据method设置值*/
 @property (nonatomic, copy, nullable) id parameter;
+/**是否空数据*/
+@property (nonatomic, readonly) BOOL isDataEmpty;
 /**是否允许分页*/
 @property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled;
 /**盛放数据模型*/
@@ -49,12 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
  @param parameter 参数key
  */
 - (void)setValue:(nullable NSString *)value forParameter:(NSString *)parameter;
-
-/**
- 目前数据是否为空
- @return 是否空数据
- */
-- (BOOL)isDataEmpty;
 
 /**
  *清除缓存

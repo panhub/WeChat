@@ -460,6 +460,11 @@
 		BFED444B23F5B05600147F4B /* WXCallMessageViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BFED444A23F5B05600147F4B /* WXCallMessageViewModel.m */; };
 		BFED444E23F5BFFF00147F4B /* WXCallMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFED444D23F5BFFF00147F4B /* WXCallMessageCell.m */; };
 		BFF58EE123F0E99C0026D7F6 /* WXMusicLyricLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF58EE023F0E99C0026D7F6 /* WXMusicLyricLabel.m */; };
+		E805C5FF25ABF75C004F55A7 /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E805C5F525ABF75C004F55A7 /* MNPurchaseManager.m */; };
+		E805C60025ABF75C004F55A7 /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = E805C5F725ABF75C004F55A7 /* MNPurchaseResponse.m */; };
+		E805C60125ABF75C004F55A7 /* MNPurchaseCheckout.m in Sources */ = {isa = PBXBuildFile; fileRef = E805C5FB25ABF75C004F55A7 /* MNPurchaseCheckout.m */; };
+		E805C60225ABF75C004F55A7 /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = E805C5FD25ABF75C004F55A7 /* MNPurchaseReceipt.m */; };
+		E805C60325ABF75C004F55A7 /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E805C5FE25ABF75C004F55A7 /* MNPurchaseRequest.m */; };
 		E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 200FC0D022215926002B7763 /* libc++.tbd */; };
 		E840D4C1240D4F81001553B9 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077A6602286C73D000EFB85 /* ExternalAccessory.framework */; };
 		E869C8CB2570EF670017025E /* MNExtendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C57B2570EF610017025E /* MNExtendViewController.m */; };
@@ -487,11 +492,6 @@
 		E869C8E12570EF670017025E /* MNException.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5AC2570EF610017025E /* MNException.m */; };
 		E869C8E22570EF670017025E /* MNKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5AF2570EF610017025E /* MNKeychain.m */; };
 		E869C8E32570EF670017025E /* MNLaunchImage.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5B22570EF610017025E /* MNLaunchImage.m */; };
-		E869C8E42570EF670017025E /* MNPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5B52570EF610017025E /* MNPurchaseManager.m */; };
-		E869C8E52570EF670017025E /* MNPurchaseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5B72570EF610017025E /* MNPurchaseResponse.m */; };
-		E869C8E62570EF670017025E /* MNPurchaseCheckout.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5BB2570EF610017025E /* MNPurchaseCheckout.m */; };
-		E869C8E72570EF670017025E /* MNPurchaseReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5BD2570EF610017025E /* MNPurchaseReceipt.m */; };
-		E869C8E82570EF670017025E /* MNPurchaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5BE2570EF610017025E /* MNPurchaseRequest.m */; };
 		E869C8E92570EF670017025E /* MNLocalEvaluation.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5C02570EF610017025E /* MNLocalEvaluation.m */; };
 		E869C8EA2570EF670017025E /* MNThread.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5C42570EF610017025E /* MNThread.m */; };
 		E869C8EB2570EF670017025E /* MNRotationGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C5C62570EF610017025E /* MNRotationGestureRecognizer.m */; };
@@ -1761,6 +1761,16 @@
 		BFED444D23F5BFFF00147F4B /* WXCallMessageCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXCallMessageCell.m; sourceTree = "<group>"; };
 		BFF58EDF23F0E99C0026D7F6 /* WXMusicLyricLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXMusicLyricLabel.h; sourceTree = "<group>"; };
 		BFF58EE023F0E99C0026D7F6 /* WXMusicLyricLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXMusicLyricLabel.m; sourceTree = "<group>"; };
+		E805C5F525ABF75C004F55A7 /* MNPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
+		E805C5F625ABF75C004F55A7 /* MNPurchaseCheckout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseCheckout.h; sourceTree = "<group>"; };
+		E805C5F725ABF75C004F55A7 /* MNPurchaseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
+		E805C5F825ABF75C004F55A7 /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
+		E805C5F925ABF75C004F55A7 /* MNPurchaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
+		E805C5FA25ABF75C004F55A7 /* MNPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
+		E805C5FB25ABF75C004F55A7 /* MNPurchaseCheckout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseCheckout.m; sourceTree = "<group>"; };
+		E805C5FC25ABF75C004F55A7 /* MNPurchaseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
+		E805C5FD25ABF75C004F55A7 /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
+		E805C5FE25ABF75C004F55A7 /* MNPurchaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
 		E869C57B2570EF610017025E /* MNExtendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNExtendViewController.m; sourceTree = "<group>"; };
@@ -1812,16 +1822,6 @@
 		E869C5B02570EF610017025E /* MNKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNKeychain.h; sourceTree = "<group>"; };
 		E869C5B22570EF610017025E /* MNLaunchImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNLaunchImage.m; sourceTree = "<group>"; };
 		E869C5B32570EF610017025E /* MNLaunchImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNLaunchImage.h; sourceTree = "<group>"; };
-		E869C5B52570EF610017025E /* MNPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseManager.m; sourceTree = "<group>"; };
-		E869C5B62570EF610017025E /* MNPurchaseCheckout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseCheckout.h; sourceTree = "<group>"; };
-		E869C5B72570EF610017025E /* MNPurchaseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseResponse.m; sourceTree = "<group>"; };
-		E869C5B82570EF610017025E /* MNPurchaseReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseReceipt.h; sourceTree = "<group>"; };
-		E869C5B92570EF610017025E /* MNPurchaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseRequest.h; sourceTree = "<group>"; };
-		E869C5BA2570EF610017025E /* MNPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseManager.h; sourceTree = "<group>"; };
-		E869C5BB2570EF610017025E /* MNPurchaseCheckout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseCheckout.m; sourceTree = "<group>"; };
-		E869C5BC2570EF610017025E /* MNPurchaseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPurchaseResponse.h; sourceTree = "<group>"; };
-		E869C5BD2570EF610017025E /* MNPurchaseReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseReceipt.m; sourceTree = "<group>"; };
-		E869C5BE2570EF610017025E /* MNPurchaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNPurchaseRequest.m; sourceTree = "<group>"; };
 		E869C5C02570EF610017025E /* MNLocalEvaluation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNLocalEvaluation.m; sourceTree = "<group>"; };
 		E869C5C12570EF610017025E /* MNLocalEvaluation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNLocalEvaluation.h; sourceTree = "<group>"; };
 		E869C5C32570EF610017025E /* MNThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNThread.h; sourceTree = "<group>"; };
@@ -4329,6 +4329,23 @@
 			path = crop;
 			sourceTree = "<group>";
 		};
+		E805C5F425ABF75C004F55A7 /* MNPurchase */ = {
+			isa = PBXGroup;
+			children = (
+				E805C5F525ABF75C004F55A7 /* MNPurchaseManager.m */,
+				E805C5F625ABF75C004F55A7 /* MNPurchaseCheckout.h */,
+				E805C5F725ABF75C004F55A7 /* MNPurchaseResponse.m */,
+				E805C5F825ABF75C004F55A7 /* MNPurchaseReceipt.h */,
+				E805C5F925ABF75C004F55A7 /* MNPurchaseRequest.h */,
+				E805C5FA25ABF75C004F55A7 /* MNPurchaseManager.h */,
+				E805C5FB25ABF75C004F55A7 /* MNPurchaseCheckout.m */,
+				E805C5FC25ABF75C004F55A7 /* MNPurchaseResponse.h */,
+				E805C5FD25ABF75C004F55A7 /* MNPurchaseReceipt.m */,
+				E805C5FE25ABF75C004F55A7 /* MNPurchaseRequest.m */,
+			);
+			path = MNPurchase;
+			sourceTree = "<group>";
+		};
 		E869C5782570EF610017025E /* MNKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -4428,12 +4445,12 @@
 		E869C5A72570EF610017025E /* units */ = {
 			isa = PBXGroup;
 			children = (
+				E805C5F425ABF75C004F55A7 /* MNPurchase */,
 				E8F253A7257904DF00A05A13 /* MNGarageBand */,
 				E869C5A82570EF610017025E /* MNAudioRecorder */,
 				E869C5AB2570EF610017025E /* MNException */,
 				E869C5AE2570EF610017025E /* MNKeychain */,
 				E869C5B12570EF610017025E /* MNLaunchImage */,
-				E869C5B42570EF610017025E /* MNPurchase */,
 				E869C5BF2570EF610017025E /* MNLocalEvaluation */,
 				E869C5C22570EF610017025E /* MNThread */,
 				E869C5C52570EF610017025E /* MNGestureRecognizer */,
@@ -4496,23 +4513,6 @@
 				E869C5B32570EF610017025E /* MNLaunchImage.h */,
 			);
 			path = MNLaunchImage;
-			sourceTree = "<group>";
-		};
-		E869C5B42570EF610017025E /* MNPurchase */ = {
-			isa = PBXGroup;
-			children = (
-				E869C5B62570EF610017025E /* MNPurchaseCheckout.h */,
-				E869C5BB2570EF610017025E /* MNPurchaseCheckout.m */,
-				E869C5BA2570EF610017025E /* MNPurchaseManager.h */,
-				E869C5B52570EF610017025E /* MNPurchaseManager.m */,
-				E869C5B82570EF610017025E /* MNPurchaseReceipt.h */,
-				E869C5BD2570EF610017025E /* MNPurchaseReceipt.m */,
-				E869C5B92570EF610017025E /* MNPurchaseRequest.h */,
-				E869C5BE2570EF610017025E /* MNPurchaseRequest.m */,
-				E869C5BC2570EF610017025E /* MNPurchaseResponse.h */,
-				E869C5B72570EF610017025E /* MNPurchaseResponse.m */,
-			);
-			path = MNPurchase;
 			sourceTree = "<group>";
 		};
 		E869C5BF2570EF610017025E /* MNLocalEvaluation */ = {
@@ -6206,6 +6206,7 @@
 				2055D6B722E007180012E43E /* YYGestureRecognizer.m in Sources */,
 				201DAE4922E893F40063E88A /* WXMomentReplyViewModel.m in Sources */,
 				BF7B524123E56132003DA959 /* WXShakeHistoryCell.m in Sources */,
+				E805C60125ABF75C004F55A7 /* MNPurchaseCheckout.m in Sources */,
 				E869C9E92570EF680017025E /* NSUserDefaults+MNShareGroup.m in Sources */,
 				2055D68822E007180012E43E /* YYLabel.m in Sources */,
 				20F3F09022F8764100B85DAE /* WXChangePasswordCell.m in Sources */,
@@ -6235,6 +6236,7 @@
 				201DAF2222E894410063E88A /* WXUserInfoViewController.m in Sources */,
 				E869C8D72570EF670017025E /* MNConfiguration.m in Sources */,
 				2055D66B22E007180012E43E /* YYDiskCache.m in Sources */,
+				E805C60325ABF75C004F55A7 /* MNPurchaseRequest.m in Sources */,
 				E869C9132570EF670017025E /* MNAddressBook.m in Sources */,
 				E869C9C42570EF670017025E /* UIAlertController+MNHelper.m in Sources */,
 				2055D8DE22E021A40012E43E /* UIImage+MultiFormat.m in Sources */,
@@ -6257,7 +6259,6 @@
 				201DAF5A22E8945F0063E88A /* WXChangeModel.m in Sources */,
 				2055D8E722E021A40012E43E /* NSImage+WebCache.m in Sources */,
 				E869C9E42570EF680017025E /* NSString+MNHelper.m in Sources */,
-				E869C8E82570EF670017025E /* MNPurchaseRequest.m in Sources */,
 				E869C9282570EF670017025E /* MNSegmentViewController.m in Sources */,
 				E869C95D2570EF670017025E /* MNSolubleTransitionAnimator.m in Sources */,
 				E869C91C2570EF670017025E /* MNURLResponseSerializer.m in Sources */,
@@ -6444,7 +6445,6 @@
 				E869C9512570EF670017025E /* MNLinkPageView.m in Sources */,
 				BF13A59623F198E90072E68A /* WXNearbyViewController.m in Sources */,
 				2055D8EA22E021A40012E43E /* UIView+WebCacheOperation.m in Sources */,
-				E869C8E72570EF670017025E /* MNPurchaseReceipt.m in Sources */,
 				E869CA382570EF680017025E /* MJRefreshAutoGifFooter.m in Sources */,
 				E869C9022570EF670017025E /* NSObject+MNSQLField.m in Sources */,
 				2055D66F22E007180012E43E /* YYImageCache.m in Sources */,
@@ -6547,6 +6547,7 @@
 				E869C9DC2570EF680017025E /* NSDate+MNHelper.m in Sources */,
 				201DB06622E8953C0063E88A /* WXMoneyLabel.m in Sources */,
 				E869C90F2570EF670017025E /* MNURLSessionManager.m in Sources */,
+				E805C60225ABF75C004F55A7 /* MNPurchaseReceipt.m in Sources */,
 				201DAEEB22E894410063E88A /* WXRedpacketInfoController.m in Sources */,
 				201DAEEE22E894410063E88A /* WXChatLocationResultController.m in Sources */,
 				E869C9002570EF670017025E /* MNScanner.m in Sources */,
@@ -6555,7 +6556,6 @@
 				201DB06922E8953C0063E88A /* WXRedpacketInfoCell.m in Sources */,
 				2055D67D22E007180012E43E /* YYClassInfo.m in Sources */,
 				E869C8F22570EF670017025E /* MNQRGenerator.m in Sources */,
-				E869C8E52570EF670017025E /* MNPurchaseResponse.m in Sources */,
 				20A92A6B22F5C91300868FBE /* SDCycleScrollView.m in Sources */,
 				2055D6A422E007180012E43E /* NSData+YYAdd.m in Sources */,
 				201DAF5C22E8945F0063E88A /* WXMessage.m in Sources */,
@@ -6681,6 +6681,7 @@
 				E869C8FE2570EF670017025E /* MNNotification.m in Sources */,
 				201DAF5D22E8945F0063E88A /* WXFileModel.m in Sources */,
 				E869C97D2570EF670017025E /* MNMaskDialog.m in Sources */,
+				E805C5FF25ABF75C004F55A7 /* MNPurchaseManager.m in Sources */,
 				2055D67722E007180012E43E /* UIImageView+YYWebImage.m in Sources */,
 				20E4712122EB399700BD125A /* WXMomentRemindView.m in Sources */,
 				2055D69422E007180012E43E /* UIColor+YYAdd.m in Sources */,
@@ -6721,6 +6722,7 @@
 				E869C9322570EF670017025E /* MNEmojiPacketView.m in Sources */,
 				E869CA682570FB500017025E /* MNPayDialog.m in Sources */,
 				E869C9562570EF670017025E /* MNLinkTableViewCell.m in Sources */,
+				E805C60025ABF75C004F55A7 /* MNPurchaseResponse.m in Sources */,
 				2055D68C22E007180012E43E /* YYTextParser.m in Sources */,
 				E869C9682570EF670017025E /* MNIndicatorView.m in Sources */,
 				201DAEED22E894410063E88A /* WXTransferDoneController.m in Sources */,
@@ -6800,7 +6802,6 @@
 				201DB0AC22E8953C0063E88A /* WXWatchView.m in Sources */,
 				201DAF0122E894410063E88A /* WXQRCodeViewController.m in Sources */,
 				2055D68122E007180012E43E /* YYTextEffectWindow.m in Sources */,
-				E869C8E62570EF670017025E /* MNPurchaseCheckout.m in Sources */,
 				2055D67922E007180012E43E /* CALayer+YYWebImage.m in Sources */,
 				2055D6A122E007180012E43E /* NSNumber+YYAdd.m in Sources */,
 				E869C90B2570EF670017025E /* MNURLResponse.m in Sources */,
@@ -6814,7 +6815,6 @@
 				E869C9422570EF670017025E /* NSAttributedString+MNEmojiHelper.m in Sources */,
 				BFA9BEC723FAEC2B00EA6963 /* WXEmotionMessageCell.m in Sources */,
 				BF7B523723E543C6003DA959 /* WXShakeSetingCell.m in Sources */,
-				E869C8E42570EF670017025E /* MNPurchaseManager.m in Sources */,
 				201DB05522E8953C0063E88A /* WXUserInfoValueCell1.m in Sources */,
 				E869C8DD2570EF670017025E /* MNNavigationBar.m in Sources */,
 				201DAF0822E894410063E88A /* WXNewMomentController.m in Sources */,

@@ -22,7 +22,7 @@
     NSString *url = isSandbox ? @"https://sandbox.itunes.apple.com/verifyReceipt" : @"https://buy.itunes.apple.com/verifyReceipt";
     NSString *body = [NSString stringWithFormat:@"{\"receipt-data\":\"%@\"",receipt.content];
     body = secretKey ? [NSString stringWithFormat:@"%@,\"password\":\"%@\"}", body, secretKey ? : @""] : [NSString stringWithFormat:@"%@}",body];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.f];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:180.f];
     request.HTTPMethod = @"POST";
     request.HTTPBody = [body dataUsingEncoding:NSUTF8StringEncoding];
     [[NSURLSession.sharedSession dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -45,14 +45,12 @@
             return;
         }
         MNPurchaseResponseCode responseCode = [self responseCodeWithStatus:status];
-        /*
         if (responseCode == MNPurchaseResponseCodeSucceed) {
             // 分析数据
             NSDictionary *product = [self seekProductInContainer:[json objectForKey:@"latest_receipt_info"] receipt:receipt];
             if (!product) product = [self seekProductInContainer:[(NSDictionary *)[json objectForKey:@"receipt"] objectForKey:@"in_app"] receipt:receipt];
             if (!product) responseCode = MNPurchaseResponseCodeFailed;
         }
-        */
         if (resultHandler) resultHandler(responseCode);
     }] resume];
 }
@@ -60,10 +58,14 @@
 + (NSDictionary *)seekProductInContainer:(NSArray <NSDictionary *>*)container receipt:(MNPurchaseReceipt *)receipt {
     if (!container || ![container isKindOfClass:NSArray.class] || container.count <= 0) return nil;
     NSDictionary *product = nil;
+    NSString *transactionDate = receipt.transactionDate;
     NSString *transactionIdentifier = receipt.transactionIdentifier;
+    NSString *originalTransactionIdentifier = receipt.originalTransactionIdentifier;
     for (NSDictionary *dic in container) {
+        NSString *purchase_date_ms = [dic objectForKey:@"purchase_date_ms"];
         NSString *transaction_id = [dic objectForKey:@"transaction_id"];
-        if ([transaction_id isEqualToString:transactionIdentifier]) {
+        NSString *original_transaction_id = [dic objectForKey:@"original_transaction_id"];
+        if ([purchase_date_ms isEqualToString:transactionDate] && ([transaction_id isEqualToString:transactionIdentifier] || [original_transaction_id isEqualToString:originalTransactionIdentifier])) {
             product = dic;
             break;
         }

@@ -94,14 +94,10 @@ static MNPurchaseManager *_manager;
         _manager.maxFailCount = 3;
         _manager.maxRequestCount = 2;
         _manager.maxCheckoutCount = 2;
+        _manager.checkoutToItunes = NO;
         _manager.receipts = @[].mutableCopy;
         _purchase_serial_queue = dispatch_queue_create("com.mn.purchase.serial.queue", DISPATCH_QUEUE_SERIAL);
         _purchase_payment_queue = SKPaymentQueue.defaultQueue;
-#ifdef DEBUG
-#if DEBUG
-        _manager.checkoutToItunes = YES;
-#endif
-#endif
     });
     return _manager;
 }
@@ -372,6 +368,7 @@ static MNPurchaseManager *_manager;
         receipt.applicationUsername = applicationUsername;
         receipt.originalTransactionIdentifier = originalTransactionIdentifier;
         receipt.restore = transactionState == SKPaymentTransactionStateRestored;
+        if (!receipt.isRestore) receipt.subscribe = originalTransaction != nil;
         receipt.transactionDate = [[NSNumber numberWithLongLong:transactionDate] stringValue];
         receipt.originalTransactionDate = [[NSNumber numberWithLongLong:originalTransactionDate] stringValue];
         // 判断若是正在请求的购买收据就绑定信息并缓存
@@ -469,11 +466,13 @@ static MNPurchaseManager *_manager;
         [self finishPurchase:receipt responseCode:MNPurchaseResponseCodeSucceed];
     } else if (receipt.checkoutCount >= self.maxCheckoutCount) {
         // 校验失败, 回调失败结果
-        if (self.request && ([receipt.identifier isEqualToString:self.request.identifier] || receipt.isLocal)) {
+        if (code != MNPurchaseResponseCodeNetworkError && code != MNPurchaseResponseCodeNotLogin && self.request && ([receipt.identifier isEqualToString:self.request.identifier] || receipt.isLocal)) {
             if ((self.maxFailCount > 0 && (receipt.failCount + 1) >= self.maxFailCount) || code == MNPurchaseResponseCodeReceiptInvalid) {
+                // 失败次数超过最大限制或者指定凭据无效
                 [self removeReceipt:receipt];
                 [self finishTransactionWithIdentifier:receipt.transactionIdentifier];
             } else {
+                // 标记失败次数
                 receipt.failCount ++;
                 [self updateReceipt:receipt];
             }
@@ -498,7 +497,7 @@ static MNPurchaseManager *_manager;
             if (receipt) {
                 [self.receipts addObject:receipt];
                 if (receipt.isLocal || receipt.isRestore) {
-                    if (self.index + 1 < self.count) {
+                    if ((self.index + 1) < self.count) {
                         self.index ++;
                         if (code == MNPurchaseResponseCodeSucceed) self.code = code;
                         return;
