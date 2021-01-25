@@ -419,11 +419,6 @@ UIColor * UIColorAtImagePoint (UIImage *image, CGPoint point) {
     return image;
 }
 
-void UIImageMaskRadius (UIImage **img, CGFloat radius) {
-    UIImage *image = [(*img) maskRadius:radius];
-    *img = image;
-}
-
 #pragma mark - 压缩图片至指定像素
 - (UIImage *)resizingToPix:(NSUInteger)pix {
     if (pix <= 0) return self;
@@ -469,9 +464,10 @@ void UIImageMaskRadius (UIImage **img, CGFloat radius) {
     NSData *imageData = UIImageJPEGRepresentation(self, 1.f);
     NSUInteger dataLength = imageData.length;
     // 小于指定大小或相差1K左右就返回
-    if (dataLength <= length || (length - dataLength) <= 1024) return imageData;
-    NSString *m = [NSString stringWithFormat:@"%.2f", dataLength*1.f/length];
-    return UIImageJPEGRepresentation(self, m.floatValue);
+    if (dataLength <= length || (dataLength - length) <= 1024) return imageData;
+    CGFloat m = [NSString stringWithFormat:@"%.2f", length*1.f/dataLength].floatValue;
+    m = MAX(m, 0.01);
+    return UIImageJPEGRepresentation(self, m);
 }
 
 - (UIImage *)resizingToQuality:(CGFloat)representation {

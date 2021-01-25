@@ -129,7 +129,6 @@ UIColor * UIColorAtImagePoint (UIImage *image, CGPoint point);
 
 /**图片圆角处理*/
 - (UIImage *)maskRadius:(CGFloat)radius;
-UIKIT_EXTERN void UIImageMaskRadius (UIImage **, CGFloat);
 
 /** 调整图片至指定像素 */
 - (UIImage *)resizingToPix:(NSUInteger)pix;
