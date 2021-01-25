@@ -140,14 +140,17 @@ UIKIT_EXTERN void UIImageMaskRadius (UIImage **, CGFloat);
 /** 调整图片至指定尺寸 */
 - (UIImage *)resizingToSize:(CGSize)size;
 
-/**压缩图片到指定质量 K为单位*/
+/**压缩图片到大约指定质量 K为单位*/
 - (NSData *)dataWithQuality:(CGFloat)representation;
 
-/**压缩图片到指定质量 K为单位*/
+/**压缩图片到大约指定质量 K为单位*/
 - (UIImage *)resizingToQuality:(CGFloat)representation;
 
-/**压缩图片到指定像素内 质量K为单位*/
+/**压缩图片到指定像素内 大约质量 K为单位*/
 - (UIImage *)resizingToPix:(NSUInteger)pix quality:(CGFloat)representation;
+
+/**压缩图片到最大像素 大约质量 K为单位*/
+- (UIImage *)resizingToMaxPix:(NSUInteger)pix quality:(CGFloat)representation;
 
 /** 截取当前image对象rect区域内的图像 */
 - (UIImage *)cropImageInRect:(CGRect)rect;

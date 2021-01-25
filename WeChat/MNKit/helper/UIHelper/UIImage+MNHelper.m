@@ -464,15 +464,14 @@ void UIImageMaskRadius (UIImage **img, CGFloat radius) {
 }
 
 - (NSData *)dataWithQuality:(CGFloat)representation {
-    CGFloat quality = 1.f;
-    NSData *imageData = nil;
     NSUInteger length = fabs(floor(representation)*1024.f);
     if (length <= 0) return nil;
-    do {
-        imageData = UIImageJPEGRepresentation(self, quality);
-        quality -= .01f;
-    } while (imageData.length > length && quality >= .01f);
-    return imageData;
+    NSData *imageData = UIImageJPEGRepresentation(self, 1.f);
+    NSUInteger dataLength = imageData.length;
+    // 小于指定大小或相差1K左右就返回
+    if (dataLength <= length || (length - dataLength) <= 1024) return imageData;
+    NSString *m = [NSString stringWithFormat:@"%.2f", dataLength*1.f/length];
+    return UIImageJPEGRepresentation(self, m.floatValue);
 }
 
 - (UIImage *)resizingToQuality:(CGFloat)representation {
@@ -483,6 +482,10 @@ void UIImageMaskRadius (UIImage **img, CGFloat radius) {
 
 - (UIImage *)resizingToPix:(NSUInteger)pix quality:(CGFloat)representation {
     return [[self resizingToPix:pix] resizingToQuality:representation];
+}
+
+- (UIImage *)resizingToMaxPix:(NSUInteger)pix quality:(CGFloat)representation {
+    return [[self resizingToMaxPix:pix] resizingToQuality:representation];
 }
 
 #pragma mark - 截取当前image对象rect区域内的图像
