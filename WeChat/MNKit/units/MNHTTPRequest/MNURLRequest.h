@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) id body;
 /**请求地址参数 只接受 NSString, NSDictory<NSString/NSNumber>*/
 @property (nonatomic, copy, nullable) id query;
+/**回调的队列*/
+@property (nonatomic, weak) dispatch_queue_t queue;
 /**请求超时时间*/
 @property (nonatomic) NSTimeInterval timeoutInterval;
 /**字符串编码格式*/

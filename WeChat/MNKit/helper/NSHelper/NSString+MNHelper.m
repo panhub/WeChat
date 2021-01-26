@@ -151,6 +151,18 @@ CGSize NSStringBoundingSize (NSString *string, CGSize size, NSDictionary *attrib
     return NSMakeRange(0, self.length);
 }
 
+#pragma mark - 是否数字字符串
+- (BOOL)isNumberString {
+    NSScanner *scanner = [[NSScanner alloc] initWithString:self];
+    scanner.charactersToBeSkipped = NSCharacterSet.new;
+    return ([scanner scanInt:NULL] && [scanner isAtEnd]);
+}
+
++ (BOOL)isNumberString:(NSString *)string {
+    if ([self isEmptyString:string]) return NO;
+    return string.isNumberString;
+}
+
 #pragma mark - 图片
 - (UIImage *)image {
     return [UIImage imageNamed:self];
@@ -189,12 +201,6 @@ NSString * NSStringFromNumber (NSNumber *number) {
 
 + (NSString *)localizedString:(NSString *)string {
     return NSLocalizedString(string, @"_localized_");
-}
-
-#pragma mark - 是否纯数字字符串
-- (BOOL)isNumberString {
-    NSCharacterSet *characters = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-    return [self rangeOfCharacterFromSet:characters].location == NSNotFound;
 }
 
 #pragma mark - 生成随机汉字

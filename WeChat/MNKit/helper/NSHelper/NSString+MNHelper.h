@@ -135,6 +135,10 @@ FOUNDATION_EXPORT CGSize NSStringBoundingSize (NSString *string, CGSize size, NS
  */
 @property (nonatomic, readonly) NSRange rangeOfAll;
 /**
+ 是否是数字字符串
+ */
+@property (nonatomic, readonly) BOOL isNumberString;
+/**
  获取以自身为名称的图片
  */
 @property (nonatomic, readonly, strong, nullable) UIImage *image;
@@ -171,9 +175,10 @@ FOUNDATION_EXPORT NSString *NSStringFromNumber (NSNumber *number);
 
 /**
  是否纯数字字符串
+ @param string 指定字符串
  @return 是否纯数字
  */
-- (BOOL)isNumberString;
++ (BOOL)isNumberString:(NSString *)string;
 
 /**
  生成随机汉字字符串

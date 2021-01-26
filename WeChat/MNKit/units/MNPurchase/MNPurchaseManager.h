@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler 结束回调
 */
 - (void)startPurchasing:(NSString *)productId
-           startHandler:(MNPurchaseStatusHandler)statusHandler
+           statusHandler:(MNPurchaseStatusHandler)statusHandler
       completionHandler:(MNPurchaseCompletionHandler)completionHandler;
 
 /**

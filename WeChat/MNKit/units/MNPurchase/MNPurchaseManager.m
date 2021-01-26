@@ -110,7 +110,7 @@ static MNPurchaseManager *_manager;
 }
 
 - (void)startPurchasing:(NSString *)productId
-           startHandler:(MNPurchaseStatusHandler)statusHandler
+           statusHandler:(MNPurchaseStatusHandler)statusHandler
       completionHandler:(MNPurchaseCompletionHandler)completionHandler
 {
     MNPurchaseRequest *request = [[MNPurchaseRequest alloc] initWithProductIdentifier:productId];

@@ -4332,16 +4332,16 @@
 		E805C5F425ABF75C004F55A7 /* MNPurchase */ = {
 			isa = PBXGroup;
 			children = (
-				E805C5F525ABF75C004F55A7 /* MNPurchaseManager.m */,
 				E805C5F625ABF75C004F55A7 /* MNPurchaseCheckout.h */,
-				E805C5F725ABF75C004F55A7 /* MNPurchaseResponse.m */,
-				E805C5F825ABF75C004F55A7 /* MNPurchaseReceipt.h */,
-				E805C5F925ABF75C004F55A7 /* MNPurchaseRequest.h */,
-				E805C5FA25ABF75C004F55A7 /* MNPurchaseManager.h */,
 				E805C5FB25ABF75C004F55A7 /* MNPurchaseCheckout.m */,
-				E805C5FC25ABF75C004F55A7 /* MNPurchaseResponse.h */,
+				E805C5FA25ABF75C004F55A7 /* MNPurchaseManager.h */,
+				E805C5F525ABF75C004F55A7 /* MNPurchaseManager.m */,
+				E805C5F825ABF75C004F55A7 /* MNPurchaseReceipt.h */,
 				E805C5FD25ABF75C004F55A7 /* MNPurchaseReceipt.m */,
+				E805C5F925ABF75C004F55A7 /* MNPurchaseRequest.h */,
 				E805C5FE25ABF75C004F55A7 /* MNPurchaseRequest.m */,
+				E805C5FC25ABF75C004F55A7 /* MNPurchaseResponse.h */,
+				E805C5F725ABF75C004F55A7 /* MNPurchaseResponse.m */,
 			);
 			path = MNPurchase;
 			sourceTree = "<group>";

@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**重试次数 失败时依此重新请求 NSURLErrorCancelled 无效*/
 @property (nonatomic) int retryCount;
 /**当前请求计次 外界不要使用*/
-@property (nonatomic) int currentRequestCount;
+@property (nonatomic) int currentRetryCount;
 /**请求方式*/
 @property (nonatomic) MNURLHTTPMethod method;
 /**是否是缓存数据*/

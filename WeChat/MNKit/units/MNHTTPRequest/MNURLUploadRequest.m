@@ -59,7 +59,7 @@
         }
     }
     /**请求结束, 回调请求结果*/
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(self.queue ? : dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didFinishRequesting:response:)]) {
             [self.delegate didFinishRequesting:self response:response];
         }

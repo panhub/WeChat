@@ -94,23 +94,24 @@ static MNURLSessionManager *_manager;
     [self removeRequestForTask:task];
     // 标记已结束第一次请求
     [request setValue:@(NO) forKey:MNURLPath(request.firstLoading)];
-    // 取消请求且不允许回调不做操作
-    if (error && error.code == NSURLErrorCancelled && !request.isAllowsCancelCallback) return;
+    // 关闭网络指示图
+    if (request.isAllowsNetworkActivity) [UIApplication closeNetworkActivityIndicating];
     // 判断是否需要重新请求并修改数据来源
     if ([request isKindOfClass:MNURLDataRequest.class]) {
         MNURLDataRequest *dataRequest = (MNURLDataRequest *)request;
         // 判断是否需要重新请求
-        if (error && error.code != NSURLErrorCancelled && dataRequest.retryCount > 0 && dataRequest.currentRequestCount <= dataRequest.retryCount) {
+        if (error && error.code != NSURLErrorCancelled && dataRequest.retryCount > 0 && dataRequest.currentRetryCount < dataRequest.retryCount) {
+            dataRequest.currentRetryCount ++;
             [self resumeRequest:dataRequest];
             return;
         }
         // 重置请求计次
-        dataRequest.currentRequestCount = 0;
+        dataRequest.currentRetryCount = 0;
         // 记录数据来源
         dataRequest.dataSource = MNURLDataSourceNetwork;
     }
-    // 关闭网络指示图
-    if (request.isAllowsNetworkActivity) [UIApplication closeNetworkActivityIndicating];
+    // 取消请求且不允许回调不做操作
+    if (error && error.code == NSURLErrorCancelled && !request.isAllowsCancelCallback) return;
     // 处理数据 回调结果
     [request didFinishWithResponseObject:responseObject error:error];
 }
@@ -144,7 +145,7 @@ static MNURLSessionManager *_manager;
     if (request.method == MNURLHTTPMethodGet && request.cachePolicy == MNURLDataCachePolicyDontLoad) {
         id<NSCoding> cache = [self cacheForUrl:request.cacheForUrl timeoutInterval:request.cacheTimeOutInterval];
         if (cache) {
-            request.currentRequestCount = 0;
+            request.currentRetryCount = 0;
             request.dataSource = MNURLDataSourceCache;
             [request setValue:@(NO) forKey:MNURLPath(request.firstLoading)];
             [request didFinishWithResponseObject:cache error:nil];
@@ -154,18 +155,17 @@ static MNURLSessionManager *_manager;
     /**开启请求*/
     NSURLSessionDataTask *dataTask = [self dataTaskWithRequest:request];
     if (!dataTask) {
-        request.currentRequestCount = 0;
+        request.currentRetryCount = 0;
         [request setValue:@(NO) forKey:MNURLPath(request.firstLoading)];
         [request didFinishWithResponseObject:nil error:NSError.taskError];
         return NO;
     }
-    request.currentRequestCount ++;
     [request setValue:dataTask forKey:MNURLPath(request.task)];
     if (request.isAllowsNetworkActivity) [UIApplication startNetworkActivityIndicating];
     [self setRequest:request forTask:dataTask];
     /**回调请求开始*/
-    if (request.currentRequestCount <= 1) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    if (request.currentRetryCount <= 0) {
+        dispatch_async(request.queue ? : dispatch_get_main_queue(), ^{
             if (request.startCallback) {
                 request.startCallback();
             }
@@ -207,7 +207,7 @@ static MNURLSessionManager *_manager;
     if (request.isAllowsNetworkActivity) [UIApplication startNetworkActivityIndicating];
     [self setRequest:request forTask:uploadTask];
     /**回调请求开始*/
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(request.queue ? : dispatch_get_main_queue(), ^{
         if (request.startCallback) {
             request.startCallback();
         }
@@ -241,7 +241,7 @@ static MNURLSessionManager *_manager;
     if (request.isAllowsNetworkActivity) [UIApplication startNetworkActivityIndicating];
     [self setRequest:request forTask:downloadTask];
     /**回调请求开始*/
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(request.queue ? : dispatch_get_main_queue(), ^{
         if (request.startCallback) {
             request.startCallback();
         }
@@ -266,10 +266,6 @@ static MNURLSessionManager *_manager;
 - (void)cancelRequest:(__kindof MNURLRequest *)request {
     /**这里的取消是不可恢复的, 断点下载有专属的取消方法*/
     if (!request.isLoading) return;
-    if (!request.isAllowsCancelCallback) {
-        if ([request isKindOfClass:MNURLDataRequest.class]) ((MNURLDataRequest *)request).currentRequestCount = 0;
-        if (request.isAllowsNetworkActivity) [UIApplication closeNetworkActivityIndicating];
-    }
     [request.task cancel];
 }
 
@@ -293,7 +289,6 @@ static MNURLSessionManager *_manager;
         if (downloadRequest) {
             [downloadRequest setValue:@(NO) forKey:MNURLPath(downloadRequest.firstLoading)];
             [downloadRequest setValue:resumeData forKey:MNURLPath(downloadRequest.resumeData)];
-            if (!request.isAllowsCancelCallback && downloadRequest.isAllowsNetworkActivity) [UIApplication closeNetworkActivityIndicating];
         }
         if (completion) completion(resumeData);
     }];
@@ -315,7 +310,7 @@ static MNURLSessionManager *_manager;
     if (request.isAllowsNetworkActivity) [UIApplication startNetworkActivityIndicating];
     [self setRequest:request forTask:downloadTask];
     /**回调请求开始*/
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(request.queue ? : dispatch_get_main_queue(), ^{
         if (request.startCallback) {
             request.startCallback();
         }

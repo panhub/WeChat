@@ -75,7 +75,7 @@
         }
     }
     /**请求结束, 回调请求结果*/
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(self.queue ? : dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didFinishRequesting:response:)]) {
             [self.delegate didFinishRequesting:self response:response];
         }
@@ -86,10 +86,6 @@
 #pragma mark - Setter
 - (void)setRetryCount:(int)retryCount {
     _retryCount = MAX(0, retryCount);
-}
-
-- (void)setCurrentRequestCount:(int)currentRequestCount {
-    _currentRequestCount = MAX(0, currentRequestCount);
 }
 
 #pragma mark - Getter
