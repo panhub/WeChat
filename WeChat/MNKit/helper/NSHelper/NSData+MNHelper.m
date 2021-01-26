@@ -202,4 +202,40 @@
     return data.copy;
 }
 
+#pragma mark - XOR异或加解密
+- (NSData *)XOREncrypt:(NSString *)key {
+    if (!key || key.length <= 0) return self;
+    // 获取key的长度
+    NSInteger length = key.length;
+    // 将OC字符串转换为C字符串
+    const char *keys = [key cStringUsingEncoding:NSASCIIStringEncoding];
+    unsigned char cKey[length];
+    memcpy(cKey, keys, length);
+    // 获取字节指针
+    const Byte *point = self.bytes;
+    // 数据初始化，空间未分配 配合使用 appendBytes
+    NSMutableData *encryptData = [[NSMutableData alloc] initWithCapacity:length];
+    for (int i = 0; i < self.length; i++) {
+        int m = i % length; // 算出当前位置字节，要和密钥的异或运算的密钥字节
+        char c = cKey[m]; // 取出密码位
+        Byte b = (Byte)((point[i])^c); // 异或运算
+        [encryptData appendBytes:&b length:1]; // 追加字节
+    }
+    return encryptData.copy;
+}
+
+- (NSData *)XOREncrypt:(NSString *)key length:(NSUInteger)encryptLength {
+    NSUInteger length = self.length;
+    if (length <= 0 || encryptLength <= 0 || key.length <= 0) return self;
+    NSMutableData *mutableData = self.mutableCopy;
+    if (length > encryptLength) {
+        NSData *subData = [[mutableData subdataWithRange:NSMakeRange(0, encryptLength)] XOREncrypt:key];
+        [mutableData replaceBytesInRange:NSMakeRange(0, encryptLength) withBytes:subData.bytes length:encryptLength];
+    } else {
+        NSData *subData = [self XOREncrypt:key];
+        [mutableData replaceBytesInRange:NSMakeRange(0, length) withBytes:subData.bytes length:subData.length];
+    }
+    return mutableData.copy;
+}
+
 @end

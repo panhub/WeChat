@@ -151,6 +151,16 @@ CGSize NSStringBoundingSize (NSString *string, CGSize size, NSDictionary *attrib
     return NSMakeRange(0, self.length);
 }
 
+#pragma mark - 图片
+- (UIImage *)image {
+    return [UIImage imageNamed:self];
+}
+
+#pragma mark - 富文本
+- (NSAttributedString *)attributedString {
+    return [[NSAttributedString alloc] initWithString:self.copy];
+}
+
 #pragma mark - 是否数字字符串
 - (BOOL)isNumberString {
     NSScanner *scanner = [[NSScanner alloc] initWithString:self];
@@ -163,14 +173,13 @@ CGSize NSStringBoundingSize (NSString *string, CGSize size, NSDictionary *attrib
     return string.isNumberString;
 }
 
-#pragma mark - 图片
-- (UIImage *)image {
-    return [UIImage imageNamed:self];
-}
-
-#pragma mark - 富文本
-- (NSAttributedString *)attributedString {
-    return [[NSAttributedString alloc] initWithString:self.copy];
+#pragma mark - 倒序字符串
+- (NSString *)reversedString {
+    NSMutableString *string = @"".mutableCopy;
+    for (int i = 0; i < self.length; i ++) {
+        [string insertString:[self substringWithRange:NSMakeRange(i, 1)] atIndex:0];
+    }
+    return string.copy;
 }
 
 #pragma mark - 获取Number类型字符串

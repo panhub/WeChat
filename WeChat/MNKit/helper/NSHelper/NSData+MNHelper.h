@@ -96,5 +96,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSData *_Nullable)dataWithHexString:(NSString*)hexString;
 
+#pragma mark - XOR异或加解密
+/**
+ 异或加解密
+ @param key 密码
+ @return 加解密后的数据流
+ */
+- (NSData *)XOREncrypt:(NSString *)key;
+
+/**
+ 选择一定长度进行异或加解密
+ @param key 密码
+ @param length 长度
+ @return 加解密后的数据流
+ */
+- (NSData *)XOREncrypt:(NSString *)key length:(NSUInteger)length;
+
 @end
 NS_ASSUME_NONNULL_END

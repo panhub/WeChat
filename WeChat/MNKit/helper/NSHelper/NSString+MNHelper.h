@@ -139,6 +139,10 @@ FOUNDATION_EXPORT CGSize NSStringBoundingSize (NSString *string, CGSize size, NS
  */
 @property (nonatomic, readonly) BOOL isNumberString;
 /**
+ 倒序字符串
+ */
+@property (nonatomic, readonly) NSString *reversedString;
+/**
  获取以自身为名称的图片
  */
 @property (nonatomic, readonly, strong, nullable) UIImage *image;
