@@ -212,7 +212,6 @@
             // 预览
             MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:@[model]];
             vc.delegate = self;
-            vc.allowsSelect = NO;
             vc.cleanAssetWhenDealloc = YES;
             [self.navigationController pushViewController:vc animated:YES];
         } else {
@@ -226,8 +225,6 @@
         MNAssetBrowser *browser = [MNAssetBrowser new];
         browser.assets = assets;
         browser.delegate = self;
-        browser.allowsSelect = YES;
-        browser.cleanAssetWhenDealloc = YES;
         browser.backgroundColor = UIColor.blackColor;
         [browser presentInView:self.contentView fromIndex:[assets indexOfObject:model] animated:YES completion:nil];
     } else {
@@ -370,8 +367,9 @@
     }];
 }
 
-- (void)assetBrowser:(MNAssetBrowser *)assetBrowser didSelectAsset:(MNAsset *)asset {
-    [self didSelectAsset:asset];
+- (void)assetBrowserDidDismiss:(MNAssetBrowser *)assetBrowser {
+    [assetBrowser.assets setValue:nil forKey:@"content"];
+    [assetBrowser.assets makeObjectsPerformSelector:@selector(cancelRequest)];
 }
 
 #pragma mark - MNAssetCellDelegate

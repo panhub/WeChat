@@ -24,9 +24,6 @@ typedef NS_ENUM(NSInteger, MNAssetBrowseState) {
     MNAssetBrowseStatePreviewing
 };
 
-/**计算图片尺寸*/
-UIKIT_EXTERN CGSize MNImageAssetAspectInSize(UIImage *_Nonnull, CGSize);
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MNAssetBrowseCellDelegate <NSObject>
@@ -55,6 +52,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**设置播放控制是否可见*/
 - (void)setPlayToolBarVisible:(BOOL)isVisible animated:(BOOL)animated;
+
+/**
+ 计算最初显示大小
+ @param image 指定图片
+ @param size 父控件大小
+ */
++ (CGSize)aspectImage:(UIImage *)image inSize:(CGSize)size;
 
 @end
 NS_ASSUME_NONNULL_END

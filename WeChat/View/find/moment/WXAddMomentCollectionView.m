@@ -124,7 +124,6 @@
         }];
         MNAssetBrowser *browser = [MNAssetBrowser new];
         browser.assets = assets;
-        browser.allowsSelect = NO;
         browser.backgroundColor = [UIColor blackColor];
         [browser presentInView:self.viewController.view fromIndex:[assets indexOfObject:asset] animated:YES completion:nil];
     }

@@ -214,6 +214,19 @@
 }
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
+    MNAssetPicker *picker = [[MNAssetPicker alloc] init];
+    picker.configuration.maxPickingCount = 100;
+    picker.configuration.maxExportPixel = 100.f;
+    picker.configuration.allowsCapturing = NO;
+    picker.configuration.allowsPreviewing = YES;
+    picker.configuration.allowsEditing = NO;
+    picker.configuration.allowsPickingGif = NO;
+    picker.configuration.allowsPickingVideo = YES;
+    picker.configuration.allowsPickingLivePhoto = YES;
+    [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
+        NSLog(@"");
+    } cancelHandler:nil];
+    return;
     @weakify(self);
     MNMenuView *menuView = [MNMenuView menuWithAlignment:MNMenuAlignmentVertical createdHandler:^(MNMenuView * _Nonnull menuView, NSUInteger idx, UIButton * _Nonnull item) {
         item.width_mn += 40.f;

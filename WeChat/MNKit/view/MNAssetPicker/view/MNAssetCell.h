@@ -12,10 +12,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MNAssetCellDelegate <NSObject>
-/**获取资源选择配置*/
-- (MNAssetPickConfiguration *_Nullable)assetPickingConfiguration;
 /**选择了资源*/
 - (void)didSelectAsset:(MNAsset *)model;
+/**获取资源选择配置*/
+- (MNAssetPickConfiguration *_Nullable)assetPickingConfiguration;
 @end
 
 @interface MNAssetCell : MNCollectionViewCell

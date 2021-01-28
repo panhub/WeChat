@@ -12,14 +12,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ 右上角按钮
+ - MNAssetBrowseEventNone: 没有
+ - MNAssetBrowseEventDone: 确定
+ - MNAssetBrowseEventSave: 保存
+ - MNAssetBrowseEventShare: 分享
+ - MNAssetBrowseEventDelete: 删除
+ - MNAssetBrowseEventSelect: 选择
+ */
+typedef NS_OPTIONS(NSInteger, MNAssetBrowseEvents) {
+    MNAssetBrowseEventNone = 0,
+    MNAssetBrowseEventDone = 1 << 1,
+    MNAssetBrowseEventSave = 1 << 2,
+    MNAssetBrowseEventShare = 1 << 3,
+    MNAssetBrowseEventDelete = 1 << 4,
+    MNAssetBrowseEventSelect = 1 << 5
+};
+
 @protocol MNAssetBrowseDelegate <NSObject>
 @optional;
 - (void)assetBrowserWillPresent:(MNAssetBrowser *)assetBrowser;
 - (void)assetBrowserDidPresent:(MNAssetBrowser *)assetBrowser;
 - (void)assetBrowserWillDismiss:(MNAssetBrowser *)assetBrowser;
 - (void)assetBrowserDidDismiss:(MNAssetBrowser *)assetBrowser;
-- (void)assetBrowser:(MNAssetBrowser *)assetBrowser didSelectAsset:(MNAsset *)asset;
 - (void)assetBrowser:(MNAssetBrowser *)assetBrowser didScrollToIndex:(NSInteger)index;
+- (void)assetBrowser:(MNAssetBrowser *)assetBrowser buttonTouchUpInside:(__kindof UIControl *)view;
 @end
 
 UIKIT_EXTERN const NSInteger MNAssetBrowserTag;
@@ -28,9 +46,13 @@ UIKIT_EXTERN const CGFloat MNAssetBrowseDismissAnimationDuration;
 
 @interface MNAssetBrowser : UIView<MNAlertProtocol>
 /**
- 是否允许选择
+ 右上角按钮
  */
-@property (nonatomic) BOOL allowsSelect;
+@property (nonatomic) MNAssetBrowseEvents events;
+/**
+ 当前展示的索引
+ */
+@property (nonatomic, readonly) NSInteger currentDisplayIndex;
 /**
  是否允许自动播放<针对视频/LivePhoto>
  */

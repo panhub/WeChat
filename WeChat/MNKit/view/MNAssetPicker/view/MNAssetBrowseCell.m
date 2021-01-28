@@ -15,15 +15,6 @@
 #import <PhotosUI/PHLivePhotoView.h>
 #endif
 
-CGSize MNImageAssetAspectInSize(UIImage *image, CGSize size) {
-    CGFloat width = size.width;
-    CGFloat height = image.size.height/image.size.width*size.width;
-    if (isnan(height) || height < 1.f) height = size.height;
-    height = floor(height);
-    if (height > size.height && height - size.height <= 1.f) height = size.height;
-    return CGSizeMake(width, height);
-}
-
 @interface MNAssetBrowseCell ()<UIScrollViewDelegate, MNPlayerDelegate, MNSliderDelegate>
 @property (nonatomic, strong) MNSlider *slider;
 @property (nonatomic, strong) MNPlayer *player;
@@ -177,8 +168,10 @@ CGSize MNImageAssetAspectInSize(UIImage *image, CGSize size) {
     } else if (self.asset.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
             PHLivePhotoView *livePhotoView = (PHLivePhotoView *)self.livePhotoView;
-            [livePhotoView stopPlayback];
-            livePhotoView.livePhoto = nil;
+            if (livePhotoView.livePhoto) {
+                [livePhotoView stopPlayback];
+                livePhotoView.livePhoto = nil;
+            }
         }
     } else {
         self.imageView.image = nil;
@@ -227,7 +220,7 @@ CGSize MNImageAssetAspectInSize(UIImage *image, CGSize size) {
         if ([model.content isKindOfClass:UIImage.class]) image = model.content;
         if (image.images.count > 1) image = image.images.firstObject;
         
-        self.scrollView.contentView.size_mn = MNImageAssetAspectInSize(image, self.scrollView.size_mn);
+        self.scrollView.contentView.size_mn = [MNAssetBrowseCell aspectImage:image inSize:self.scrollView.size_mn];
         self.scrollView.contentSize = CGSizeMake(self.scrollView.width_mn, MAX(self.scrollView.contentView.height_mn, self.scrollView.height_mn));
         self.scrollView.contentView.center_mn = self.scrollView.bounds_center;
         if (self.scrollView.contentView.height_mn > self.scrollView.height_mn) {
@@ -340,6 +333,23 @@ CGSize MNImageAssetAspectInSize(UIImage *image, CGSize size) {
             [livePhotoView stopPlayback];
         }
     }
+}
+
+#pragma mark - Method
++ (CGSize)aspectImage:(UIImage *)image inSize:(CGSize)size {
+    size.width = floor(size.width);
+    size.height = floor(size.height);
+    CGFloat width = size.width;
+    CGFloat height = image.size.height/image.size.width*width;
+    if (isnan(height) || height < 1.f) height = size.height;
+    height = floor(height);
+    if (height >= size.height) {
+        height = size.height - 1.f;
+        width = image.size.width/image.size.height*height;
+        if (isnan(width) || width < 1.f) width = size.width;
+        width = floor(width);
+    }
+    return CGSizeMake(width, height);
 }
 
 @end

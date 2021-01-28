@@ -217,7 +217,6 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
             MNAsset *asset = [MNAsset assetWithContent:image];
             asset.containerView = viewModel.imageViewModel.obj;
             MNAssetBrowser *browser = [MNAssetBrowser new];
-            browser.allowsSelect = NO;
             browser.assets = @[asset];
             browser.backgroundColor = UIColor.blackColor;
             [browser presentFromIndex:0 animated:YES];
@@ -228,7 +227,6 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
             MNAsset *asset = [MNAsset assetWithContent:fileModel.filePath];
             asset.containerView = viewModel.imageViewModel.obj;
             MNAssetBrowser *browser = [MNAssetBrowser new];
-            browser.allowsSelect = NO;
             browser.assets = @[asset];
             browser.allowsAutoPlaying = YES;
             browser.backgroundColor = UIColor.blackColor;

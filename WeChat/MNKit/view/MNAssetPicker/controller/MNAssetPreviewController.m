@@ -27,7 +27,7 @@
 - (instancetype)initWithAssets:(NSArray <MNAsset *>*)asset {
     if (self = [super init]) {
         self.assets = asset.copy;
-        self.allowsSelect = YES;
+        self.allowsSelect = NO;
         self.currentDisplayIndex = -1;
         self.statusBarHidden = UIApplication.sharedApplication.isStatusBarHidden;
     }

@@ -45,8 +45,12 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
 @property (nonatomic, strong) UIImageView *blurBackgroundView;
 /**资源展示*/
 @property (nonatomic, strong) UICollectionView *collectionView;
+/**右按钮*/
+@property (nonatomic, strong) NSMutableArray <UIView *>*buttons;
 /**资源选择控制*/
-@property (nonatomic, strong) MNAssetBrowseControl *browseControl;
+@property (nonatomic, strong) MNAssetBrowseControl *selectButton;
+/**是否允许交互时缩小效果*/
+@property (nonatomic, getter=isAllowsShrinkInteractive) BOOL allowsShrinkInteractive;
 @end
 
 #pragma clang diagnostic push
@@ -66,11 +70,11 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:[[UIScreen mainScreen] bounds]]) {
         
-        self.tag = MNAssetBrowserTag;
-        self.allowsSelect = NO;
         self.statusBarHidden = YES;
         self.allowsAutoPlaying = NO;
         self.currentDisplayIndex = -1;
+        self.tag = MNAssetBrowserTag;
+        self.events = MNAssetBrowseEventNone;
         self.statusBarOriginalStyle = [[UIApplication sharedApplication] statusBarStyle];
         self.statusBarOriginalHidden = [[UIApplication sharedApplication] isStatusBarHidden];
         self.statusBarStyle = self.statusBarOriginalStyle;
@@ -118,15 +122,85 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
         [self addSubview:interactiveView];
         self.interactiveView = interactiveView;
         
-        MNAssetBrowseControl *browseControl = [[MNAssetBrowseControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 33.f)];
-        browseControl.hidden = YES;
-        browseControl.right_mn = self.width_mn - 20.f;
-        browseControl.top_mn = (MN_NAV_BAR_HEIGHT - browseControl.height_mn)/2.f + MN_STATUS_BAR_HEIGHT;
-        browseControl.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-        [browseControl addTarget:self action:@selector(browseControlClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:browseControl];
-        self.browseControl = browseControl;
+        CGFloat m = 15.f;
+        CGFloat x = self.width_mn - 20.f;
+        CGFloat y = MN_NAV_BAR_HEIGHT/2.f + MN_STATUS_BAR_HEIGHT;
+        self.buttons = @[].mutableCopy;
+        if (self.events & MNAssetBrowseEventDone) {
+            // 确定
+            UIButton *doneButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"确定" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+            [doneButton sizeToFit];
+            doneButton.width_mn += 5.f;
+            doneButton.height_mn = 17.f;
+            doneButton.touchInset = UIEdgeInsetWith(-m/2.f);
+            doneButton.right_mn = x;
+            doneButton.centerY_mn = y;
+            doneButton.tag = MNAssetBrowseEventDone;
+            doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+            [doneButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:doneButton];
+            [self.buttons addObject:doneButton];
+            x = doneButton.left_mn - m;
+        }
+        if (self.events & MNAssetBrowseEventSave) {
+            // 保存
+            UIButton *saveButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"保存" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+            [saveButton sizeToFit];
+            saveButton.width_mn += 5.f;
+            saveButton.height_mn = 17.f;
+            saveButton.touchInset = UIEdgeInsetWith(-m/2.f);
+            saveButton.right_mn = x;
+            saveButton.centerY_mn = y;
+            saveButton.tag = MNAssetBrowseEventSave;
+            saveButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+            [saveButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:saveButton];
+            [self.buttons addObject:saveButton];
+            x = saveButton.left_mn - m;
+        }
+        if (self.events & MNAssetBrowseEventShare) {
+            // 分享
+            UIButton *shareButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"分享" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+            shareButton.width_mn = 17.f;
+            shareButton.height_mn = 17.f;
+            shareButton.touchInset = UIEdgeInsetWith(-m/2.f);
+            shareButton.right_mn = x;
+            shareButton.centerY_mn = y;
+            shareButton.tag = MNAssetBrowseEventShare;
+            shareButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+            [shareButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:shareButton];
+            [self.buttons addObject:shareButton];
+            x = shareButton.left_mn - m;
+        }
+        if (self.events & MNAssetBrowseEventDelete) {
+            // 删除
+            UIButton *deleteButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"删除" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+            [deleteButton sizeToFit];
+            deleteButton.width_mn += 5.f;
+            deleteButton.height_mn = 17.f;
+            deleteButton.touchInset = UIEdgeInsetWith(-m/2.f);
+            deleteButton.right_mn = x;
+            deleteButton.centerY_mn = y;
+            deleteButton.tag = MNAssetBrowseEventDelete;
+            deleteButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+            [deleteButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:deleteButton];
+            [self.buttons addObject:deleteButton];
+            x = deleteButton.left_mn - m;
+        }
+        if (self.events & MNAssetBrowseEventSelect) {
+            MNAssetBrowseControl *selectButton = [[MNAssetBrowseControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 33.f)];
+            selectButton.right_mn = x;
+            selectButton.centerY_mn = y;
+            selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+            [selectButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:selectButton];
+            [self.buttons addObject:selectButton];
+            self.selectButton = selectButton;
+        }
         
+        // 交互事件
         UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
         doubleTap.numberOfTapsRequired = 2;
         [self addGestureRecognizer:doubleTap];
@@ -215,7 +289,7 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
         [self.delegate assetBrowserWillPresent:self];
     }
     
-    CGSize renderSize = MNImageAssetAspectInSize(animatedImage, self.bounds.size);
+    CGSize renderSize = [MNAssetBrowseCell aspectImage:animatedImage inSize:self.bounds.size];
     CGRect toFrame = CGRectMake((self.width_mn - renderSize.width)/2.f, (self.height_mn - renderSize.height)/2.f, renderSize.width, renderSize.height);
     
     UIImageView *imageView = [UIImageView imageViewWithFrame:[fromView convertRect:fromView.bounds toView:self] image:animatedImage];
@@ -275,7 +349,6 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
     MNAsset *asset = [MNAsset assetWithContent:animatedImage];
     asset.containerView = containerView;
     MNAssetBrowser *browser = [[MNAssetBrowser alloc] initWithAssets:@[asset]];
-    browser.allowsSelect = NO;
     browser.statusBarHidden = YES;
     browser.backgroundColor = UIColor.blackColor;
     [browser presentFromIndex:0 animated:animated completion:completionHandler];
@@ -363,7 +436,7 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
     if (currentPageIndex == self.currentDisplayIndex) return;
     self.currentDisplayIndex = currentPageIndex;
     [[self cellForItemAtCurrentDisplayIndex] didBeginDisplaying];
-    if (self.allowsSelect) [self.browseControl updateAsset:self.assets[currentPageIndex]];
+    if (self.selectButton) [self.selectButton updateAsset:self.assets[currentPageIndex]];
     if ([self.delegate respondsToSelector:@selector(assetBrowser:didScrollToIndex:)]) {
         [self.delegate assetBrowser:self didScrollToIndex:currentPageIndex];
     }
@@ -443,38 +516,43 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
             self.interactiveView.hidden = NO;
             self.collectionView.hidden = YES;
             
+            self.allowsShrinkInteractive = self.height_mn - self.interactiveView.height_mn >= 50.f;
+            
             CGRect fromRect = self.fromView.frame;
             self.interactiveDelay = (self.height_mn - fromRect.size.height)/2.f;
             self.interactiveRatio = CGPointMake(fromRect.size.width/self.interactiveView.width_mn, fromRect.size.height/self.interactiveView.height_mn);
             
-            if (self.browseControl) {
-                [UIView animateWithDuration:.3f animations:^{
-                    self.browseControl.alpha = 0.f;
-                }];
-            }
+            [UIView animateWithDuration:.3f animations:^{
+                [self.buttons setValue:@(0.f) forKey:@"alpha"];
+            }];
 
         } break;
         case UIGestureRecognizerStateChanged:
         {
             if (self.interactiveView.isHidden) return;
             
-            CGPoint point = [recognizer translationInView:self];
-            [recognizer setTranslation:CGPointZero inView:self];
-            
-            CGPoint center = self.interactiveView.center_mn;
-            center.x += point.x;
-            center.y += point.y;
-    
             CGFloat interactiveRatio = fabs(self.height_mn/2.f - self.interactiveView.centerY_mn)/self.interactiveDelay;
             
-            CGRect frame = self.interactiveFrame;
-            frame.size.width = (1.f - (1.f - self.interactiveRatio.x)*interactiveRatio)*frame.size.width;
-            frame.size.height = (1.f - (1.f - self.interactiveRatio.y)*interactiveRatio)*frame.size.height;
-            frame.origin.x = center.x - frame.size.width/2.f;
-            frame.origin.y = center.y - frame.size.height/2.f;
-            frame.origin.x = MIN(MAX(0.f, frame.origin.x), self.width_mn - frame.size.width);
-            frame.origin.y = MIN(MAX(0.f, frame.origin.y), self.height_mn - frame.size.height);
-            self.interactiveView.frame = frame;
+            CGPoint point = [recognizer translationInView:self];
+            [recognizer setTranslation:CGPointZero inView:self];
+    
+            CGPoint center = self.interactiveView.center_mn;
+            center.y += point.y;
+    
+            if (self.isAllowsShrinkInteractive) {
+                center.x += point.x;
+                CGRect frame = self.interactiveFrame;
+                frame.size.width = (1.f - (1.f - self.interactiveRatio.x)*interactiveRatio)*frame.size.width;
+                frame.size.height = (1.f - (1.f - self.interactiveRatio.y)*interactiveRatio)*frame.size.height;
+                frame.origin.x = center.x - frame.size.width/2.f;
+                frame.origin.y = center.y - frame.size.height/2.f;
+                frame.origin.x = MIN(MAX(0.f, frame.origin.x), self.width_mn - frame.size.width);
+                frame.origin.y = MIN(MAX(0.f, frame.origin.y), self.height_mn - frame.size.height);
+                self.interactiveView.frame = frame;
+            } else {
+                self.interactiveView.center_mn = center;
+                self.interactiveView.top_mn = MIN(self.height_mn, MAX(-(self.interactiveView.height_mn - MNAssetBrowseCellInteritemSpacing), self.interactiveView.top_mn));
+            }
             
             self.blurBackgroundView.alpha = 1.f - interactiveRatio*.8f;
             
@@ -502,7 +580,7 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
     [UIView animateWithDuration:MNAssetBrowsePresentAnimationDuration/2.f delay:0.f options:UIViewAnimationOptionBeginFromCurrentState|UIViewAnimationOptionCurveEaseInOut animations:^{
         self.blurBackgroundView.alpha = 1.f;
         self.interactiveView.frame = self.interactiveFrame;
-        if (self.browseControl) self.browseControl.alpha = 1.f;
+        [self.buttons setValue:@(1.f) forKey:@"alpha"];
     } completion:^(BOOL finished) {
         self.interactiveView.hidden = YES;
         self.collectionView.hidden = NO;
@@ -551,13 +629,11 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
     }];
 }
 
-- (void)browseControlClicked:(MNAssetBrowseControl *)control {
+- (void)buttonTouchUpInside:(UIControl *)sender {
     if (self.collectionView.isDragging || self.collectionView.isDecelerating) return;
-    MNAsset *model = self.assets[self.currentDisplayIndex];
-    if ([self.delegate respondsToSelector:@selector(assetBrowser:didSelectAsset:)]) {
-        [self.delegate assetBrowser:self didSelectAsset:model];
+    if ([self.delegate respondsToSelector:@selector(assetBrowser:buttonTouchUpInside:)]) {
+        [self.delegate assetBrowser:self buttonTouchUpInside:sender];
     }
-    [self.browseControl updateAsset:model];
 }
 
 #pragma mark - UICollectionViewDelegate && UICollectionViewDataSource
@@ -599,7 +675,7 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
 
 #pragma mark - UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return touch.view != self.browseControl;
+    return ![self.buttons containsObject:touch.view];
 }
 
 #pragma mark - Getter

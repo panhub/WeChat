@@ -221,7 +221,6 @@
         [UIWindow endEditing:YES];
         WXMomentBrowser *browser = [[WXMomentBrowser alloc] initWithViewModel:viewModel];
         browser.assets = assets;
-        browser.allowsSelect = NO;
         browser.backgroundColor = [UIColor blackColor];
         [browser presentInView:self.view fromIndex:index animated:YES completion:nil];
     };

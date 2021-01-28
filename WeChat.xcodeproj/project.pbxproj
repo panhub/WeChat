@@ -5418,18 +5418,18 @@
 		E869C7642570EF640017025E /* controller */ = {
 			isa = PBXGroup;
 			children = (
-				E869C7652570EF640017025E /* MNImageCropController.h */,
-				E869C7662570EF640017025E /* MNAssetPreviewController.m */,
-				E869C7672570EF640017025E /* MNVideoTailorController.m */,
 				E869C7682570EF640017025E /* MNAssetPickController.h */,
-				E869C7692570EF640017025E /* MNCameraController.m */,
-				E869C76A2570EF640017025E /* MNAssetTouchController.h */,
+				E869C7702570EF640017025E /* MNAssetPickController.m */,
 				E869C76B2570EF640017025E /* MNAssetPreviewController.h */,
-				E869C76C2570EF640017025E /* MNImageCropController.m */,
-				E869C76D2570EF640017025E /* MNVideoTailorController.h */,
+				E869C7662570EF640017025E /* MNAssetPreviewController.m */,
+				E869C76A2570EF640017025E /* MNAssetTouchController.h */,
 				E869C76E2570EF640017025E /* MNAssetTouchController.m */,
 				E869C76F2570EF640017025E /* MNCameraController.h */,
-				E869C7702570EF640017025E /* MNAssetPickController.m */,
+				E869C7692570EF640017025E /* MNCameraController.m */,
+				E869C7652570EF640017025E /* MNImageCropController.h */,
+				E869C76C2570EF640017025E /* MNImageCropController.m */,
+				E869C76D2570EF640017025E /* MNVideoTailorController.h */,
+				E869C7672570EF640017025E /* MNVideoTailorController.m */,
 			);
 			path = controller;
 			sourceTree = "<group>";
