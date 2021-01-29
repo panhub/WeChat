@@ -528,19 +528,27 @@
 }
 
 #pragma mark - MNAssetPreviewDelegate
-- (void)previewControllerDoneButtonClicked:(MNAssetPreviewController *)previewController {
-    [self didFinishPickingAssets:previewController.assets];
+- (void)previewController:(MNAssetPreviewController *)previewController rightBarItemTouchUpInside:(UIControl *)sender {
+    if (sender.tag == MNAssetPreviewEventDone) {
+        [self didFinishPickingAssets:previewController.assets];
+    } else {
+        [self didSelectAsset:previewController.assets[previewController.currentDisplayIndex]];
+    }
 }
 
 #pragma mark - MNAssetTouchDelegate
-- (void)touchControllerDoneButtonClicked:(MNAssetTouchController *)touchController {
-    MNAsset *asset = touchController.asset;
-    if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
-        [self cropImageAsset:asset];
-    } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing && floor(asset.duration) > self.configuration.minExportDuration) {
-        [self tailorVideoAsset:asset];
+- (void)touchController:(MNAssetTouchController *)touchController rightBarItemTouchUpInside:(UIControl *)sender {
+    if (sender.tag == MNAssetTouchEventSelect) {
+        [self didSelectAsset:touchController.asset];
     } else {
-        [self didFinishPickingAssets:@[asset]];
+        MNAsset *asset = touchController.asset;
+        if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
+            [self cropImageAsset:asset];
+        } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing && floor(asset.duration) > self.configuration.minExportDuration) {
+            [self tailorVideoAsset:asset];
+        } else {
+            [self didFinishPickingAssets:@[asset]];
+        }
     }
 }
 
@@ -561,7 +569,10 @@
     vc.asset = model;
     vc.actions = @[action];
     vc.cleanAssetWhenDealloc = YES;
-    vc.allowsSelect = self.configuration.maxPickingCount > 1;
+    vc.events = MNAssetTouchEventDone;
+    if (self.configuration.maxPickingCount > 1) {
+        vc.events |= MNAssetTouchEventSelect;
+    }
     return vc;
 }
 

@@ -11,7 +11,7 @@
 #import "MNPlayView.h"
 #import "MNAssetScrollView.h"
 #import "MNAssetProgressView.h"
-#import "MNAssetBrowseControl.h"
+#import "MNAssetSelectButton.h"
 #if __has_include(<Photos/Photos.h>)
 #import "MNAssetHelper.h"
 #endif
@@ -36,14 +36,16 @@
 @property (nonatomic, strong) MNAssetScrollView *scrollView;
 @property (nonatomic, strong) UIImageView *playToolBar;
 @property (nonatomic, strong) UIImageView *videoSnapshotView;
+@property (nonatomic, strong) MNAssetSelectButton *selectButton;
 @property (nonatomic, strong) MNAssetProgressView *progressView;
 @property (nonatomic, getter=isStatusBarHidden) BOOL statusBarHidden;
+
 @end
 
 @implementation MNAssetTouchController
 - (instancetype)init {
     if (self = [super init]) {
-        self.allowsSelect = YES;
+        self.events = MNAssetTouchEventNone;
         self.statusBarHidden = UIApplication.sharedApplication.isStatusBarHidden;
     }
     return self;
@@ -330,6 +332,12 @@
     }
 }
 
+#pragma mark - Setter
+- (void)setAsset:(MNAsset *)asset {
+    _asset = asset;
+    if (self.selectButton) [self.selectButton updateAsset:asset];
+}
+
 #pragma mark - Getter
 - (MNPlayer *)player {
     if (!_player) {
@@ -362,16 +370,32 @@
 }
 
 - (UIView *)navigationBarShouldCreateRightBarItem {
-    if (self.allowsSelect) {
-        MNAssetBrowseControl *browseControl = [[MNAssetBrowseControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 33.f)];
-        [browseControl updateAsset:self.asset];
-        [browseControl addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-        return browseControl;
+    UIView *rightBarItem = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 25.f)];
+    if (self.events & MNAssetTouchEventSelect) {
+        MNAssetSelectButton *selectButton = [[MNAssetSelectButton alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, rightBarItem.height_mn)];
+        selectButton.centerY_mn = rightBarItem.height_mn/2.f;
+        selectButton.tag = MNAssetTouchEventSelect;
+        selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [selectButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        if (self.asset) [selectButton updateAsset:self.asset];
+        [rightBarItem addSubview:selectButton];
+        rightBarItem.width_mn = selectButton.right_mn;
+        self.selectButton = selectButton;
     }
-    UIButton *rightBarButton = [UIButton buttonWithFrame:CGRectMake(0.f, 0.f, 40.f, 30.f) image:nil title:@"确定" titleColor:[UIColor whiteColor] titleFont:[UIFont systemFontOfSize:16.5f]];
-    rightBarButton.touchInset = UIEdgeInsetWith(-5.f);
-    [rightBarButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-    return rightBarButton;
+    if (self.events & MNAssetTouchEventDone) {
+        // 确定
+        UIButton *doneButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"确定" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+        [doneButton sizeToFit];
+        doneButton.height_mn = rightBarItem.height_mn;
+        doneButton.left_mn = rightBarItem.width_mn + 15.f;
+        doneButton.centerY_mn = rightBarItem.height_mn/2.f;
+        doneButton.tag = MNAssetTouchEventDone;
+        doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [doneButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [rightBarItem addSubview:doneButton];
+        rightBarItem.width_mn = doneButton.right_mn + 15.f;
+    }
+    return rightBarItem;
 }
 
 - (void)navigationBarDidCreateBarItem:(MNNavigationBar *)navigationBar {
@@ -382,14 +406,10 @@
 }
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIControl *)rightItem {
-    if (self.allowsSelect) {
-        if ([self.delegate respondsToSelector:@selector(didSelectAsset:)]) {
-            [self.delegate didSelectAsset:self.asset];
-            [kTransform(MNAssetBrowseControl *, rightItem) updateAsset:self.asset];
-        }
-    } else {
-        if ([self.delegate respondsToSelector:@selector(touchControllerDoneButtonClicked:)]) {
-            [self.delegate touchControllerDoneButtonClicked:self];
+    if ([self.delegate respondsToSelector:@selector(touchController:rightBarItemTouchUpInside:)]) {
+        [self.delegate touchController:self rightBarItemTouchUpInside:rightItem];
+        if (rightItem.tag == MNAssetTouchEventSelect) {
+            [kTransform(MNAssetSelectButton *, rightItem) updateAsset:self.asset];
         }
     }
 }

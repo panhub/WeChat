@@ -14,21 +14,31 @@ typedef NS_ENUM(NSInteger, MNAssetTouchState) {
     MNAssetTouchStateWeight // 重压
 };
 
+/**
+ 右按钮
+ - MNAssetTouchEventNone: 没有
+ - MNAssetTouchEventDone: 确定
+ - MNAssetTouchEventSelect: 选择
+ */
+typedef NS_OPTIONS(NSInteger, MNAssetTouchEvents) {
+    MNAssetTouchEventNone = 0,
+    MNAssetTouchEventDone = 1 << 1,
+    MNAssetTouchEventSelect = 1 << 2
+};
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 
-@protocol MNAssetTouchDelegate <NSObject>
-/**回调资源选择器*/
-- (void)didSelectAsset:(MNAsset *_Nonnull)model;
-/**确定按钮点击*/
-- (void)touchControllerDoneButtonClicked:(MNAssetTouchController *_Nonnull)touchController;
-@end
-
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MNAssetTouchDelegate <NSObject>
+/**导航有按钮点击事件*/
+- (void)touchController:(MNAssetTouchController *)touchController rightBarItemTouchUpInside:(UIControl *)sender;
+@end
+
 @interface MNAssetTouchController : MNExtendViewController
-/**是否允许选择*/
-@property (nonatomic) BOOL allowsSelect;
+/**右按钮事件*/
+@property (nonatomic) MNAssetTouchEvents events;
 /**资源选项*/
 @property (nonatomic, strong) MNAsset *asset;
 /**展示状态*/

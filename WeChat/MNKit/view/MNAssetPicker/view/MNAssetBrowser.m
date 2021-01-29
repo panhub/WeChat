@@ -9,7 +9,7 @@
 #import "MNAssetBrowser.h"
 #import "MNAssetBrowseCell.h"
 #import "MNAsset.h"
-#import "MNAssetBrowseControl.h"
+#import "MNAssetSelectButton.h"
 
 const NSInteger MNAssetBrowserTag = 1213151;
 const CGFloat MNAssetBrowseCellInteritemSpacing = 15.f;
@@ -48,7 +48,7 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
 /**右按钮*/
 @property (nonatomic, strong) NSMutableArray <UIView *>*buttons;
 /**资源选择控制*/
-@property (nonatomic, strong) MNAssetBrowseControl *selectButton;
+@property (nonatomic, strong) MNAssetSelectButton *selectButton;
 /**是否允许交互时缩小效果*/
 @property (nonatomic, getter=isAllowsShrinkInteractive) BOOL allowsShrinkInteractive;
 @end
@@ -68,153 +68,161 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:[[UIScreen mainScreen] bounds]]) {
-        
-        self.statusBarHidden = YES;
-        self.allowsAutoPlaying = NO;
-        self.currentDisplayIndex = -1;
-        self.tag = MNAssetBrowserTag;
-        self.events = MNAssetBrowseEventNone;
-        self.statusBarOriginalStyle = [[UIApplication sharedApplication] statusBarStyle];
-        self.statusBarOriginalHidden = [[UIApplication sharedApplication] isStatusBarHidden];
-        self.statusBarStyle = self.statusBarOriginalStyle;
-        
-        UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
-        backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        [self addSubview:backgroundView];
-        self.backgroundView = backgroundView;
-        
-        UIImageView *blurBackgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
-        blurBackgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        [self addSubview:blurBackgroundView];
-        self.blurBackgroundView = blurBackgroundView;
-        
-        UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
-        layout.minimumLineSpacing = MNAssetBrowseCellInteritemSpacing;
-        layout.minimumInteritemSpacing = 0.f;
-        layout.sectionInset = UIEdgeInsetsMake(0.f, MNAssetBrowseCellInteritemSpacing/2.f, 0.f, MNAssetBrowseCellInteritemSpacing/2.f);
-        layout.headerReferenceSize = CGSizeZero;
-        layout.footerReferenceSize = CGSizeZero;
-        layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        layout.itemSize = self.size_mn;
-        
-        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-MNAssetBrowseCellInteritemSpacing/2.f, 0.f, self.width_mn + MNAssetBrowseCellInteritemSpacing, self.height_mn) collectionViewLayout:layout];
-        collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        collectionView.backgroundColor = [UIColor clearColor];
-        collectionView.delegate = self;
-        collectionView.dataSource = self;
-        collectionView.scrollsToTop = NO;
-        collectionView.pagingEnabled = YES;
-        collectionView.delaysContentTouches = NO;
-        collectionView.canCancelContentTouches = YES;
-        collectionView.showsVerticalScrollIndicator = NO;
-        collectionView.showsHorizontalScrollIndicator = NO;
-        [collectionView adjustContentInset];
-        [collectionView registerClass:[MNAssetBrowseCell class]
-           forCellWithReuseIdentifier:MNCollectionElementCellReuseIdentifier];
-        [self addSubview:collectionView];
-        self.collectionView = collectionView;
-        
-        UIImageView *interactiveView = [UIImageView imageViewWithFrame:CGRectZero image:nil];
-        interactiveView.hidden = YES;
-        interactiveView.clipsToBounds = YES;
-        interactiveView.contentMode = UIViewContentModeScaleAspectFill;
-        [self addSubview:interactiveView];
-        self.interactiveView = interactiveView;
-        
-        CGFloat m = 15.f;
-        CGFloat x = self.width_mn - 20.f;
-        CGFloat y = MN_NAV_BAR_HEIGHT/2.f + MN_STATUS_BAR_HEIGHT;
-        self.buttons = @[].mutableCopy;
-        if (self.events & MNAssetBrowseEventDone) {
-            // 确定
-            UIButton *doneButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"确定" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
-            [doneButton sizeToFit];
-            doneButton.width_mn += 5.f;
-            doneButton.height_mn = 17.f;
-            doneButton.touchInset = UIEdgeInsetWith(-m/2.f);
-            doneButton.right_mn = x;
-            doneButton.centerY_mn = y;
-            doneButton.tag = MNAssetBrowseEventDone;
-            doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-            [doneButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:doneButton];
-            [self.buttons addObject:doneButton];
-            x = doneButton.left_mn - m;
-        }
-        if (self.events & MNAssetBrowseEventSave) {
-            // 保存
-            UIButton *saveButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"保存" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
-            [saveButton sizeToFit];
-            saveButton.width_mn += 5.f;
-            saveButton.height_mn = 17.f;
-            saveButton.touchInset = UIEdgeInsetWith(-m/2.f);
-            saveButton.right_mn = x;
-            saveButton.centerY_mn = y;
-            saveButton.tag = MNAssetBrowseEventSave;
-            saveButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-            [saveButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:saveButton];
-            [self.buttons addObject:saveButton];
-            x = saveButton.left_mn - m;
-        }
-        if (self.events & MNAssetBrowseEventShare) {
-            // 分享
-            UIButton *shareButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"分享" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
-            shareButton.width_mn = 17.f;
-            shareButton.height_mn = 17.f;
-            shareButton.touchInset = UIEdgeInsetWith(-m/2.f);
-            shareButton.right_mn = x;
-            shareButton.centerY_mn = y;
-            shareButton.tag = MNAssetBrowseEventShare;
-            shareButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-            [shareButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:shareButton];
-            [self.buttons addObject:shareButton];
-            x = shareButton.left_mn - m;
-        }
-        if (self.events & MNAssetBrowseEventDelete) {
-            // 删除
-            UIButton *deleteButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"删除" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
-            [deleteButton sizeToFit];
-            deleteButton.width_mn += 5.f;
-            deleteButton.height_mn = 17.f;
-            deleteButton.touchInset = UIEdgeInsetWith(-m/2.f);
-            deleteButton.right_mn = x;
-            deleteButton.centerY_mn = y;
-            deleteButton.tag = MNAssetBrowseEventDelete;
-            deleteButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-            [deleteButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:deleteButton];
-            [self.buttons addObject:deleteButton];
-            x = deleteButton.left_mn - m;
-        }
-        if (self.events & MNAssetBrowseEventSelect) {
-            MNAssetBrowseControl *selectButton = [[MNAssetBrowseControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 33.f)];
-            selectButton.right_mn = x;
-            selectButton.centerY_mn = y;
-            selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
-            [selectButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:selectButton];
-            [self.buttons addObject:selectButton];
-            self.selectButton = selectButton;
-        }
-        
-        // 交互事件
-        UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
-        doubleTap.numberOfTapsRequired = 2;
-        [self addGestureRecognizer:doubleTap];
-        
-        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
-        singleTap.delegate = self;
-        singleTap.numberOfTapsRequired = 1;
-        [singleTap requireGestureRecognizerToFail:doubleTap];
-        [self addGestureRecognizer:singleTap];
-        
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handPan:)];
-        [self addGestureRecognizer:pan];
+    if (self = [super initWithFrame:UIScreen.mainScreen.bounds]) {
+        [self initialized];
     }
     return self;
+}
+
+- (void)initialized {
+    self.statusBarHidden = YES;
+    self.allowsAutoPlaying = NO;
+    self.currentDisplayIndex = -1;
+    self.tag = MNAssetBrowserTag;
+    self.events = MNAssetBrowseEventNone;
+}
+
+- (void)createView {
+    
+    self.statusBarOriginalStyle = [[UIApplication sharedApplication] statusBarStyle];
+    self.statusBarOriginalHidden = [[UIApplication sharedApplication] isStatusBarHidden];
+    self.statusBarStyle = self.statusBarOriginalStyle;
+    
+    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
+    backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    [self addSubview:backgroundView];
+    self.backgroundView = backgroundView;
+    
+    UIImageView *blurBackgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
+    blurBackgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    [self addSubview:blurBackgroundView];
+    self.blurBackgroundView = blurBackgroundView;
+    
+    UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+    layout.minimumLineSpacing = MNAssetBrowseCellInteritemSpacing;
+    layout.minimumInteritemSpacing = 0.f;
+    layout.sectionInset = UIEdgeInsetsMake(0.f, MNAssetBrowseCellInteritemSpacing/2.f, 0.f, MNAssetBrowseCellInteritemSpacing/2.f);
+    layout.headerReferenceSize = CGSizeZero;
+    layout.footerReferenceSize = CGSizeZero;
+    layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+    layout.itemSize = self.size_mn;
+    
+    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-MNAssetBrowseCellInteritemSpacing/2.f, 0.f, self.width_mn + MNAssetBrowseCellInteritemSpacing, self.height_mn) collectionViewLayout:layout];
+    collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    collectionView.backgroundColor = [UIColor clearColor];
+    collectionView.delegate = self;
+    collectionView.dataSource = self;
+    collectionView.scrollsToTop = NO;
+    collectionView.pagingEnabled = YES;
+    collectionView.delaysContentTouches = NO;
+    collectionView.canCancelContentTouches = YES;
+    collectionView.showsVerticalScrollIndicator = NO;
+    collectionView.showsHorizontalScrollIndicator = NO;
+    [collectionView adjustContentInset];
+    [collectionView registerClass:[MNAssetBrowseCell class]
+       forCellWithReuseIdentifier:MNCollectionElementCellReuseIdentifier];
+    [self addSubview:collectionView];
+    self.collectionView = collectionView;
+    
+    UIImageView *interactiveView = [UIImageView imageViewWithFrame:CGRectZero image:nil];
+    interactiveView.hidden = YES;
+    interactiveView.clipsToBounds = YES;
+    interactiveView.contentMode = UIViewContentModeScaleAspectFill;
+    [self addSubview:interactiveView];
+    self.interactiveView = interactiveView;
+    
+    CGFloat m = 15.f;
+    CGFloat x = self.width_mn - 20.f;
+    CGFloat y = MN_NAV_BAR_HEIGHT/2.f + MN_STATUS_BAR_HEIGHT;
+    self.buttons = @[].mutableCopy;
+    if (self.events & MNAssetBrowseEventDone) {
+        // 确定
+        UIButton *doneButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"确定" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+        [doneButton sizeToFit];
+        doneButton.width_mn += 5.f;
+        doneButton.height_mn = 17.f;
+        doneButton.touchInset = UIEdgeInsetWith(-m/2.f);
+        doneButton.right_mn = x;
+        doneButton.centerY_mn = y;
+        doneButton.tag = MNAssetBrowseEventDone;
+        doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [doneButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:doneButton];
+        [self.buttons addObject:doneButton];
+        x = doneButton.left_mn - m;
+    }
+    if (self.events & MNAssetBrowseEventSave) {
+        // 保存
+        UIButton *saveButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"保存" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+        [saveButton sizeToFit];
+        saveButton.width_mn += 5.f;
+        saveButton.height_mn = 17.f;
+        saveButton.touchInset = UIEdgeInsetWith(-m/2.f);
+        saveButton.right_mn = x;
+        saveButton.centerY_mn = y;
+        saveButton.tag = MNAssetBrowseEventSave;
+        saveButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [saveButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:saveButton];
+        [self.buttons addObject:saveButton];
+        x = saveButton.left_mn - m;
+    }
+    if (self.events & MNAssetBrowseEventShare) {
+        // 分享
+        UIButton *shareButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"分享" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+        shareButton.width_mn = 17.f;
+        shareButton.height_mn = 17.f;
+        shareButton.touchInset = UIEdgeInsetWith(-m/2.f);
+        shareButton.right_mn = x;
+        shareButton.centerY_mn = y;
+        shareButton.tag = MNAssetBrowseEventShare;
+        shareButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [shareButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:shareButton];
+        [self.buttons addObject:shareButton];
+        x = shareButton.left_mn - m;
+    }
+    if (self.events & MNAssetBrowseEventDelete) {
+        // 删除
+        UIButton *deleteButton = [UIButton buttonWithFrame:CGRectZero image:nil title:@"删除" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.5f]];
+        [deleteButton sizeToFit];
+        deleteButton.width_mn += 5.f;
+        deleteButton.height_mn = 17.f;
+        deleteButton.touchInset = UIEdgeInsetWith(-m/2.f);
+        deleteButton.right_mn = x;
+        deleteButton.centerY_mn = y;
+        deleteButton.tag = MNAssetBrowseEventDelete;
+        deleteButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [deleteButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:deleteButton];
+        [self.buttons addObject:deleteButton];
+        x = deleteButton.left_mn - m;
+    }
+    if (self.events & MNAssetBrowseEventSelect) {
+        MNAssetSelectButton *selectButton = [[MNAssetSelectButton alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 33.f)];
+        selectButton.right_mn = x;
+        selectButton.centerY_mn = y;
+        selectButton.tag = MNAssetBrowseEventSelect;
+        selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
+        [selectButton addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:selectButton];
+        [self.buttons addObject:selectButton];
+        self.selectButton = selectButton;
+    }
+    
+    // 交互事件
+    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+    doubleTap.numberOfTapsRequired = 2;
+    [self addGestureRecognizer:doubleTap];
+    
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
+    singleTap.delegate = self;
+    singleTap.numberOfTapsRequired = 1;
+    [singleTap requireGestureRecognizerToFail:doubleTap];
+    [self addGestureRecognizer:singleTap];
+    
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handPan:)];
+    [self addGestureRecognizer:pan];
 }
 
 #pragma mark - Private Method
@@ -253,6 +261,8 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
         animatedImage = content.images.count > 1 ? content.images.firstObject : content;
     }
     if (!animatedImage) return;
+    
+    [self createView];
     
     if (!superview) superview = [[UIApplication sharedApplication] keyWindow];
     BOOL isUserInteractionEnabled = superview.isUserInteractionEnabled;

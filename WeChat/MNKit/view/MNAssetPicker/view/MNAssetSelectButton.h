@@ -1,5 +1,5 @@
 //
-//  MNAssetBrowseControl.h
+//  MNAssetSelectButton.h
 //  MNKit
 //
 //  Created by Vincent on 2019/9/9.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 @class MNAsset;
 
-@interface MNAssetBrowseControl : UIControl
+@interface MNAssetSelectButton : UIControl
 
 - (void)updateAsset:(MNAsset *)asset;
 

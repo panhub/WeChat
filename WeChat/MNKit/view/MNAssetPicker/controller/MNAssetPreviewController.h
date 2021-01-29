@@ -11,23 +11,36 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ 右按钮
+ - MNAssetPreviewEventNone: 没有
+ - MNAssetPreviewEventDone: 确定
+ - MNAssetPreviewEventSelect: 选择
+ */
+typedef NS_OPTIONS(NSInteger, MNAssetPreviewEvents) {
+    MNAssetPreviewEventNone = 0,
+    MNAssetPreviewEventDone = 1 << 1,
+    MNAssetPreviewEventSelect = 1 << 2
+};
+
 @protocol MNAssetPreviewDelegate <NSObject>
-/**选择了资源*/
-- (void)didSelectAsset:(MNAsset *)model;
 /**导航有按钮点击事件*/
-- (void)previewControllerDoneButtonClicked:(MNAssetPreviewController *)previewController;
+- (void)previewController:(MNAssetPreviewController *)previewController rightBarItemTouchUpInside:(UIControl *)sender;
 @end
 
 @interface MNAssetPreviewController : MNListViewController
 
-/**是否允许选择*/
-@property (nonatomic) BOOL allowsSelect;
+/**右按钮事件*/
+@property (nonatomic) MNAssetPreviewEvents events;
 
 /**释放时同时清理资源缓存*/
 @property (nonatomic, getter=isCleanAssetWhenDealloc) BOOL cleanAssetWhenDealloc;
 
 /**预览资源*/
 @property (nonatomic, copy) NSArray <MNAsset *>*assets;
+
+/**当前展示索引*/
+@property (nonatomic, readonly) NSInteger currentDisplayIndex;
 
 /**交互代理*/
 @property (nonatomic, weak, nullable) id<MNAssetPreviewDelegate> delegate;
