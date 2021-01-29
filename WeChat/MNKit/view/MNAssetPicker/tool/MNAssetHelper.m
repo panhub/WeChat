@@ -238,8 +238,12 @@ static MNAssetHelper *_helper;
     if (model.fileSizeString.length <= 0 && !model.isCapturingModel) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             if (model.asset) {
-                NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:model.asset];
-                model.fileSize = resources.count ? [[resources.firstObject valueForKey:@"fileSize"] longLongValue] : 0;
+                if (@available(iOS 9.0, *)) {
+                    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:model.asset];
+                    model.fileSize = resources.count ? [[resources.firstObject valueForKey:@"fileSize"] longLongValue] : 0;
+                } else {
+                    model.fileSize = 0;
+                }
             } else {
                 model.fileSize = 0;
             }
@@ -392,7 +396,7 @@ static MNAssetHelper *_helper;
                 if (configuration.isAllowsExportHEIF) {
                     image = [UIImage imageWithData:imageData];
                 } else {
-                    if (model.asset.isHEIFAsset) {
+                    if (model.asset.isHEIF) {
 #ifdef __IPHONE_11_0
                         if (@available(iOS 11.0, *)) {
                             CIImage *ciImage = [CIImage imageWithData:imageData];

@@ -20,12 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  是否是HEIF格式资源
  */
-@property (nonatomic, readonly) BOOL isHEIFAsset;
+@property (nonatomic, readonly) BOOL isHEIF;
 
 /**
  是否是GIF格式资源
  */
-@property (nonatomic, readonly) BOOL isGIFAsset;
+@property (nonatomic, readonly) BOOL isGIF;
 
 @end
 

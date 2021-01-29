@@ -12,7 +12,7 @@
     return CGSizeMake(self.pixelWidth, self.pixelHeight);
 }
 
-- (BOOL)isHEIFAsset {
+- (BOOL)isHEIF {
     __block BOOL isHEIF = NO;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {
@@ -35,7 +35,7 @@
     return isHEIF;
 }
 
-- (BOOL)isGIFAsset {
+- (BOOL)isGIF {
     __block BOOL isGIF = NO;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {

@@ -223,6 +223,7 @@
     picker.configuration.allowsPickingGif = NO;
     picker.configuration.allowsPickingVideo = YES;
     picker.configuration.allowsPickingLivePhoto = YES;
+    picker.configuration.allowsDisplayFileSize = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
         NSLog(@"");
     } cancelHandler:nil];

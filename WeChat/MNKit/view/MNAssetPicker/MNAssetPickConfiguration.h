@@ -45,10 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
  是否允许拍照/录像 <不完善 default NO>
  */
 @property (nonatomic, getter=isAllowsCapturing) BOOL allowsCapturing;
+#ifdef __IPHONE_9_0
 /**
  是否允许显示文件大小
  */
 @property (nonatomic, getter=isAllowsDisplayFileSize) BOOL allowsDisplayFileSize;
+#endif
 /**
 视频拍摄最大长度 <default 60s>
 */
