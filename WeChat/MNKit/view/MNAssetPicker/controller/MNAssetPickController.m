@@ -202,19 +202,19 @@
         // 拍照/拍摄
         [self beginCapturing];
     } else if (self.configuration.maxPickingCount == 1) {
-        if (model.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
-            // 图片裁剪
-            [self cropImageAsset:model];
-        } else if (model.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
-            // 视频裁剪
-            [self tailorVideoAsset:model];
-        } else if (self.configuration.isAllowsPreviewing) {
+        if (self.configuration.isAllowsPreviewing) {
             // 预览
             MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:@[model]];
             vc.delegate = self;
-            vc .events = MNAssetPreviewEventDone;
             vc.cleanAssetWhenDealloc = YES;
+            vc .events = MNAssetPreviewEventDone;
             [self.navigationController pushViewController:vc animated:YES];
+        } else if (model.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
+            // 图片裁剪
+            [self cropImageAsset:model];
+        } else if (model.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
+            // 视频裁剪 不判断时长是因为导入时不符合时长的资源已隐藏
+            [self tailorVideoAsset:model];
         } else {
             // 确认选择
             [self didFinishPickingAssets:@[model]];
@@ -528,8 +528,25 @@
 #pragma mark - MNAssetPreviewDelegate
 - (void)previewController:(MNAssetPreviewController *)previewController rightBarItemTouchUpInside:(UIControl *)sender {
     if (sender.tag == MNAssetPreviewEventDone) {
-        [self didFinishPickingAssets:previewController.assets];
+        NSArray <MNAsset *>*assets = previewController.assets;
+        if (assets.count == 1) {
+            MNAsset *asset = assets.firstObject;
+            if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
+                // 裁剪图片
+                [self cropImageAsset:asset];
+            } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
+                // 裁剪视频 不判断时长是因为导入时不符合时长的资源已隐藏
+                [self tailorVideoAsset:asset];
+            } else {
+                // 完成选择
+                [self didFinishPickingAssets:@[asset]];
+            }
+        } else {
+            // 完成选择
+            [self didFinishPickingAssets:assets];
+        }
     } else {
+        // 资源选择状态更新
         [self didSelectAsset:previewController.assets[previewController.currentDisplayIndex]];
     }
 }
@@ -541,10 +558,13 @@
     } else {
         MNAsset *asset = touchController.asset;
         if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
+            // 裁剪图片
             [self cropImageAsset:asset];
-        } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing && floor(asset.duration) > self.configuration.minExportDuration) {
+        } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
+            // 裁剪视频 不判断时长是因为导入时不符合时长的资源已隐藏
             [self tailorVideoAsset:asset];
         } else {
+            // 结束选择
             [self didFinishPickingAssets:@[asset]];
         }
     }

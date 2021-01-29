@@ -11,8 +11,10 @@
 
 @interface MNAssetSelectCell : MNCollectionViewCell
 
+/**是否选中*/
 @property (nonatomic, getter=isSelect) BOOL select;
 
+/**资源模型*/
 @property (nonatomic, strong) MNAsset *asset;
 
 @end

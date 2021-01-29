@@ -135,7 +135,7 @@ static MNAssetHelper *_helper;
         if (type == MNAssetTypeVideo) {
             // 不符合视频选择时长
             NSTimeInterval duration = floor(asset.duration);
-            if ((configuration.minExportDuration > 0.f && duration < configuration.minExportDuration) || (configuration.maxExportDuration > 0.f && (!configuration.isAllowsEditing || configuration.maxPickingCount > 1) && duration > configuration.maxExportDuration)) return;
+            if ((configuration.minExportDuration > 0.f && duration < configuration.minExportDuration) || (configuration.maxExportDuration > 0.f && duration > configuration.maxExportDuration && (!configuration.isAllowsEditing || configuration.maxPickingCount > 1))) return;
         } else if (type == MNAssetTypeGif) {
             // 不允许选择Gif
             if (!configuration.isAllowsPickingGif) return;
