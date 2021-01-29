@@ -40,7 +40,7 @@
 - (void)initialized {
     [super initialized];
     self.cropScale = 0.f;
-    self.ratios = @[@(2.f/3.f), @(3.f/2.f), @(3.f/5.f), @(5.f/3.f), @(9.f/16.f), @(16.f/9.f), @(0.f), @(1.f)];
+    self.ratios = @[@(3.f/4.f), @(4.f/3.f), @(9.f/16.f), @(16.f/9.f), @(0.f), @(1.f)];
 }
 
 - (void)createView {
@@ -135,7 +135,7 @@
         [[MNActionSheet actionSheetWithTitle:@"选择裁剪比例" cancelButtonTitle:@"取消" handler:^(MNActionSheet *actionSheet, NSInteger buttonIndex) {
             if (buttonIndex == actionSheet.cancelButtonIndex || buttonIndex >= weakself.ratios.count) return;
             [weakself.imageView setResizeWHScale:[weakself.ratios[buttonIndex] floatValue] animated:YES];
-        } otherButtonTitles:@"2:3", @"3:2", @"3:5", @"5:3", @"9:16", @"16:9",  @"任意尺寸", @"正方形", nil] showInView:self.view];
+        } otherButtonTitles:@"3:4", @"4:3", @"9:16", @"16:9", @"任意尺寸", @"正方形", nil] showInView:self.view];
     } else {
         __weak typeof(self) weakself = self;
         [self.imageView originImageresizerWithComplete:^(UIImage *resizeImage) {

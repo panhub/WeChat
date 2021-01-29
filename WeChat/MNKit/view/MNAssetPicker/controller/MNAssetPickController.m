@@ -215,7 +215,7 @@
             [self.navigationController pushViewController:vc animated:YES];
         } else if (model.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
             // 图片裁剪
-            [self cropImageAsset:model];
+            [self cropImageAsset:model removed:YES];
         } else if (model.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
             // 视频裁剪 不判断时长是因为导入时不符合时长的资源已隐藏
             [self tailorVideoAsset:model];
@@ -240,18 +240,19 @@
 }
 
 #pragma mark - 裁剪图片
-- (void)cropImageAsset:(MNAsset *)asset {
+- (void)cropImageAsset:(MNAsset *)asset removed:(BOOL)isRemoved {
     __weak typeof(self) weakself = self;
     [self.navigationController.view showActivityDialog:@"请稍后"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [MNAssetHelper requestAssetContent:asset configuration:nil completion:^(MNAsset *obj) {
+            UIImage *image = obj.content;
+            if (isRemoved) obj.content = nil;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [weakself.navigationController.view closeDialogWithCompletionHandler:^{
-                    if (obj && obj.content) {
-                        MNImageCropController *v = [[MNImageCropController alloc] initWithImage:obj.content];
+                    if (image) {
+                        MNImageCropController *v = [[MNImageCropController alloc] initWithImage:image];
                         v.delegate = weakself;
                         v.cropScale = weakself.configuration.cropScale;
-                        obj.content = nil;
                         [weakself.navigationController pushViewController:v animated:YES];
                     } else {
                         [[MNAlertView alertViewWithTitle:@"获取图片失败" message:@"请检查网络后重试" handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:weakself.navigationController.view];
@@ -537,7 +538,7 @@
             MNAsset *asset = assets.firstObject;
             if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
                 // 裁剪图片
-                [self cropImageAsset:asset];
+                [self cropImageAsset:asset removed:NO];
             } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
                 // 裁剪视频 不判断时长是因为导入时不符合时长的资源已隐藏
                 [self tailorVideoAsset:asset];
@@ -563,7 +564,7 @@
         MNAsset *asset = touchController.asset;
         if (asset.type == MNAssetTypePhoto && self.configuration.isAllowsEditing) {
             // 裁剪图片
-            [self cropImageAsset:asset];
+            [self cropImageAsset:asset removed:NO];
         } else if (asset.type == MNAssetTypeVideo && self.configuration.isAllowsEditing) {
             // 裁剪视频 不判断时长是因为导入时不符合时长的资源已隐藏
             [self tailorVideoAsset:asset];
