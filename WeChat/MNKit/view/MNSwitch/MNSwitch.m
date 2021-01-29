@@ -8,6 +8,7 @@
 
 #import "MNSwitch.h"
 #import "UIView+MNLayout.h"
+#import "NSInvocation+MNHelper.h"
 
 @interface MNSwitch ()
 @property (nonatomic, strong) UIView *thumbView;

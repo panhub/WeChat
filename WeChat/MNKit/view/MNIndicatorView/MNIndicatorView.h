@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**隐藏显示是否动画*/
 @property (nonatomic, getter=isHidesUseAnimation) BOOL hidesUseAnimation;
 /**是否动画*/
-@property (nonatomic, getter=isAnimating) BOOL animating;
+@property (nonatomic, readonly) BOOL isAnimating;
 
 /**
  开启动画

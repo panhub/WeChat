@@ -7,32 +7,34 @@
 //
 
 #import "MNIndicatorView.h"
+#import "UIView+MNLayout.h"
+#import "CALayer+MNLayout.h"
 #import "CALayer+MNAnimation.h"
 
-#define MNIndicatorAnimationKey         @"com.mn.indicator.animation.key"
 #define MNIndicatorAnimationDuration  .2f
+#define MNIndicatorAnimationKey  @"com.mn.indicator.animation.key"
 
 @interface MNIndicatorView ()
-/**背景轨迹*/
-@property (nonatomic, strong) CAShapeLayer *backgroundLayer;
-/**动画轨迹*/
+@property (nonatomic, strong) UIView *contentView;
+@property (nonatomic, strong) CAShapeLayer *shapeLayer;
 @property (nonatomic, strong) CAShapeLayer *animationLayer;
 @end
 
 @implementation MNIndicatorView
 - (instancetype)init {
-    return [self initWithFrame:CGRectMake(0.f, 0.f, 60.f, 60.f)];
+    return [self initWithFrame:CGRectMake(0.f, 0.f, 50.f, 50.f)];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
-        [self initialization];
-        [self makeLayer];
+        [self initialized];
+        [self createView];
+        self.backgroundColor = UIColor.clearColor;
     }
     return self;
 }
 
-- (void)initialization {
+- (void)initialized {
     _lineWidth = .8f;
     _progress = .25f;
     _duration = 1.1f;
@@ -41,15 +43,21 @@
     _lineColor = [UIColor colorWithRed:87.f/255.f green:106.f/255.f blue:149.f/255.f alpha:1.f];
 }
 
-- (void)makeLayer {
+- (void)createView {
     
-    CAShapeLayer *backgroundLayer = CAShapeLayer.layer;
-    backgroundLayer.fillColor = UIColor.clearColor.CGColor;
-    backgroundLayer.strokeStart = 0.f;
-    backgroundLayer.strokeEnd = 1.f;
-    backgroundLayer.lineCap = kCALineCapButt;
-    [self.layer addSublayer:backgroundLayer];
-    self.backgroundLayer = backgroundLayer;
+    UIView *contentView = [[UIView alloc] initWithFrame:self.bounds];
+    contentView.backgroundColor = UIColor.clearColor;
+    contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    [self addSubview:contentView];
+    self.contentView = contentView;
+    
+    CAShapeLayer *shapeLayer = CAShapeLayer.layer;
+    shapeLayer.strokeEnd = 1.f;
+    shapeLayer.strokeStart = 0.f;
+    shapeLayer.lineCap = kCALineCapButt;
+    shapeLayer.fillColor = UIColor.clearColor.CGColor;
+    [contentView.layer addSublayer:shapeLayer];
+    self.shapeLayer = shapeLayer;
     
     CAShapeLayer *animationLayer = CAShapeLayer.layer;
     animationLayer.fillColor = UIColor.clearColor.CGColor;
@@ -58,23 +66,23 @@
     [animationLayer addAnimation:self.rotationAnimation forKey:MNIndicatorAnimationKey];
     [animationLayer pauseAnimation];
     
-    [self.layer addSublayer:animationLayer];
+    [contentView.layer addSublayer:animationLayer];
     self.animationLayer = animationLayer;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    CGFloat radius = MIN(self.bounds.size.width, self.bounds.size.height);
+    CGFloat radius = MIN(self.contentView.bounds.size.width, self.contentView.bounds.size.height);
     
-    self.backgroundLayer.path = [UIBezierPath bezierPathWithArcCenter:self.bounds_center radius:(radius - self.lineWidth)/2.f startAngle:0.f endAngle:M_PI*2.f clockwise:YES].CGPath;
-    self.backgroundLayer.size_mn = CGSizeMake(radius, radius);
-    self.backgroundLayer.center_mn = self.bounds_center;
-    self.backgroundLayer.lineWidth = self.lineWidth;
-    self.backgroundLayer.strokeColor = self.color.CGColor;
+    self.shapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.contentView.bounds_center radius:(radius - self.lineWidth)/2.f startAngle:0.f endAngle:M_PI*2.f clockwise:YES].CGPath;
+    self.shapeLayer.size_mn = CGSizeMake(radius, radius);
+    self.shapeLayer.center_mn = self.contentView.bounds_center;
+    self.shapeLayer.lineWidth = self.lineWidth;
+    self.shapeLayer.strokeColor = self.color.CGColor;
     
-    self.animationLayer.path = [UIBezierPath bezierPathWithArcCenter:self.bounds_center radius:(radius - self.lineWidth)/2.f startAngle:-M_PI_2 endAngle:M_PI_2*3.f clockwise:YES].CGPath;
-    self.animationLayer.frame = self.backgroundLayer.frame;
+    self.animationLayer.path = [UIBezierPath bezierPathWithArcCenter:self.contentView.bounds_center radius:(radius - self.lineWidth)/2.f startAngle:-M_PI_2 endAngle:M_PI_2*3.f clockwise:YES].CGPath;
+    self.animationLayer.frame = self.shapeLayer.frame;
     self.animationLayer.strokeColor = self.lineColor.CGColor;
     self.animationLayer.lineWidth = self.lineWidth;
     self.animationLayer.strokeEnd = self.progress;
@@ -82,35 +90,37 @@
 
 - (void)startAnimating {
     if (self.isAnimating) return;
-    [self makeAnimating:YES completion:nil];
+    [self setAnimating:YES completion:nil];
 }
 
 - (void)stopAnimating {
-    [self stopAnimatingWithHandler:nil];
+    if (!self.isAnimating) return;
+    [self setAnimating:NO completion:nil];
 }
 
 - (void)stopAnimatingWithHandler:(void (^)(void))endHandler {
     if (!self.isAnimating) return;
-    [self makeAnimating:NO completion:endHandler];
+    [self setAnimating:NO completion:endHandler];
 }
 
-- (void)makeAnimating:(BOOL)isAnimating completion:(void(^)(void))completion {
-    if (isAnimating) {
-        [self.animationLayer resumeAnimation];
-    } else if (!self.isHidesWhenStopped || !self.isHidesUseAnimation) {
-        [self.animationLayer pauseAnimation];
+- (void)setAnimating:(BOOL)isAnimating completion:(void(^)(void))completion {
+    if (isAnimating) [self.animationLayer resumeAnimation];
+    CGFloat alpha = isAnimating ? 1.f : (self.isHidesWhenStopped ? 0.f : self.contentView.alpha);
+    if (self.contentView.alpha == alpha) {
+        if (!isAnimating) [self.animationLayer pauseAnimation];
+        if (completion) completion();
+        return;
     }
-    if (!self.isHidesWhenStopped) return;
-    BOOL alpha = isAnimating ? 1.f : 0.f;
     if (self.isHidesUseAnimation) {
         [UIView animateWithDuration:MNIndicatorAnimationDuration animations:^{
-            self.alpha = alpha;
+            self.contentView.alpha = alpha;
         } completion:^(BOOL finished) {
             if (!isAnimating) [self.animationLayer pauseAnimation];
             if (completion) completion();
         }];
     } else {
-        self.alpha = alpha;
+        self.contentView.alpha = alpha;
+        if (!isAnimating) [self.animationLayer pauseAnimation];
         if (completion) completion();
     }
 }
@@ -142,7 +152,7 @@
 
 - (void)setHidesWhenStopped:(BOOL)hidesWhenStopped {
     _hidesWhenStopped = hidesWhenStopped;
-    if (hidesWhenStopped) self.alpha = self.isAnimating ? 1.f : 0.f;
+    if (hidesWhenStopped && !self.isAnimating) self.contentView.alpha = 0.f;
 }
 
 #pragma mark - Getter

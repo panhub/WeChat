@@ -313,16 +313,16 @@
     [self.view showProgressDialog:@"视频导出中"];
     if (!self.isFrameResizing && (end - begin) >= .99f && !self.resolutionButton.isSelected) {
         // 画面 时长几乎与原始相同
-        dispatch_async(dispatch_get_high_queue(), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             NSError *error;
             if ([NSFileManager.defaultManager copyItemAtPath:self.videoPath toPath:outputPath error:&error]) {
-                dispatch_async_main(^{
+                dispatch_async(dispatch_get_main_queue(), ^{
                     [weakself.view closeDialogWithCompletionHandler:^{
                         [weakself endTailoring:outputPath];
                     }];
                 });
             } else {
-                dispatch_async_main(^{
+                dispatch_async(dispatch_get_main_queue(), ^{
                     [weakself.view showInfoDialog:error.localizedDescription ? : @"视频导出失败"];
                 });
             }
@@ -331,13 +331,13 @@
     }
     // 裁剪视频 进度回调
     void (^progressHandler)(float) = ^(float progress) {
-        dispatch_async_main(^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             [weakself.view updateDialogProgress:MIN(.99f, progress)];
         });
     };
     // 完成回调
     void (^completionHandler)(NSInteger, NSError*) = ^(NSInteger status, NSError *error) {
-        dispatch_async_main(^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             if (status == MNAssetExportStatusCompleted) {
                 [weakself.view closeDialogWithCompletionHandler:^{
                     [weakself endTailoring:outputPath];

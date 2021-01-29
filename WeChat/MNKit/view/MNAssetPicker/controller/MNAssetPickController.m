@@ -110,13 +110,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    /// 监听相册变动代理
+    // 监听相册变动代理
     [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
-    if (@available(iOS 9.0, *)) {
-        if (self.configuration.isAllowsPreviewing && self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-            /// 注册3DTouch
-            [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
+    // 注册3DTouch
+    if (self.configuration.isAllowsPreviewing) {
+#ifdef __IPHONE_9_0
+        if (@available(iOS 9.0, *)) {
+            if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+                [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
+            }
         }
+#endif
     }
 }
 
