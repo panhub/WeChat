@@ -4961,18 +4961,18 @@
 		E869C6802570EF620017025E /* MNEmojiKeyboard */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6812570EF620017025E /* MNEmojiTextField.m */,
-				E869C6822570EF620017025E /* MNEmojiKeyboardConfiguration.m */,
-				E869C6832570EF620017025E /* page */,
-				E869C6882570EF630017025E /* MNEmojiKeyboard.m */,
-				E869C6892570EF630017025E /* input */,
-				E869C6982570EF630017025E /* MNEmojiTextView.m */,
 				E869C6992570EF630017025E /* emoji */,
-				E869C6A22570EF630017025E /* MNEmojiKeyboardConfiguration.h */,
-				E869C6A32570EF630017025E /* MNEmojiTextField.h */,
+				E869C6892570EF630017025E /* input */,
 				E869C6A42570EF630017025E /* MNEmojiKeyboard.h */,
-				E869C6A52570EF630017025E /* tool */,
+				E869C6882570EF630017025E /* MNEmojiKeyboard.m */,
+				E869C6A22570EF630017025E /* MNEmojiKeyboardConfiguration.h */,
+				E869C6822570EF620017025E /* MNEmojiKeyboardConfiguration.m */,
+				E869C6A32570EF630017025E /* MNEmojiTextField.h */,
+				E869C6812570EF620017025E /* MNEmojiTextField.m */,
 				E869C6AE2570EF630017025E /* MNEmojiTextView.h */,
+				E869C6982570EF630017025E /* MNEmojiTextView.m */,
+				E869C6832570EF620017025E /* page */,
+				E869C6A52570EF630017025E /* tool */,
 			);
 			path = MNEmojiKeyboard;
 			sourceTree = "<group>";
@@ -4980,10 +4980,10 @@
 		E869C6832570EF620017025E /* page */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6842570EF620017025E /* MNEmojiPacketCell.m */,
-				E869C6852570EF620017025E /* MNEmojiPacketView.m */,
 				E869C6862570EF620017025E /* MNEmojiPacketCell.h */,
+				E869C6842570EF620017025E /* MNEmojiPacketCell.m */,
 				E869C6872570EF620017025E /* MNEmojiPacketView.h */,
+				E869C6852570EF620017025E /* MNEmojiPacketView.m */,
 			);
 			path = page;
 			sourceTree = "<group>";
@@ -5027,14 +5027,14 @@
 		E869C6A52570EF630017025E /* tool */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6A62570EF630017025E /* UITextField+MNEmojiHelper.m */,
 				E869C6A72570EF630017025E /* MNEmojiBackedString.h */,
-				E869C6A82570EF630017025E /* NSAttributedString+MNEmojiHelper.h */,
-				E869C6A92570EF630017025E /* UITextView+MNEmojiHelper.m */,
-				E869C6AA2570EF630017025E /* UITextField+MNEmojiHelper.h */,
-				E869C6AB2570EF630017025E /* NSAttributedString+MNEmojiHelper.m */,
 				E869C6AC2570EF630017025E /* MNEmojiBackedString.m */,
+				E869C6A82570EF630017025E /* NSAttributedString+MNEmojiHelper.h */,
+				E869C6AB2570EF630017025E /* NSAttributedString+MNEmojiHelper.m */,
+				E869C6AA2570EF630017025E /* UITextField+MNEmojiHelper.h */,
+				E869C6A62570EF630017025E /* UITextField+MNEmojiHelper.m */,
 				E869C6AD2570EF630017025E /* UITextView+MNEmojiHelper.h */,
+				E869C6A92570EF630017025E /* UITextView+MNEmojiHelper.m */,
 			);
 			path = tool;
 			sourceTree = "<group>";
@@ -5060,15 +5060,15 @@
 		E869C6B52570EF630017025E /* MNCollectionLayout */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6B62570EF630017025E /* MNCollectionLayout.h */,
-				E869C6B72570EF630017025E /* MNCollectionVerticalLayout.h */,
-				E869C6B82570EF630017025E /* MNCollectionViewLayout.h */,
 				E869C6B92570EF630017025E /* MNCollectionHorizontalLayout.h */,
-				E869C6BA2570EF630017025E /* MNCollectionTextLayout.m */,
-				E869C6BB2570EF630017025E /* MNCollectionViewLayout.m */,
-				E869C6BC2570EF630017025E /* MNCollectionVerticalLayout.m */,
-				E869C6BD2570EF630017025E /* MNCollectionTextLayout.h */,
 				E869C6BE2570EF630017025E /* MNCollectionHorizontalLayout.m */,
+				E869C6B62570EF630017025E /* MNCollectionLayout.h */,
+				E869C6BD2570EF630017025E /* MNCollectionTextLayout.h */,
+				E869C6BA2570EF630017025E /* MNCollectionTextLayout.m */,
+				E869C6B72570EF630017025E /* MNCollectionVerticalLayout.h */,
+				E869C6BC2570EF630017025E /* MNCollectionVerticalLayout.m */,
+				E869C6B82570EF630017025E /* MNCollectionViewLayout.h */,
+				E869C6BB2570EF630017025E /* MNCollectionViewLayout.m */,
 			);
 			path = MNCollectionLayout;
 			sourceTree = "<group>";

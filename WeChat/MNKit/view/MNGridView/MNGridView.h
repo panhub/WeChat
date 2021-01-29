@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, MNGridAlignment) {
 - (UIView *)gridView:(MNGridView *)gridView viewForHeaderInSection:(NSInteger)section;
 - (UIView *)gridView:(MNGridView *)gridView viewForFooterInSection:(NSInteger)section;
 - (UIEdgeInsets)gridView:(MNGridView *)gridView contentInsetForSection:(NSInteger)section;
+- (void)gridView:(MNGridView *)gridView didAddCell:(__kindof UIView *)cell forItemAtIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @protocol MNGridViewDelegate <UIScrollViewDelegate>

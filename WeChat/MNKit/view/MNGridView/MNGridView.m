@@ -9,9 +9,7 @@
 #import "MNGridView.h"
 
 @interface UIView ()
-
 @property (nonatomic) NSInteger mn_item;
-
 @end
 
 @interface MNGridView ()
@@ -105,6 +103,9 @@
             [cells addObject:cell];
             [items addObject:cell];
             [self addSubview:cell];
+            if ([self.dataSource respondsToSelector:@selector(gridView:didAddCell:forItemAtIndexPath:)]) {
+                [self.dataSource gridView:self didAddCell:cell forItemAtIndexPath:[NSIndexPath indexPathForItem:item inSection:section]];
+            }
         }
         [self.cellCache setObject:cells.copy forKey:@(section)];
         [self layoutItems:items offset:UIOffsetMake(width - left + minimumInterItemSpacing, bottom - y - minimumLineSpacing)];

@@ -18,7 +18,7 @@
 @end
 
 @interface MNSlider : UIView
-
+/**交互代理*/
 @property (nonatomic, weak) id<MNSliderDelegate> delegate;
 /**缓冲区颜色*/
 @property (nonatomic, strong) UIColor *bufferColor;
@@ -39,16 +39,13 @@
 /**轨迹高度*/
 @property (nonatomic) CGFloat trackHeight;
 /**是否在拖拽*/
-@property (nonatomic, readonly, getter=isDragging) BOOL dragging;
+@property (nonatomic, readonly) BOOL isDragging;
 /**是否在点击*/
-@property (nonatomic, readonly, getter=isTouching) BOOL touching;
+@property (nonatomic, readonly) BOOL isTouching;
 
 /**进度值, 0 - 1*/
 @property (nonatomic) float progress;
 @property (nonatomic) float buffer;
-
-/**标记是否在交互*/
-@property (nonatomic, readonly, getter=isSelected) BOOL selected;
 
 /**弃用(请使用initWithFrame:实例化方法)*/
 - (instancetype)init NS_UNAVAILABLE;

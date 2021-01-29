@@ -42,7 +42,6 @@
 - (void)initialized {
     _buffer = 0.f;
     _progress = 0.f;
-    _selected = NO;
 }
 
 - (void)createView {
@@ -192,7 +191,7 @@
 }
 
 - (void)setProgress:(float)progress animated:(BOOL)animated {
-    if (self.selected) return;
+    if (self.isDragging || self.isTouching) return;
     progress = MIN(MAX(0.f, progress), 1.f);
     _progress = progress;
     if (animated) {
@@ -201,8 +200,8 @@
             self.thumbView.right_mn = self.progressView.right_mn + self.thumbView.width_mn/2.f;
         }];
     } else {
-        _progressView.width_mn = _trackView.width_mn*progress;
-        _thumbView.right_mn = _progressView.right_mn + _thumbView.width_mn/2.f;
+        self.progressView.width_mn = self.trackView.width_mn*progress;
+        self.thumbView.right_mn = self.progressView.right_mn + self.thumbView.width_mn/2.f;
     }
 }
 
