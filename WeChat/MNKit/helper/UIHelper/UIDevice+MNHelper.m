@@ -7,9 +7,19 @@
 //
 
 #import "UIDevice+MNHelper.h"
+#import "MNFileHandle.h"
+#import "MNKeychain.h"
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 #include <sys/sysctl.h>
 #include <mach/mach.h>
 #import <sys/utsname.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+
+
+// 用于生成设备唯一标识, 生成后不要更改此标识
+#define kDeviceIdentifier   @"com.mn.kit.device.identifier"
 
 @implementation UIDevice (MNHelper)
 #pragma mark - DeviceModel
@@ -104,17 +114,25 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
     return [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 }
 
-#pragma mark - 强制旋转屏幕
-+ (BOOL)rotateInterfaceToOrientation:(UIInterfaceOrientation)orientation {
-    if (![[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) return NO;
-    SEL selector  = NSSelectorFromString(@"setOrientation:");
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
-    [invocation setSelector:selector];
-    [invocation setTarget:[UIDevice currentDevice]];
-    /**从第二个参数开始是因为前两个参数已经被selector和target占用*/
-    [invocation setArgument:&orientation atIndex:2];
-    [invocation invoke];
-    return YES;
++ (NSString *)identifier {
+    static NSString *device_identifier;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        device_identifier = [NSUserDefaults.standardUserDefaults stringForKey:kDeviceIdentifier];
+        if (device_identifier.length <= 0) {
+            device_identifier = [MNKeychain stringForKey:kDeviceIdentifier];
+            if (device_identifier.length > 0) {
+                [NSUserDefaults.standardUserDefaults setObject:device_identifier forKey:kDeviceIdentifier];
+                [NSUserDefaults.standardUserDefaults synchronize];
+            } else {
+                device_identifier = MNFileHandle.fileName;
+                [MNKeychain setString:device_identifier forKey:kDeviceIdentifier];
+                [NSUserDefaults.standardUserDefaults setObject:device_identifier forKey:kDeviceIdentifier];
+                [NSUserDefaults.standardUserDefaults synchronize];
+            }
+        }
+    });
+    return device_identifier;
 }
 
 #pragma mark - 判断是否为越狱设备
@@ -141,6 +159,33 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
         }
     });
     return is_break_device;
+}
+
+#pragma mark - 设备地址
++ (NSString *)address {
+    NSString *address = @"error";
+    struct ifaddrs *interfaces = NULL;
+    struct ifaddrs *temp_addr = NULL;
+    int success = 0;
+    // retrieve the current interfaces - returns 0 on success
+    success = getifaddrs(&interfaces);
+    if (success == 0) {
+        // Loop through linked list of interfaces
+        temp_addr = interfaces;
+        while (temp_addr != NULL) {
+            if (temp_addr->ifa_addr->sa_family == AF_INET) {
+                // Check if interface is en0 which is the wifi connection on the iPhone
+                if ([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
+                    // Get NSString from C String
+                    address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+                }
+            }
+            temp_addr = temp_addr->ifa_next;
+        }
+    }
+    // Free memory
+    freeifaddrs(interfaces);
+    return address;
 }
 
 #pragma mark - 获取设备型号
@@ -225,6 +270,19 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
         else device_model = @"iPhone 11 Series Later";
     });
     return device_model;
+}
+
+#pragma mark - 强制旋转屏幕
++ (BOOL)rotateInterfaceToOrientation:(UIInterfaceOrientation)orientation {
+    if (![[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) return NO;
+    SEL selector  = NSSelectorFromString(@"setOrientation:");
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
+    [invocation setSelector:selector];
+    [invocation setTarget:[UIDevice currentDevice]];
+    /**从第二个参数开始是因为前两个参数已经被selector和target占用*/
+    [invocation setArgument:&orientation atIndex:2];
+    [invocation invoke];
+    return YES;
 }
 
 @end

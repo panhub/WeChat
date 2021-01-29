@@ -17,9 +17,21 @@
  */
 @property (nonatomic, readonly, class) NSString *model;
 /**
+ 生成唯一标识符 理论上不刷机不该表
+ */
+@property (nonatomic, readonly, class) NSString *identifier;
+/**
+ 设备标识符 设备与应用共同作用下的标识符
+ */
+@property (nonatomic, readonly, class) NSString *UUIDString;
+/**
  是否为越狱设备
  */
-@property (nonatomic, readonly, class, getter=isBreakDevice) BOOL breakDevice;
+@property (nonatomic, readonly, class) BOOL isBreakDevice;
+/**
+ 设备ip地址
+ */
+@property (nonatomic, readonly, class) NSString *address;
 
 /**
  *获取设备类型(e.g. @"iPhone", @"iPod touch")
@@ -83,12 +95,6 @@ FOUNDATION_EXPORT BOOL IOS_VERSION_LATER (CGFloat version);
  @return 判断结果
  */
 FOUNDATION_EXPORT BOOL IOS_VERSION_UNDER (CGFloat version);
-
-/**
- 设备标识符
- @return 设备与应用共同作用下的标识符
- */
-+ (NSString *)UUIDString;
 
 /**
  *旋转屏幕(无论手机是否设置锁定屏幕方向)

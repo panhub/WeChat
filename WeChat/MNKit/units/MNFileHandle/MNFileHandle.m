@@ -21,7 +21,7 @@
     //当前时空UUID
     NSString *uuidString = [[NSUUID UUID] UUIDString];
     //拼接文件名
-    NSString *fileName = [NSString stringWithFormat:@"%@-%@-%@-%@", identifier, uuidString, [NSDate shortTimestamps], @(__COUNTER__)];
+    NSString *fileName = [NSString stringWithFormat:@"%@-%@-%@-%@", identifier, uuidString, [NSNumber numberWithLongLong:[[NSDate date] timeIntervalSince1970]*1000], @(__COUNTER__)];
     return fileName.md5String32;
 }
 
