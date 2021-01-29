@@ -372,10 +372,10 @@
 - (UIView *)navigationBarShouldCreateRightBarItem {
     UIView *rightBarItem = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 25.f)];
     if (self.events & MNAssetTouchEventSelect) {
+        // 选择
         MNAssetSelectButton *selectButton = [[MNAssetSelectButton alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, rightBarItem.height_mn)];
         selectButton.centerY_mn = rightBarItem.height_mn/2.f;
         selectButton.tag = MNAssetTouchEventSelect;
-        selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
         [selectButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         if (self.asset) [selectButton updateAsset:self.asset];
         [rightBarItem addSubview:selectButton];
@@ -390,7 +390,6 @@
         doneButton.left_mn = rightBarItem.width_mn + 15.f;
         doneButton.centerY_mn = rightBarItem.height_mn/2.f;
         doneButton.tag = MNAssetTouchEventDone;
-        doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
         [doneButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [rightBarItem addSubview:doneButton];
         rightBarItem.width_mn = doneButton.right_mn + 15.f;

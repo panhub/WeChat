@@ -56,7 +56,7 @@
         clearButton.tag = 2;
         clearButton.centerX_mn = self.width_mn/2.f;
         clearButton.centerY_mn = doneButton.centerY_mn;
-        [clearButton setTitle:@"清除" forState:UIControlStateNormal];
+        [clearButton setTitle:@"清空" forState:UIControlStateNormal];
         clearButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         [clearButton setTitleColor:MNAssetToolBarHighlightColor forState:UIControlStateNormal];
         [clearButton setTitleColor:MNAssetToolBarDisabledColor forState:UIControlStateDisabled];

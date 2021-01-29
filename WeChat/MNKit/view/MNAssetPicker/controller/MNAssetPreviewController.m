@@ -14,9 +14,9 @@
 
 @interface MNAssetPreviewController ()<MNAssetSelectViewDelegate, MNAssetBrowseCellDelegate, UIGestureRecognizerDelegate>
 @property (nonatomic) NSInteger currentDisplayIndex;
-@property (nonatomic, getter=isStatusBarHidden) BOOL statusBarHidden;
 @property (nonatomic, strong) MNAssetSelectView *selectView;
 @property (nonatomic, strong) MNAssetSelectButton *selectButton;
+@property (nonatomic, getter=isStatusBarHidden) BOOL statusBarHidden;
 @end
 
 #define kAssetInteritemSpacing  15.f
@@ -199,10 +199,10 @@
     
     UIView *rightBarItem = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 25.f)];
     if (self.events & MNAssetPreviewEventSelect) {
+        // 选择
         MNAssetSelectButton *selectButton = [[MNAssetSelectButton alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, rightBarItem.height_mn)];
         selectButton.centerY_mn = rightBarItem.height_mn/2.f;
         selectButton.tag = MNAssetPreviewEventSelect;
-        selectButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
         [selectButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [rightBarItem addSubview:selectButton];
         self.selectButton = selectButton;
@@ -216,7 +216,6 @@
         doneButton.left_mn = rightBarItem.width_mn + 15.f;
         doneButton.centerY_mn = rightBarItem.height_mn/2.f;
         doneButton.tag = MNAssetPreviewEventDone;
-        doneButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleBottomMargin;
         [doneButton addTarget:self action:@selector(navigationBarRightBarItemTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [rightBarItem addSubview:doneButton];
         rightBarItem.width_mn = doneButton.right_mn + 15.f;
