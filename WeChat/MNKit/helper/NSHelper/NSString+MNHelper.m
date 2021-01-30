@@ -258,4 +258,30 @@ NSString * NSStringFromNumber (NSNumber *number) {
     return [emailTest evaluateWithObject:email];
 }
 
+- (NSArray <NSString *>*)matchSubstringUseingExpressions:(NSArray <NSString *>*)expressions {
+    if (self.length <= 0 || expressions.count <= 0) return nil;
+    NSMutableArray <NSString *>*resultArray = @[].mutableCopy;
+    [expressions enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSError *error;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:obj
+                                                                               options:NSRegularExpressionCaseInsensitive
+                                                                                 error:&error];
+        if (regex && !error) {
+            NSArray <NSTextCheckingResult *>*allMatches = [regex matchesInString:self options:kNilOptions range:NSMakeRange(0, self.length)];
+            if (allMatches.count > 0) {
+                [allMatches enumerateObjectsUsingBlock:^(NSTextCheckingResult * _Nonnull r, NSUInteger i, BOOL * _Nonnull s) {
+                    NSString *sub = [self substringWithRange:r.range];
+                    if (![resultArray containsObject:sub]) [resultArray addObject:sub];
+                }];
+            }
+        }
+    }];
+    return resultArray.count > 0 ? resultArray.copy : nil;
+}
+
++ (NSArray <NSString *>*)matchString:(NSString *)string useingExpressions:(NSArray <NSString *>*)expressions {
+    if ([self isEmptyString:string]) return nil;
+    return [string matchSubstringUseingExpressions:expressions];
+}
+
 @end

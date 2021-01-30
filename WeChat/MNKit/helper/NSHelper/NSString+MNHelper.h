@@ -213,5 +213,20 @@ FOUNDATION_EXPORT NSString *NSStringFromNumber (NSNumber *number);
  */
 + (BOOL)evaluateEmail:(NSString *)email;
 
+/**
+ 验证字符串
+ @param expressions 正则表达式
+ @return 验证结果
+ */
+- (NSArray <NSString *>*)matchSubstringUseingExpressions:(NSArray <NSString *>*)expressions;
+
+/**
+ 验证字符串
+ @param string 待验证字符串
+ @param expressions 正则表达式
+ @return 验证结果
+ */
++ (NSArray <NSString *>*)matchString:(NSString *)string useingExpressions:(NSArray <NSString *>*)expressions;
+
 @end
 NS_ASSUME_NONNULL_END

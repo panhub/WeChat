@@ -782,6 +782,10 @@
 		E869CA412570EF680017025E /* MJRefreshComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C8B12570EF660017025E /* MJRefreshComponent.m */; };
 		E869CA682570FB500017025E /* MNPayDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = E869CA642570FB4F0017025E /* MNPayDialog.m */; };
 		E869CA692570FB500017025E /* MNWechatDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = E869CA672570FB500017025E /* MNWechatDialog.m */; };
+		E88676E225C54D12004C859F /* WXErasureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E88676E125C54D12004C859F /* WXErasureViewController.m */; };
+		E88676EF25C56237004C859F /* ZMTokenRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E88676EE25C56237004C859F /* ZMTokenRequest.m */; };
+		E88676F525C56701004C859F /* ZMRegularRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E88676F425C56701004C859F /* ZMRegularRequest.m */; };
+		E88676FE25C57673004C859F /* ZMVideoUrlRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E88676FD25C57673004C859F /* ZMVideoUrlRequest.m */; };
 		E89522C82578945800F2513B /* libxml2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522902578945700F2513B /* libxml2.framework */; };
 		E89522C92578945800F2513B /* lame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522912578945700F2513B /* lame.framework */; };
 		E89522CA2578945800F2513B /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522922578945700F2513B /* libswresample.framework */; };
@@ -2424,6 +2428,14 @@
 		E869CA652570FB4F0017025E /* MNWechatDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNWechatDialog.h; sourceTree = "<group>"; };
 		E869CA662570FB500017025E /* MNPayDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNPayDialog.h; sourceTree = "<group>"; };
 		E869CA672570FB500017025E /* MNWechatDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNWechatDialog.m; sourceTree = "<group>"; };
+		E88676E025C54D12004C859F /* WXErasureViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXErasureViewController.h; sourceTree = "<group>"; };
+		E88676E125C54D12004C859F /* WXErasureViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXErasureViewController.m; sourceTree = "<group>"; };
+		E88676ED25C56237004C859F /* ZMTokenRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZMTokenRequest.h; sourceTree = "<group>"; };
+		E88676EE25C56237004C859F /* ZMTokenRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZMTokenRequest.m; sourceTree = "<group>"; };
+		E88676F325C56701004C859F /* ZMRegularRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZMRegularRequest.h; sourceTree = "<group>"; };
+		E88676F425C56701004C859F /* ZMRegularRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZMRegularRequest.m; sourceTree = "<group>"; };
+		E88676FC25C57673004C859F /* ZMVideoUrlRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZMVideoUrlRequest.h; sourceTree = "<group>"; };
+		E88676FD25C57673004C859F /* ZMVideoUrlRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZMVideoUrlRequest.m; sourceTree = "<group>"; };
 		E89522902578945700F2513B /* libxml2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libxml2.framework; sourceTree = "<group>"; };
 		E89522912578945700F2513B /* lame.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = lame.framework; sourceTree = "<group>"; };
 		E89522922578945700F2513B /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
@@ -3015,6 +3027,7 @@
 				201DAE9A22E894400063E88A /* WXAppletResultController.m */,
 				201DAEA222E894400063E88A /* WXTestViewController.h */,
 				201DAE9922E894400063E88A /* WXTestViewController.m */,
+				E88676DF25C54CD6004C859F /* qsy */,
 				201DAE9B22E894400063E88A /* moment */,
 				BF7B525823E5CC44003DA959 /* music */,
 				BF375BD623E3E4E6008F36C3 /* shake */,
@@ -3284,6 +3297,7 @@
 		201DAF6B22E8952C0063E88A /* find */ = {
 			isa = PBXGroup;
 			children = (
+				E88676EC25C560CD004C859F /* qsy */,
 				201DAF6C22E8952C0063E88A /* cook */,
 				201DAF7122E8952C0063E88A /* weather */,
 			);
@@ -5871,6 +5885,28 @@
 			path = Base;
 			sourceTree = "<group>";
 		};
+		E88676DF25C54CD6004C859F /* qsy */ = {
+			isa = PBXGroup;
+			children = (
+				E88676E025C54D12004C859F /* WXErasureViewController.h */,
+				E88676E125C54D12004C859F /* WXErasureViewController.m */,
+			);
+			path = qsy;
+			sourceTree = "<group>";
+		};
+		E88676EC25C560CD004C859F /* qsy */ = {
+			isa = PBXGroup;
+			children = (
+				E88676ED25C56237004C859F /* ZMTokenRequest.h */,
+				E88676EE25C56237004C859F /* ZMTokenRequest.m */,
+				E88676F325C56701004C859F /* ZMRegularRequest.h */,
+				E88676F425C56701004C859F /* ZMRegularRequest.m */,
+				E88676FC25C57673004C859F /* ZMVideoUrlRequest.h */,
+				E88676FD25C57673004C859F /* ZMVideoUrlRequest.m */,
+			);
+			path = qsy;
+			sourceTree = "<group>";
+		};
 		E895228F2578945700F2513B /* FFmpeg */ = {
 			isa = PBXGroup;
 			children = (
@@ -6242,6 +6278,7 @@
 				2055D8DE22E021A40012E43E /* UIImage+MultiFormat.m in Sources */,
 				E869C9402570EF670017025E /* UITextField+MNEmojiHelper.m in Sources */,
 				BF7B523423E52BA8003DA959 /* WXPreference.m in Sources */,
+				E88676F525C56701004C859F /* ZMRegularRequest.m in Sources */,
 				2055D8D422E021A40012E43E /* UIImage+WebP.m in Sources */,
 				2055D69722E007180012E43E /* UITableView+YYAdd.m in Sources */,
 				BFED444E23F5BFFF00147F4B /* WXCallMessageCell.m in Sources */,
@@ -6678,6 +6715,7 @@
 				E869C9462570EF670017025E /* MNCollectionTextLayout.m in Sources */,
 				201DAE3F22E893F40063E88A /* WXWebpageMessageViewModel.m in Sources */,
 				E869C9532570EF670017025E /* MNLinkPageController.m in Sources */,
+				E88676FE25C57673004C859F /* ZMVideoUrlRequest.m in Sources */,
 				E869C8FE2570EF670017025E /* MNNotification.m in Sources */,
 				201DAF5D22E8945F0063E88A /* WXFileModel.m in Sources */,
 				E869C97D2570EF670017025E /* MNMaskDialog.m in Sources */,
@@ -6763,6 +6801,7 @@
 				E869C9572570EF670017025E /* MNLinkTableView.m in Sources */,
 				201DAE4722E893F40063E88A /* WXMomentCommentViewModel.m in Sources */,
 				BFF58EE123F0E99C0026D7F6 /* WXMusicLyricLabel.m in Sources */,
+				E88676EF25C56237004C859F /* ZMTokenRequest.m in Sources */,
 				E869C96D2570EF670017025E /* MNWebProgressView.m in Sources */,
 				2055D8ED22E021A40012E43E /* UIButton+WebCache.m in Sources */,
 				2042BADF22EFE53700F65033 /* WXSelectBackgroundCell.m in Sources */,
@@ -6809,6 +6848,7 @@
 				201DAF5B22E8945F0063E88A /* WXDataValueModel.m in Sources */,
 				2055D8E022E021A40012E43E /* SDWebImageCompat.m in Sources */,
 				BF375BD923E3E506008F36C3 /* WXShakeViewController.m in Sources */,
+				E88676E225C54D12004C859F /* WXErasureViewController.m in Sources */,
 				E869C9052570EF670017025E /* MNEmail.m in Sources */,
 				E869C8D12570EF670017025E /* MNWebUserContentController.m in Sources */,
 				201DB08822E8953C0063E88A /* WXPayHeaderView.m in Sources */,

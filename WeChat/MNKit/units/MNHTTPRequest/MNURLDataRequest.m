@@ -65,9 +65,8 @@
     [self setValue:response forKey:MNURLPath(self.response)];
     /**缓存数据, 回调解析数据*/
     if (response.code == MNURLResponseCodeSucceed) {
-        if (self.method == MNURLHTTPMethodGet && self.dataSource == MNURLDataSourceNetwork && self.cachePolicy == MNURLDataCachePolicyElseLoad) {
-            NSString *cacheUrl = self.cacheForUrl;
-            if (cacheUrl && cacheUrl.length) [MNURLSessionManager.defaultManager setCache:responseObject forUrl:cacheUrl];
+        if (self.method == MNURLHTTPMethodGet && self.dataSource == MNURLDataSourceNetwork && self.cachePolicy != MNURLDataCachePolicyNever) {
+            [MNURLSessionManager.defaultManager setCache:responseObject forUrl:self.cacheForUrl];
         }
         [self didSucceedWithResponseObject:responseObject];
         if ([self.delegate respondsToSelector:@selector(didSucceedRequesting:responseObject:)]) {

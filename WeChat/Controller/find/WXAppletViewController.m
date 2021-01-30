@@ -85,9 +85,9 @@
         [valueArray addObject:WXLivePhotoMakerControllerName];
     }
 #endif
-    NSArray <NSArray <NSString *>*>*titles = @[@[@"百达钟表"], @[@"菜谱大全", @"天气查询"], titleArray];
-    NSArray <NSArray <NSString *>*>*imgs = @[@[@"wx_find_timeline"], @[@"wx_find_scanning", @"wx_find_shake"], imageArray];
-    NSArray <NSArray <NSString *>*>*values = @[@[@"WXWatchViewController"], @[@"WXCookViewController", @"WXCityViewController"], valueArray];
+    NSArray <NSArray <NSString *>*>*titles = @[@[@"百达钟表"], @[@"菜谱大全", @"天气查询"], titleArray, @[@"视频去水印"]];
+    NSArray <NSArray <NSString *>*>*imgs = @[@[@"wx_find_timeline"], @[@"wx_find_scanning", @"wx_find_shake"], imageArray, @[@"wx_find_shake"]];
+    NSArray <NSArray <NSString *>*>*values = @[@[@"WXWatchViewController"], @[@"WXCookViewController", @"WXCityViewController"], valueArray, @[@"WXErasureViewController"]];
     NSMutableArray *dataArray = [NSMutableArray arrayWithCapacity:titles.count];
     [titles enumerateObjectsUsingBlock:^(NSArray<NSString *> * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSMutableArray *listArray = [NSMutableArray arrayWithCapacity:obj.count];

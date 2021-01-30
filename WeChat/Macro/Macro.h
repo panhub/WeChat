@@ -52,4 +52,7 @@
 #define LOGIN_NOTIFY_NAME   @"com.wx.login.notification.name"
 #define LOGOUT_NOTIFY_NAME   @"com.wx.logout.notification.name"
 
+/// 去水印相关
+#define kVideoToken @"com.zm.token.key"
+
 #endif /* Macro_h */
