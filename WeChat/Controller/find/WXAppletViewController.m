@@ -8,12 +8,13 @@
 
 #import "WXAppletViewController.h"
 #import "WXAppletResultController.h"
+#import "WXSelectCoverController.h"
 #import "WXDataValueModel.h"
 #import "WXAppletListCell.h"
 #import "WXVideoCropController.h"
 #import "MNAssetExporter.h"
 
-@interface WXAppletViewController ()<UITextFieldDelegate, MNAssetPickerDelegate>
+@interface WXAppletViewController ()<UITextFieldDelegate, MNAssetPickerDelegate, WXAppletResultDelegate>
 @property (nonatomic, strong) NSArray <NSArray <WXDataValueModel *>*>*dataArray;
 @end
 
@@ -69,6 +70,7 @@
     }];
     /// 检索结果展示
     WXAppletResultController *resultController = [[WXAppletResultController alloc] initWithFrame:CGRectMake(0.f, self.navigationBar.height_mn + self.tableView.tableHeaderView.height_mn, self.view.width_mn, self.view.height_mn - MN_STATUS_BAR_HEIGHT - self.searchBar.height_mn)];
+    resultController.delegate = self;
     resultController.dataSource = dataSource.copy;
     self.updater = resultController;
     self.searchResultController = resultController;
@@ -140,9 +142,18 @@
     NSArray <WXDataValueModel *>*listArray = self.dataArray[indexPath.section];
     if (indexPath.row >= listArray.count) return;
     WXDataValueModel *model = listArray[indexPath.row];
+    [self execute:model];
+}
+
+#pragma mark - WXAppletResultDelegate
+- (void)appletResultDidSelectModel:(WXDataValueModel *)model {
+    [self execute:model];
+}
+
+- (void)execute:(WXDataValueModel *)model {
     NSString *value = kTransform(NSString *, model.value);
     if ([value isEqualToString:WXLivePhotoMakerControllerName]) {
-        [self selectVideoFromAlbum];
+        [self selectVideo];
     } else {
         Class cls = NSClassFromString(value);
         if (!cls) return;
@@ -150,7 +161,7 @@
     }
 }
 
-- (void)selectVideoFromAlbum {
+- (void)selectVideo {
     MNAssetPicker *imagePicker = [[MNAssetPicker alloc] init];
     imagePicker.configuration.delegate = self;
     imagePicker.configuration.allowsPreviewing = YES;
@@ -158,7 +169,10 @@
     imagePicker.configuration.allowsPickingPhoto = NO;
     imagePicker.configuration.allowsPickingVideo = YES;
     imagePicker.configuration.allowsPickingLivePhoto = NO;
-    imagePicker.configuration.allowsCapturing = YES;
+    imagePicker.configuration.allowsCapturing = NO;
+    imagePicker.configuration.allowsEditing = YES;
+    imagePicker.configuration.minExportDuration = 3.f;
+    imagePicker.configuration.maxExportDuration = 30.f;
     imagePicker.configuration.maxPickingCount = 1;
     [self.navigationController presentViewController:imagePicker animated:YES completion:nil];
 }
@@ -172,13 +186,7 @@
     @weakify(self);
     [picker dismissViewControllerAnimated:YES completion:^{
         @strongify(self);
-        if (assets.count <= 0) {
-            [self.view showInfoDialog:@"获取视频失败"];
-            return;
-        }
-        NSString *outputPath = MNCacheDirectoryAppending([MNFileHandle fileNameWithExtension:@"mp4"]);
-        if (![NSFileManager.defaultManager copyItemAtPath:assets.firstObject.content toPath:outputPath error:nil]) outputPath = assets.firstObject.content;
-        WXVideoCropController *vc = [[WXVideoCropController alloc] initWithContentsOfFile:outputPath];
+        WXSelectCoverController *vc = [[WXSelectCoverController alloc] initWithVideoPath:assets.firstObject.content];
         [self.navigationController pushViewController:vc animated:YES];
     }];
 }

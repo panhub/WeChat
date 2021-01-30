@@ -11,9 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol WXAppletResultDelegate <NSObject>
+@required
+- (void)appletResultDidSelectModel:(WXDataValueModel *)model;
+@end
+
 @interface WXAppletResultController : MNListViewController<MNSearchResultUpdating>
 
+/**数据源*/
 @property (nonatomic, strong) NSArray <WXDataValueModel *>*dataSource;
+
+/**交互代理*/
+@property (nonatomic, weak) id <WXAppletResultDelegate> delegate;
 
 @end
 

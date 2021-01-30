@@ -162,7 +162,7 @@ typedef NS_ENUM(NSInteger, MNTailorSeekStatus) {
     naturalSize = CGSizeMultiplyByRatio(naturalSize, UIScreen.mainScreen.scale);
     // 获取视频截图
     @weakify(self);
-    dispatch_async(dispatch_get_high_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSMutableArray <UIImage *>*thumbnailArray = @[].mutableCopy;
         AVURLAsset *videoAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:videoPath]
                                                      options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@YES}];
@@ -203,7 +203,7 @@ typedef NS_ENUM(NSInteger, MNTailorSeekStatus) {
             thumbnail = thumbnailImage;
             maskImage = thumbnailImage.grayImage;
         }
-        dispatch_async_main(^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             @strongify(self);
             if (thumbnail) {
                 [self.indicatorView stopAnimating];

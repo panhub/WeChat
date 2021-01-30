@@ -147,7 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  导出视频的最大时长<仅视频有效 不符合时长要求的视频裁剪或隐藏处理>
  */
-@property (nonatomic) NSTimeInterval maxExportDuration;
+@property (nonatomic) NSTimeInterval  maxExportDuration;
 /**
  视频导出路径<视频裁剪选项>
  */

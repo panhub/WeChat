@@ -65,7 +65,7 @@
     [self setValue:response forKey:MNURLPath(self.response)];
     /**缓存数据, 回调解析数据*/
     if (response.code == MNURLResponseCodeSucceed) {
-        if (self.method == MNURLHTTPMethodGet && self.dataSource == MNURLDataSourceNetwork && self.cachePolicy != MNURLDataCachePolicyNever) {
+        if (self.cachePolicy != MNURLDataCachePolicyNever && self.method == MNURLHTTPMethodGet && self.dataSource == MNURLDataSourceNetwork) {
             [MNURLSessionManager.defaultManager setCache:responseObject forUrl:self.cacheForUrl];
         }
         [self didSucceedWithResponseObject:responseObject];

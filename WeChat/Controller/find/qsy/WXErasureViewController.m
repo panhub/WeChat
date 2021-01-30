@@ -238,7 +238,7 @@
                 [weakself.navigationController pushViewController:vc animated:YES];
             }];
         } else {
-            [weakself.contentView showInfoDialog:@"下载视频失败"];
+            [weakself.contentView showInfoDialog:response.message];
         }
     }];
 }

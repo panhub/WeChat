@@ -67,10 +67,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row >= self.dataArray.count) return;
     WXDataValueModel *model = self.dataArray[indexPath.row];
-    if (kTransform(NSString *, model.value).length > 0) {
-        Class cls = NSClassFromString(model.value);
-        if (!cls) return;
-        UIViewControllerPush(model.value, YES);
+    if ([self.delegate respondsToSelector:@selector(appletResultDidSelectModel:)]) {
+        [self.delegate appletResultDidSelectModel:model];
     }
 }
 

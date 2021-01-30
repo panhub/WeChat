@@ -847,6 +847,9 @@
 		E8F253B92579055100A05A13 /* ExtAudioConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253B62579055100A05A13 /* ExtAudioConverter.m */; };
 		E8F253C42579105A00A05A13 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8F253C32579105A00A05A13 /* LaunchScreen.storyboard */; };
 		E8F253CD257911E000A05A13 /* WXLaunchController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253CC257911E000A05A13 /* WXLaunchController.m */; };
+		E8F71E0B25C5D31300F67DCE /* WXSelectCoverController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F71E0A25C5D31300F67DCE /* WXSelectCoverController.m */; };
+		E8F71E1425C5D44B00F67DCE /* WXSelectCoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F71E1325C5D44B00F67DCE /* WXSelectCoverView.m */; };
+		E8F71E1A25C5DD9000F67DCE /* WXSelectCoverCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F71E1925C5DD9000F67DCE /* WXSelectCoverCell.m */; };
 		E8FD03442430CA0D00841036 /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */; };
 		E8FD03452430CA0D00841036 /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */; };
 		E8FD03462430CA0D00841036 /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E8FD03412430CA0D00841036 /* AMap.bundle */; };
@@ -2504,6 +2507,12 @@
 		E8F253C32579105A00A05A13 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
 		E8F253CB257911E000A05A13 /* WXLaunchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXLaunchController.h; sourceTree = "<group>"; };
 		E8F253CC257911E000A05A13 /* WXLaunchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXLaunchController.m; sourceTree = "<group>"; };
+		E8F71E0925C5D31300F67DCE /* WXSelectCoverController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXSelectCoverController.h; sourceTree = "<group>"; };
+		E8F71E0A25C5D31300F67DCE /* WXSelectCoverController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXSelectCoverController.m; sourceTree = "<group>"; };
+		E8F71E1225C5D44B00F67DCE /* WXSelectCoverView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXSelectCoverView.h; sourceTree = "<group>"; };
+		E8F71E1325C5D44B00F67DCE /* WXSelectCoverView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXSelectCoverView.m; sourceTree = "<group>"; };
+		E8F71E1825C5DD9000F67DCE /* WXSelectCoverCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXSelectCoverCell.h; sourceTree = "<group>"; };
+		E8F71E1925C5DD9000F67DCE /* WXSelectCoverCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXSelectCoverCell.m; sourceTree = "<group>"; };
 		E8FD033F2430CA0D00841036 /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
 		E8FD03402430CA0D00841036 /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
 		E8FD03412430CA0D00841036 /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
@@ -3037,7 +3046,7 @@
 				201DAEAE22E894400063E88A /* watch */,
 				201DAEB222E894400063E88A /* weather */,
 				BF1210372392A1D700121D07 /* crop */,
-				BFA28AE823A4E232003CB264 /* livePhoto */,
+				BFA28AE823A4E232003CB264 /* live */,
 			);
 			path = find;
 			sourceTree = "<group>";
@@ -3579,7 +3588,7 @@
 				201DB03722E8953C0063E88A /* cook */,
 				201DB04122E8953C0063E88A /* watch */,
 				201DB04722E8953C0063E88A /* weather */,
-				BFA28AE923A4E26F003CB264 /* livePhoto */,
+				BFA28AE923A4E26F003CB264 /* live */,
 			);
 			path = find;
 			sourceTree = "<group>";
@@ -4305,24 +4314,30 @@
 			path = music;
 			sourceTree = "<group>";
 		};
-		BFA28AE823A4E232003CB264 /* livePhoto */ = {
+		BFA28AE823A4E232003CB264 /* live */ = {
 			isa = PBXGroup;
 			children = (
 				BFA28AED23A4E336003CB264 /* WXVideoCropController.h */,
 				BFA28AEE23A4E336003CB264 /* WXVideoCropController.m */,
 				BF6CDDB323A50CE60008600E /* WXLivePhotoController.h */,
 				BF6CDDB423A50CE60008600E /* WXLivePhotoController.m */,
+				E8F71E0925C5D31300F67DCE /* WXSelectCoverController.h */,
+				E8F71E0A25C5D31300F67DCE /* WXSelectCoverController.m */,
 			);
-			path = livePhoto;
+			path = live;
 			sourceTree = "<group>";
 		};
-		BFA28AE923A4E26F003CB264 /* livePhoto */ = {
+		BFA28AE923A4E26F003CB264 /* live */ = {
 			isa = PBXGroup;
 			children = (
 				BFA28AEB23A4E2DB003CB264 /* WXVideoCropView.h */,
 				BFA28AEA23A4E2DB003CB264 /* WXVideoCropView.m */,
+				E8F71E1225C5D44B00F67DCE /* WXSelectCoverView.h */,
+				E8F71E1325C5D44B00F67DCE /* WXSelectCoverView.m */,
+				E8F71E1825C5DD9000F67DCE /* WXSelectCoverCell.h */,
+				E8F71E1925C5DD9000F67DCE /* WXSelectCoverCell.m */,
 			);
-			path = livePhoto;
+			path = live;
 			sourceTree = "<group>";
 		};
 		BFDBA2AE2394FA8000AB3290 /* crop */ = {
@@ -6649,6 +6664,7 @@
 				201DAE4122E893F40063E88A /* WXTextMessageViewModel.m in Sources */,
 				20F04B492340DA4E007C0D36 /* WXMomentPreview.m in Sources */,
 				E869C9872570EF670017025E /* MNLoadDialog.m in Sources */,
+				E8F71E1A25C5DD9000F67DCE /* WXSelectCoverCell.m in Sources */,
 				201DAF6A22E8945F0063E88A /* WXSession.m in Sources */,
 				E869C98A2570EF670017025E /* MNTextView.m in Sources */,
 				E869C9092570EF670017025E /* MNURLBodyAdaptor.m in Sources */,
@@ -6770,6 +6786,7 @@
 				201DAEF522E894410063E88A /* WXChangeViewController.m in Sources */,
 				BFDF612323EA4E80002E45CE /* WXMusicLyricCell.m in Sources */,
 				2055D6AB22E007180012E43E /* NSNotificationCenter+YYAdd.m in Sources */,
+				E8F71E1425C5D44B00F67DCE /* WXSelectCoverView.m in Sources */,
 				E869C9C52570EF670017025E /* UICollectionView+MNHelper.m in Sources */,
 				E869C9992570EF670017025E /* MNCapturingView.m in Sources */,
 				E869C9102570EF670017025E /* MNURLRequest.m in Sources */,
@@ -6784,6 +6801,7 @@
 				E869C93D2570EF670017025E /* MNEmojiManager.m in Sources */,
 				2042BAE222F0161F00F65033 /* WXEmoticonViewController.m in Sources */,
 				E869C91B2570EF670017025E /* MNURLSession.m in Sources */,
+				E8F71E0B25C5D31300F67DCE /* WXSelectCoverController.m in Sources */,
 				201DB05822E8953C0063E88A /* WXAddUserHeaderView.m in Sources */,
 				E869C9552570EF670017025E /* MNLinkViewController.m in Sources */,
 				E869C8EC2570EF670017025E /* MNPlayer.m in Sources */,
