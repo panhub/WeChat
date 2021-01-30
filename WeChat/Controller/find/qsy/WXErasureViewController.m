@@ -184,7 +184,6 @@
     }
     // 检查是否与当前弹窗提示信息相同<如有的话>
     if ([display_url isEqualToString:MNAlertView.currentAlertView.messageText] || [url isEqualToString:self.textField.text]) return;
-    UIPasteboard.generalPasteboard.string = @"";
     // 关闭所有弹窗, 显示新弹窗
     @weakify(self);
     [MNAlertView close];
@@ -193,7 +192,7 @@
         if (buttonIndex != alertView.ensureButtonIndex) return;
         weakself.textField.text = url;
         [weakself extract];
-    } ensureButtonTitle:@"立即提取" otherButtonTitles:@"取消", nil] showInView:self.view];
+    } ensureButtonTitle:@"立即提取" otherButtonTitles:@"取消", nil] show];
     [MNAlertView setAlertViewButtonTitleColor:THEME_COLOR ofIndex:1];
 }
 
@@ -213,9 +212,14 @@
 }
 
 - (void)download:(NSString *)url {
+    if (url.length <= 0) {
+        [self.contentView showInfoDialog:@"查询视频失败"];
+        return;
+    }
     @weakify(self);
     NSString *filePath = MNCacheDirectoryAppending([MNFileHandle fileNameWithExtension:@"mp4"]);
     MNURLDownloadRequest *downloadRequest = MNURLDownloadRequest.new;
+    downloadRequest.url = url;
     [downloadRequest downloadData:^{
         [weakself.contentView showProgressDialog:@"正在下载视频"];
     } filePath:^NSURL *(NSURLResponse *response, NSURL *location) {
@@ -242,7 +246,7 @@
 #pragma mark - MNVideoTailorDelegate
 - (void)videoTailorControllerDidCancel:(MNVideoTailorController *_Nonnull)tailorController {
     [NSFileManager.defaultManager removeItemAtPath:tailorController.videoPath error:nil];
-    [tailorController.navigationController popWithAnimated:YES];
+    [tailorController.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)videoTailorController:(MNVideoTailorController *_Nonnull)tailorController didTailoringVideoAtPath:(NSString *_Nonnull)videoPath {

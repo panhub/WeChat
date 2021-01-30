@@ -55,7 +55,7 @@
     self.body = body;
 }
 
-- (void)didLoadFinishWithResponse:(MNURLResponse *)response {
+- (void)didFinishWithSupposedResponse:(MNURLResponse *)response {
     /**定义错误*/
     if (self.serializationType != MNURLRequestSerializationTypeJSON) return;
     NSDictionary *json = response.data;
@@ -64,7 +64,7 @@
     if (message) response.message = message;
 }
 
-- (void)didLoadSucceedWithResponseObject:(id)responseObject {
+- (void)didSucceedWithResponseObject:(id)responseObject {
     NSDictionary *data = [NSDictionary dictionaryValueWithDictionary:responseObject forKey:@"data"];
     self.downloadUrl = [NSDictionary stringValueWithDictionary:data forKey:@"url"];
 }

@@ -40,7 +40,7 @@
     self.headerFields = headerFields.copy;
 }
 
-- (void)didLoadFinishWithResponse:(MNURLResponse *)response {
+- (void)didFinishWithSupposedResponse:(MNURLResponse *)response {
     /**定义错误*/
     if (self.serializationType != MNURLRequestSerializationTypeJSON) return;
     NSDictionary *json = response.data;
