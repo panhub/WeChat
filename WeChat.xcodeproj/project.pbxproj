@@ -837,6 +837,13 @@
 		E89522FC2578945800F2513B /* xvidcore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C52578945700F2513B /* xvidcore.framework */; };
 		E89522FD2578945800F2513B /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C62578945700F2513B /* mobileffmpeg.framework */; };
 		E89522FE2578945800F2513B /* libwebp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C72578945700F2513B /* libwebp.framework */; };
+		E89F388B25C6E69B001D2E0A /* WXNewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F388A25C6E69B001D2E0A /* WXNewsViewController.m */; };
+		E89F389525C6E735001D2E0A /* WXNewsRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F389425C6E735001D2E0A /* WXNewsRequest.m */; };
+		E89F389F25C6E77F001D2E0A /* WXNewsDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F389E25C6E77F001D2E0A /* WXNewsDataModel.m */; };
+		E89F38A525C6E94D001D2E0A /* WXNewsCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F38A425C6E94D001D2E0A /* WXNewsCategory.m */; };
+		E89F38AB25C6ECF7001D2E0A /* WXNewsListController.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F38AA25C6ECF7001D2E0A /* WXNewsListController.m */; };
+		E89F38B825C6EE7E001D2E0A /* WXNewsViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F38B725C6EE7E001D2E0A /* WXNewsViewModel.m */; };
+		E89F38C225C6F321001D2E0A /* WXNewsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F38C125C6F321001D2E0A /* WXNewsCell.m */; };
 		E8F253AB257904DF00A05A13 /* band.band in Resources */ = {isa = PBXBuildFile; fileRef = E8F253A8257904DF00A05A13 /* band.band */; };
 		E8F253AC257904DF00A05A13 /* MNGarageBand.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253A9257904DF00A05A13 /* MNGarageBand.m */; };
 		E8F253B82579055100A05A13 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F253B42579055100A05A13 /* libmp3lame.a */; };
@@ -2485,6 +2492,20 @@
 		E89522C72578945700F2513B /* libwebp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libwebp.framework; sourceTree = "<group>"; };
 		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
 		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
+		E89F388925C6E69B001D2E0A /* WXNewsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsViewController.h; sourceTree = "<group>"; };
+		E89F388A25C6E69B001D2E0A /* WXNewsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsViewController.m; sourceTree = "<group>"; };
+		E89F389325C6E735001D2E0A /* WXNewsRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsRequest.h; sourceTree = "<group>"; };
+		E89F389425C6E735001D2E0A /* WXNewsRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsRequest.m; sourceTree = "<group>"; };
+		E89F389D25C6E77F001D2E0A /* WXNewsDataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsDataModel.h; sourceTree = "<group>"; };
+		E89F389E25C6E77F001D2E0A /* WXNewsDataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsDataModel.m; sourceTree = "<group>"; };
+		E89F38A325C6E94D001D2E0A /* WXNewsCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsCategory.h; sourceTree = "<group>"; };
+		E89F38A425C6E94D001D2E0A /* WXNewsCategory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsCategory.m; sourceTree = "<group>"; };
+		E89F38A925C6ECF7001D2E0A /* WXNewsListController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsListController.h; sourceTree = "<group>"; };
+		E89F38AA25C6ECF7001D2E0A /* WXNewsListController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsListController.m; sourceTree = "<group>"; };
+		E89F38B625C6EE7E001D2E0A /* WXNewsViewModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsViewModel.h; sourceTree = "<group>"; };
+		E89F38B725C6EE7E001D2E0A /* WXNewsViewModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsViewModel.m; sourceTree = "<group>"; };
+		E89F38C025C6F321001D2E0A /* WXNewsCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsCell.h; sourceTree = "<group>"; };
+		E89F38C125C6F321001D2E0A /* WXNewsCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXNewsCell.m; sourceTree = "<group>"; };
 		E8F253A8257904DF00A05A13 /* band.band */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = band.band; sourceTree = "<group>"; };
 		E8F253A9257904DF00A05A13 /* MNGarageBand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNGarageBand.m; sourceTree = "<group>"; };
 		E8F253AA257904DF00A05A13 /* MNGarageBand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNGarageBand.h; sourceTree = "<group>"; };
@@ -2845,6 +2866,7 @@
 		201DAE2522E893F40063E88A /* find */ = {
 			isa = PBXGroup;
 			children = (
+				E89F38B525C6EE68001D2E0A /* news */,
 				201DAE3522E893F40063E88A /* cook */,
 				BF7B2EDD23EC7685003D923F /* music */,
 				201DAE2622E893F40063E88A /* moment */,
@@ -3022,6 +3044,7 @@
 				201DAEB122E894400063E88A /* WXAppletViewController.m */,
 				201DAEAD22E894400063E88A /* WXAppletResultController.h */,
 				201DAE9A22E894400063E88A /* WXAppletResultController.m */,
+				E89F388825C6E642001D2E0A /* news */,
 				E88676DF25C54CD6004C859F /* qsy */,
 				201DAE9B22E894400063E88A /* moment */,
 				BF7B525823E5CC44003DA959 /* music */,
@@ -3219,6 +3242,7 @@
 		201DAF3C22E8945F0063E88A /* find */ = {
 			isa = PBXGroup;
 			children = (
+				E89F389C25C6E75B001D2E0A /* news */,
 				BF7B525623E5CC08003DA959 /* music */,
 				BF7B523823E55285003DA959 /* shake */,
 				BFDBA2AE2394FA8000AB3290 /* crop */,
@@ -3292,6 +3316,7 @@
 		201DAF6B22E8952C0063E88A /* find */ = {
 			isa = PBXGroup;
 			children = (
+				E89F389225C6E70E001D2E0A /* news */,
 				E88676EC25C560CD004C859F /* qsy */,
 				201DAF6C22E8952C0063E88A /* cook */,
 				201DAF7122E8952C0063E88A /* weather */,
@@ -3566,6 +3591,7 @@
 				201DB01522E8953C0063E88A /* WXFindListCell.m */,
 				201DB04022E8953C0063E88A /* WXAppletListCell.h */,
 				201DB01622E8953C0063E88A /* WXAppletListCell.m */,
+				E89F38BF25C6F2F7001D2E0A /* news */,
 				BF7B525723E5CC23003DA959 /* music */,
 				BFDBA2B22394FE0500AB3290 /* crop */,
 				BF375BDA23E424EF008F36C3 /* shake */,
@@ -5965,6 +5991,55 @@
 			path = FFmpeg;
 			sourceTree = "<group>";
 		};
+		E89F388825C6E642001D2E0A /* news */ = {
+			isa = PBXGroup;
+			children = (
+				E89F388925C6E69B001D2E0A /* WXNewsViewController.h */,
+				E89F388A25C6E69B001D2E0A /* WXNewsViewController.m */,
+				E89F38A925C6ECF7001D2E0A /* WXNewsListController.h */,
+				E89F38AA25C6ECF7001D2E0A /* WXNewsListController.m */,
+			);
+			path = news;
+			sourceTree = "<group>";
+		};
+		E89F389225C6E70E001D2E0A /* news */ = {
+			isa = PBXGroup;
+			children = (
+				E89F389325C6E735001D2E0A /* WXNewsRequest.h */,
+				E89F389425C6E735001D2E0A /* WXNewsRequest.m */,
+			);
+			path = news;
+			sourceTree = "<group>";
+		};
+		E89F389C25C6E75B001D2E0A /* news */ = {
+			isa = PBXGroup;
+			children = (
+				E89F389D25C6E77F001D2E0A /* WXNewsDataModel.h */,
+				E89F389E25C6E77F001D2E0A /* WXNewsDataModel.m */,
+				E89F38A325C6E94D001D2E0A /* WXNewsCategory.h */,
+				E89F38A425C6E94D001D2E0A /* WXNewsCategory.m */,
+			);
+			path = news;
+			sourceTree = "<group>";
+		};
+		E89F38B525C6EE68001D2E0A /* news */ = {
+			isa = PBXGroup;
+			children = (
+				E89F38B625C6EE7E001D2E0A /* WXNewsViewModel.h */,
+				E89F38B725C6EE7E001D2E0A /* WXNewsViewModel.m */,
+			);
+			path = news;
+			sourceTree = "<group>";
+		};
+		E89F38BF25C6F2F7001D2E0A /* news */ = {
+			isa = PBXGroup;
+			children = (
+				E89F38C025C6F321001D2E0A /* WXNewsCell.h */,
+				E89F38C125C6F321001D2E0A /* WXNewsCell.m */,
+			);
+			path = news;
+			sourceTree = "<group>";
+		};
 		E8F253A7257904DF00A05A13 /* MNGarageBand */ = {
 			isa = PBXGroup;
 			children = (
@@ -6161,6 +6236,7 @@
 				2055D8E322E021A40012E43E /* SDImageCache.m in Sources */,
 				E869CA3D2570EF680017025E /* MJRefreshFooter.m in Sources */,
 				201DB08922E8953C0063E88A /* WXWalletListCell.m in Sources */,
+				E89F38C225C6F321001D2E0A /* WXNewsCell.m in Sources */,
 				E869C9642570EF670017025E /* MNMaskTransitionAnimator.m in Sources */,
 				2055D8E522E021A40012E43E /* NSData+ImageContentType.m in Sources */,
 				E869C9AC2570EF670017025E /* MNCityPicker.m in Sources */,
@@ -6229,6 +6305,7 @@
 				E869C9142570EF670017025E /* MNLock.m in Sources */,
 				2042BAD922EFD97900F65033 /* WXChatBackgroundController.m in Sources */,
 				E869C9B72570EF670017025E /* UICollectionViewCell+MNHelper.m in Sources */,
+				E89F389F25C6E77F001D2E0A /* WXNewsDataModel.m in Sources */,
 				201DB0A422E8953C0063E88A /* WXMomentPictureView.m in Sources */,
 				E869C9362570EF670017025E /* MNEmojiCell.m in Sources */,
 				201DB07822E8953C0063E88A /* WXVideoPlayTopBar.m in Sources */,
@@ -6466,6 +6543,7 @@
 				2055D6B422E007180012E43E /* YYTransaction.m in Sources */,
 				201DB0A522E8953C0063E88A /* WXMomentMoreView.m in Sources */,
 				E869C9672570EF670017025E /* MNSwitch.m in Sources */,
+				E89F389525C6E735001D2E0A /* WXNewsRequest.m in Sources */,
 				E869C9A42570EF670017025E /* MNTailorTimeView.m in Sources */,
 				E869C9912570EF670017025E /* MNAssetTouchController.m in Sources */,
 				E869C99C2570EF670017025E /* MNVideoResizeButton.m in Sources */,
@@ -6601,6 +6679,7 @@
 				E869C9712570EF670017025E /* MNStreamView.m in Sources */,
 				201DAF1F22E894410063E88A /* WXUserSettingViewController.m in Sources */,
 				201DAF1022E894410063E88A /* WXCityViewController.m in Sources */,
+				E89F38AB25C6ECF7001D2E0A /* WXNewsListController.m in Sources */,
 				E869C8D32570EF670017025E /* MNActionSheetController.m in Sources */,
 				201DAF2022E894410063E88A /* WXAddUserViewController.m in Sources */,
 				2055D69922E007180012E43E /* UIScreen+YYAdd.m in Sources */,
@@ -6639,6 +6718,7 @@
 				2055D6AC22E007180012E43E /* NSDictionary+YYAdd.m in Sources */,
 				E869C9EB2570EF680017025E /* NSObject+MNHelper.m in Sources */,
 				BF38B06723D73EDE00C1171F /* WXCardMessageCell.m in Sources */,
+				E89F38A525C6E94D001D2E0A /* WXNewsCategory.m in Sources */,
 				E869C9BD2570EF670017025E /* UIResponder+MNHelper.m in Sources */,
 				201DAE4122E893F40063E88A /* WXTextMessageViewModel.m in Sources */,
 				20F04B492340DA4E007C0D36 /* WXMomentPreview.m in Sources */,
@@ -6770,6 +6850,7 @@
 				E869C93F2570EF670017025E /* MNEmojiPacket.m in Sources */,
 				201DAEF722E894410063E88A /* WXWalletViewController.m in Sources */,
 				E869C9F32570EF680017025E /* UIImage+JPExtension.m in Sources */,
+				E89F388B25C6E69B001D2E0A /* WXNewsViewController.m in Sources */,
 				E869C90A2570EF670017025E /* MNURLUploadRequest.m in Sources */,
 				E8F253AC257904DF00A05A13 /* MNGarageBand.m in Sources */,
 				E869C8ED2570EF670017025E /* MNAssetExporter+MNExportSession.m in Sources */,
@@ -6784,6 +6865,7 @@
 				201DB08222E8953C0063E88A /* WXMineListCell.m in Sources */,
 				E869C94B2570EF670017025E /* MNCardLayout.m in Sources */,
 				20E4712D22EC5A4C00BD125A /* WXMomentRemindController.m in Sources */,
+				E89F38B825C6EE7E001D2E0A /* WXNewsViewModel.m in Sources */,
 				E869C9B22570EF670017025E /* MNRange.m in Sources */,
 				201DAEF022E894410063E88A /* WXTabBarController.m in Sources */,
 				20F3F08D22F870E900B85DAE /* WXChangePasswordController.m in Sources */,

@@ -68,7 +68,7 @@
 - (void)loadData {
     NSArray <NSArray <NSString *>*>*titles = @[@[@"朋友圈"], @[@"扫一扫", @"摇一摇"], @[@"看一看", @"搜一搜"], @[@"附近的人"], @[@"音乐", @"游戏"], @[@"小程序"]];
     NSArray <NSArray <NSString *>*>*imgs = @[@[@"wx_find_timeline"], @[@"wx_find_scanning", @"wx_find_shake"], @[@"wx_find_see", @"wx_find_search"], @[@"wx_find_nearby"], @[@"wx_find_shopping", @"wx_find_game"], @[@"wx_find_program"]];
-    NSArray <NSArray <NSString *>*>*values = @[@[@"WXMomentViewController"], @[@"WXScanViewController", @"WXShakeViewController"], @[@"WXWatchViewController", @""], @[@"WXNearbyViewController"], @[@"WXMusicViewController", @""], @[@"WXAppletViewController"]];
+    NSArray <NSArray <NSString *>*>*values = @[@[@"WXMomentViewController"], @[@"WXScanViewController", @"WXShakeViewController"], @[@"WXNewsViewController", @""], @[@"WXNearbyViewController"], @[@"WXMusicViewController", @""], @[@"WXAppletViewController"]];
     NSMutableArray *dataArray = [NSMutableArray arrayWithCapacity:titles.count];
     [titles enumerateObjectsUsingBlock:^(NSArray<NSString *> * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSMutableArray *listArray = [NSMutableArray arrayWithCapacity:obj.count];
