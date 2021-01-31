@@ -11,14 +11,13 @@
 #import "WXSelectCoverController.h"
 #import "WXDataValueModel.h"
 #import "WXAppletListCell.h"
-#import "WXVideoCropController.h"
 #import "MNAssetExporter.h"
 
 @interface WXAppletViewController ()<UITextFieldDelegate, WXAppletResultDelegate>
 @property (nonatomic, strong) NSArray <NSArray <WXDataValueModel *>*>*dataArray;
 @end
 
-#define WXLivePhotoMakerControllerName   @"WXVideoCropController"
+#define WXLivePhotoControllerName   @"WXSelectCoverController"
 
 @implementation WXAppletViewController
 - (instancetype)init {
@@ -84,7 +83,7 @@
     if (@available(iOS 9.1, *)) {
         [titleArray addObject:@"制作LivePhoto"];
         [imageArray addObject:@"wx_find_search"];
-        [valueArray addObject:WXLivePhotoMakerControllerName];
+        [valueArray addObject:WXLivePhotoControllerName];
     }
 #endif
     NSArray <NSArray <NSString *>*>*titles = @[@[@"百达钟表"], @[@"菜谱大全", @"天气查询"], titleArray, @[@"视频去水印"]];
@@ -152,7 +151,7 @@
 
 - (void)execute:(WXDataValueModel *)model {
     NSString *value = kTransform(NSString *, model.value);
-    if ([value isEqualToString:WXLivePhotoMakerControllerName]) {
+    if ([value isEqualToString:WXLivePhotoControllerName]) {
         @weakify(self);
         [self selectAsset:^(MNAssetPickConfiguration *configuration) {
             configuration.allowsPickingGif = NO;

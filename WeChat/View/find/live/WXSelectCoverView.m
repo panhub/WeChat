@@ -8,32 +8,40 @@
 
 #import "WXSelectCoverView.h"
 #import "WXSelectCoverCell.h"
+#import "WXDataValueModel.h"
 
 @interface WXSelectCoverView ()<UICollectionViewDelegate, UICollectionViewDataSource>
-@property (nonatomic, strong) NSArray <UIImage *>*images;
+@property (nonatomic, copy) NSString *videoPath;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
+@property (nonatomic, strong) NSArray <WXDataValueModel *>*images;
 @end
 
 @implementation WXSelectCoverView
-- (instancetype)initWithFrame:(CGRect)frame size:(CGSize)coverSize {
+- (instancetype)initWithFrame:(CGRect)frame videoPath:(NSString *)videoPath {
     if (self = [super initWithFrame:frame]) {
         
-        coverSize = CGSizeMultiplyToHeight(coverSize, self.height_mn);
-        coverSize.width = floor(coverSize.width);
+        CGSize itemSize = [MNAssetExporter exportNaturalSizeOfVideoAtPath:videoPath];
+        itemSize = CGSizeMultiplyToHeight(itemSize, self.height_mn);
+        itemSize.width = floor(itemSize.width);
+        
+        self.backgroundColor = [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1.f];
         
         UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+        layout.itemSize = itemSize;
         layout.minimumLineSpacing = 0.f;
         layout.minimumInteritemSpacing = 0.f;
-        layout.itemSize = coverSize;
+        layout.sectionInset = UIEdgeInsetsZero;
         layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         
         UICollectionView *collectionView = [UICollectionView collectionViewWithFrame:self.bounds layout:layout];
-        collectionView.dataSource = self;
+        collectionView.alpha = 0.f;
         collectionView.delegate = self;
-        collectionView.scrollEnabled = NO;
-        collectionView.clipsToBounds = NO;
+        collectionView.dataSource = self;
+        collectionView.clipsToBounds = YES;
         collectionView.backgroundColor = UIColor.clearColor;
+        collectionView.showsVerticalScrollIndicator = NO;
+        collectionView.showsHorizontalScrollIndicator = NO;
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeNone;
         [collectionView registerClass:[WXSelectCoverCell class]
            forCellWithReuseIdentifier:MNCollectionElementCellReuseIdentifier];
@@ -66,9 +74,20 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(WXSelectCoverCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.images.count <= indexPath.item) return;
-    cell.image = self.images[indexPath.item];
+    cell.model = self.images[indexPath.item];
 }
 
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.images.count <= indexPath.item) return;
+    WXDataValueModel *model = self.images[indexPath.item];
+    if (model.isSelected) return;
+    [self.images setValue:@(NO) forKey:@"selected"];
+    model.selected = YES;
+    [collectionView reloadData];
+    if ([self.delegate respondsToSelector:@selector(coverViewDidSelectThumbnail:)]) {
+        [self.delegate coverViewDidSelectThumbnail:model];
+    }
+}
 
 #pragma mark - Setter
 - (void)loadThumbnails {
@@ -78,17 +97,25 @@
     CGSize itemSize = layout.itemSize;
     CGFloat w = self.width_mn*2.5f;
     NSInteger count = (NSInteger)ceil(w/itemSize.width);
-    
-    
     NSTimeInterval duration = [MNAssetExporter exportDurationWithMediaAtPath:videoPath];
-    if (duration <= 0.f) {
+    if (duration <= 0.f || itemSize.width <= 0.f) {
         [self fail];
+        [UIView animateWithDuration:.3f animations:^{
+            self.collectionView.alpha = 1.f;
+        } completion:^(BOOL finished) {
+            if ([self.delegate respondsToSelector:@selector(coverViewLoadThumbnailsFailed:)]) {
+                [self.delegate coverViewLoadThumbnailsFailed:self];
+            }
+        }];
         return;
+    }
+    if ([self.delegate respondsToSelector:@selector(coverViewBeginLoadThumbnails:)]) {
+        [self.delegate coverViewBeginLoadThumbnails:self];
     }
     @weakify(self);
     [self.indicatorView startAnimating];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSMutableArray <UIImage *>*images = @[].mutableCopy;
+        NSMutableArray <WXDataValueModel *>*images = @[].mutableCopy;
         AVURLAsset *videoAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:videoPath]
                                                      options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@YES}];
         AVAssetImageGenerator *thumbnailGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:videoAsset];
@@ -97,13 +124,17 @@
         thumbnailGenerator.requestedTimeToleranceAfter = kCMTimeZero;
         thumbnailGenerator.maximumSize = CGSizeMultiplyByRatio(itemSize, 3.f);
         for (NSInteger i = 0; i < count; i ++) {
-            CGFloat progress = i*1.f/count;
+            CGFloat progress = [[NSString stringWithFormat:@"%.2f", i*1.f/count] floatValue];
             CGImageRef imageRef = [thumbnailGenerator copyCGImageAtTime:CMTimeMultiplyByFloat64(videoAsset.duration, progress) actualTime:NULL error:NULL];
             if (!imageRef) continue;
-            UIImage *img = [UIImage imageWithCGImage:imageRef];
-            if (!img) continue;
-            [images addObject:img];
+            UIImage *image = [UIImage imageWithCGImage:imageRef];
+            if (!image) continue;
+            WXDataValueModel *model = WXDataValueModel.new;
+            model.image = image;
+            model.value = @(progress);
+            [images addObject:model];
         }
+        images.firstObject.selected = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             @strongify(self);
             if (images.count) {
@@ -113,10 +144,11 @@
                 __weak typeof(self) weakself = self;
                 [UIView animateWithDuration:.3f animations:^{
                     weakself.collectionView.alpha = 1.f;
+                    weakself.backgroundColor = UIColor.clearColor;
                 } completion:^(BOOL finished) {
-//                    if ([weakself.delegate respondsToSelector:@selector(tailorViewDidLoadThumbnails:)]) {
-//                        [weakself.delegate tailorViewDidLoadThumbnails:weakself];
-//                    }
+                    if ([weakself.delegate respondsToSelector:@selector(coverViewDidLoadThumbnails:)]) {
+                        [weakself.delegate coverViewDidLoadThumbnails:weakself];
+                    }
                 }];
             } else {
                 [self fail];
@@ -124,22 +156,25 @@
                 [UIView animateWithDuration:.3f animations:^{
                     self.collectionView.alpha = 1.f;
                 } completion:^(BOOL finished) {
-//                    if ([weakself.delegate respondsToSelector:@selector(tailorViewDidLoadThumbnails:)]) {
-//                        [weakself.delegate tailorViewDidLoadThumbnails:weakself];
-//                    }
+                    if ([weakself.delegate respondsToSelector:@selector(coverViewLoadThumbnailsFailed:)]) {
+                        [weakself.delegate coverViewLoadThumbnailsFailed:weakself];
+                    }
                 }];
             }
         });
-        
     });
 }
 
 - (void)fail {
-    UILabel *thumbnailLabel = [UILabel labelWithFrame:self.collectionView.bounds text:@"无法获取视频截图" alignment:NSTextAlignmentCenter textColor:UIColor.whiteColor font:[UIFont systemFontOfSize:16.f]];
-    //thumbnailLabel.alpha = 0.f;
+    UILabel *thumbnailLabel = [UILabel labelWithFrame:self.collectionView.bounds text:@"无法获取视频截图" alignment:NSTextAlignmentCenter textColor:[UIColor colorWithHex:@"F7F7F7"] font:[UIFont systemFontOfSize:16.f]];
     thumbnailLabel.backgroundColor = UIColor.clearColor;
     [self.collectionView addSubview:thumbnailLabel];
 }
 
+#pragma mark - Getter
+- (WXDataValueModel *)coverModel {
+    NSArray <WXDataValueModel *>*results = [self.images filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == YES"]];
+    return results.count ? results.firstObject : nil;
+}
 
 @end

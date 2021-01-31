@@ -172,7 +172,7 @@ typedef NS_ENUM(NSInteger, MNTailorSeekStatus) {
         thumbnailGenerator.requestedTimeToleranceAfter = kCMTimeZero;
         thumbnailGenerator.maximumSize = naturalSize;
         for (NSInteger i = 0; i < thumbnailCount; i ++) {
-            CGFloat progress = i*1.f/thumbnailCount;
+            CGFloat progress = [[NSString stringWithFormat:@"%.2f", i*1.f/thumbnailCount] floatValue];
             CGImageRef imageRef = [thumbnailGenerator copyCGImageAtTime:CMTimeMultiplyByFloat64(videoAsset.duration, progress) actualTime:NULL error:NULL];
             if (!imageRef) continue;
             UIImage *img = [UIImage imageWithCGImage:imageRef];

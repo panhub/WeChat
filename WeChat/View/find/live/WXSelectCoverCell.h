@@ -7,12 +7,14 @@
 //
 
 #import "MNCollectionViewCell.h"
+@class WXDataValueModel;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WXSelectCoverCell : MNCollectionViewCell
 
-@property (nonatomic, strong) UIImage *image;
+/**数据模型*/
+@property (nonatomic, strong) WXDataValueModel *model;
 
 @end
 

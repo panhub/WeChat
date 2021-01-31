@@ -139,11 +139,18 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 /**
   存储LivePhoto
+  @param livePhoto LivePhoto
+  @param completion 结束回调
+ */
++ (void)writeLivePhoto:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completion;
+
+/**
+  存储LivePhoto
   @param imagePath 图片路径<NSString NSURL>
   @param videoPath 视频路径<NSString NSURL>
   @param completion 结束回调
  */
-+ (void)writeLivePhotoWithImagePath:(id)imagePath videoPath:(id)videoPath completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable))completion;
++ (void)writeLivePhotoWithImagePath:(id)imagePath videoPath:(id)videoPath completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completion;
 
 /**
  获取LivePhoto的本地文件

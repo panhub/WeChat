@@ -22,9 +22,17 @@
  */
 @property (nonatomic, copy) NSString *desc;
 /**
- 图片<有的话>
+ 图片地址
  */
 @property (nonatomic, copy) NSString *img;
+/**
+ 图片
+ */
+@property (nonatomic, copy) UIImage *image;
+/**
+ 是否选中
+ */
+@property (nonatomic, getter=isSelected) BOOL selected;
 /**
  预留传值
  */

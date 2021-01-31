@@ -418,7 +418,6 @@
 		BF55091E23E7B4770056BDFA /* WXLyricViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF55091D23E7B4770056BDFA /* WXLyricViewController.m */; };
 		BF55092123E7B9940056BDFA /* WXArtworkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF55092023E7B9940056BDFA /* WXArtworkViewController.m */; };
 		BF55092423E7F45C0056BDFA /* WXMusicPlayerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = BF55092323E7F45C0056BDFA /* WXMusicPlayerButton.m */; };
-		BF6CDDB523A50CE60008600E /* WXLivePhotoController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6CDDB423A50CE60008600E /* WXLivePhotoController.m */; };
 		BF7B2ED623EC6553003D923F /* WXCallButton.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B2ED523EC6553003D923F /* WXCallButton.m */; };
 		BF7B2ED923EC65FD003D923F /* WXVoiceCallController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B2ED723EC65FD003D923F /* WXVoiceCallController.m */; };
 		BF7B2EDC23EC66AD003D923F /* WXCallTransitionAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = BF7B2EDB23EC66AD003D923F /* WXCallTransitionAnimator.m */; };
@@ -437,8 +436,6 @@
 		BFA0112823D9D4A700B594B5 /* SESessionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0112723D9D4A700B594B5 /* SESessionCell.m */; };
 		BFA0112B23D9DA0800B594B5 /* SESessionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0112A23D9DA0800B594B5 /* SESessionHeader.m */; };
 		BFA0112E23D9E1CC00B594B5 /* SEIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0112D23D9E1CC00B594B5 /* SEIndicatorView.m */; };
-		BFA28AEC23A4E2DB003CB264 /* WXVideoCropView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA28AEA23A4E2DB003CB264 /* WXVideoCropView.m */; };
-		BFA28AEF23A4E336003CB264 /* WXVideoCropController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA28AEE23A4E336003CB264 /* WXVideoCropController.m */; };
 		BFA5079B23D6DD5A00F2CD17 /* WXContactsSelectController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA5079A23D6DD5A00F2CD17 /* WXContactsSelectController.m */; };
 		BFA507A123D6F24F00F2CD17 /* WXSendCardAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA507A023D6F24F00F2CD17 /* WXSendCardAlertView.m */; };
 		BFA9BEC423FAE65E00EA6963 /* WXEmotionMessageViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA9BEC323FAE65E00EA6963 /* WXEmotionMessageViewModel.m */; };
@@ -1687,8 +1684,6 @@
 		BF55092023E7B9940056BDFA /* WXArtworkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXArtworkViewController.m; sourceTree = "<group>"; };
 		BF55092223E7F45C0056BDFA /* WXMusicPlayerButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXMusicPlayerButton.h; sourceTree = "<group>"; };
 		BF55092323E7F45C0056BDFA /* WXMusicPlayerButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXMusicPlayerButton.m; sourceTree = "<group>"; };
-		BF6CDDB323A50CE60008600E /* WXLivePhotoController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLivePhotoController.h; sourceTree = "<group>"; };
-		BF6CDDB423A50CE60008600E /* WXLivePhotoController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXLivePhotoController.m; sourceTree = "<group>"; };
 		BF7B2ED423EC6553003D923F /* WXCallButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCallButton.h; sourceTree = "<group>"; };
 		BF7B2ED523EC6553003D923F /* WXCallButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCallButton.m; sourceTree = "<group>"; };
 		BF7B2ED723EC65FD003D923F /* WXVoiceCallController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVoiceCallController.m; sourceTree = "<group>"; };
@@ -1724,10 +1719,6 @@
 		BFA0112A23D9DA0800B594B5 /* SESessionHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SESessionHeader.m; sourceTree = "<group>"; };
 		BFA0112C23D9E1CC00B594B5 /* SEIndicatorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEIndicatorView.h; sourceTree = "<group>"; };
 		BFA0112D23D9E1CC00B594B5 /* SEIndicatorView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SEIndicatorView.m; sourceTree = "<group>"; };
-		BFA28AEA23A4E2DB003CB264 /* WXVideoCropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVideoCropView.m; sourceTree = "<group>"; };
-		BFA28AEB23A4E2DB003CB264 /* WXVideoCropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXVideoCropView.h; sourceTree = "<group>"; };
-		BFA28AED23A4E336003CB264 /* WXVideoCropController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXVideoCropController.h; sourceTree = "<group>"; };
-		BFA28AEE23A4E336003CB264 /* WXVideoCropController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXVideoCropController.m; sourceTree = "<group>"; };
 		BFA5079923D6DD5A00F2CD17 /* WXContactsSelectController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXContactsSelectController.h; sourceTree = "<group>"; };
 		BFA5079A23D6DD5A00F2CD17 /* WXContactsSelectController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXContactsSelectController.m; sourceTree = "<group>"; };
 		BFA5079F23D6F24F00F2CD17 /* WXSendCardAlertView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXSendCardAlertView.h; sourceTree = "<group>"; };
@@ -4312,10 +4303,6 @@
 		BFA28AE823A4E232003CB264 /* live */ = {
 			isa = PBXGroup;
 			children = (
-				BFA28AED23A4E336003CB264 /* WXVideoCropController.h */,
-				BFA28AEE23A4E336003CB264 /* WXVideoCropController.m */,
-				BF6CDDB323A50CE60008600E /* WXLivePhotoController.h */,
-				BF6CDDB423A50CE60008600E /* WXLivePhotoController.m */,
 				E8F71E0925C5D31300F67DCE /* WXSelectCoverController.h */,
 				E8F71E0A25C5D31300F67DCE /* WXSelectCoverController.m */,
 			);
@@ -4325,8 +4312,6 @@
 		BFA28AE923A4E26F003CB264 /* live */ = {
 			isa = PBXGroup;
 			children = (
-				BFA28AEB23A4E2DB003CB264 /* WXVideoCropView.h */,
-				BFA28AEA23A4E2DB003CB264 /* WXVideoCropView.m */,
 				E8F71E1225C5D44B00F67DCE /* WXSelectCoverView.h */,
 				E8F71E1325C5D44B00F67DCE /* WXSelectCoverView.m */,
 				E8F71E1825C5DD9000F67DCE /* WXSelectCoverCell.h */,
@@ -4695,12 +4680,12 @@
 		E869C6082570EF620017025E /* MNLivePhoto */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6092570EF620017025E /* MNQuickTime.m */,
 				E869C60A2570EF620017025E /* MNJPEG.h */,
-				E869C60B2570EF620017025E /* MNLivePhoto.h */,
-				E869C60C2570EF620017025E /* MNQuickTime.h */,
 				E869C60D2570EF620017025E /* MNJPEG.m */,
+				E869C60B2570EF620017025E /* MNLivePhoto.h */,
 				E869C60E2570EF620017025E /* MNLivePhoto.m */,
+				E869C60C2570EF620017025E /* MNQuickTime.h */,
+				E869C6092570EF620017025E /* MNQuickTime.m */,
 			);
 			path = MNLivePhoto;
 			sourceTree = "<group>";
@@ -6191,7 +6176,6 @@
 				2055D68E22E007180012E43E /* UIPasteboard+YYText.m in Sources */,
 				2055D69B22E007180012E43E /* UIBarButtonItem+YYAdd.m in Sources */,
 				E869C9AA2570EF670017025E /* MNAssetHelper.m in Sources */,
-				BFA28AEF23A4E336003CB264 /* WXVideoCropController.m in Sources */,
 				2055D8D522E021A40012E43E /* MKAnnotationView+WebCache.m in Sources */,
 				E869C91D2570EF670017025E /* MNFileManager.m in Sources */,
 				201DB08D22E8953C0063E88A /* WXChangeInfoToolBar.m in Sources */,
@@ -6750,11 +6734,9 @@
 				E869CA3E2570EF680017025E /* MJRefreshHeader.m in Sources */,
 				201DAF6022E8945F0063E88A /* WXMomentWebpage.m in Sources */,
 				E869C8CB2570EF670017025E /* MNExtendViewController.m in Sources */,
-				BF6CDDB523A50CE60008600E /* WXLivePhotoController.m in Sources */,
 				201DB0A722E8953C0063E88A /* WXMapHeaderView.m in Sources */,
 				E869C9C12570EF670017025E /* UISlider+MNHelper.m in Sources */,
 				E869C9DF2570EF680017025E /* NSArray+MNHelper.m in Sources */,
-				BFA28AEC23A4E2DB003CB264 /* WXVideoCropView.m in Sources */,
 				201DAEE922E894410063E88A /* WXChatLocationController.m in Sources */,
 				E869C8FC2570EF670017025E /* MNKVStorage.m in Sources */,
 				2055D8D922E021A40012E43E /* UIImage+ForceDecode.m in Sources */,

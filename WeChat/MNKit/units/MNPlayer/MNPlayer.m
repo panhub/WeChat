@@ -334,9 +334,9 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     progress = MIN(MAX(progress, 0.f), 1.f);
     CMTime time = playerItem.duration;
     time.value = time.value*progress;
-    if (_state == MNPlayerStatePause && progress >= .999f) {
+    if (_state == MNPlayerStatePause && progress >= .99f) {
         _state = MNPlayerStateFinished;
-    } else if (_state == MNPlayerStateFinished && progress < .999f) {
+    } else if (_state == MNPlayerStateFinished && progress < .99f) {
         _state = MNPlayerStatePause;
     }
     [_player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completion];

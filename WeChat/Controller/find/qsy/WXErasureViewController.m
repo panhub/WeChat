@@ -44,7 +44,7 @@
     UIButton *extractButton = [UIButton buttonWithFrame:CGRectZero image:[UIImage imageWithColor:THEME_COLOR] title:@"提取视频" titleColor:UIColor.whiteColor titleFont:[UIFont systemFontOfSize:16.f]];
     [extractButton sizeToFit];
     extractButton.width_mn += 25.f;
-    extractButton.height_mn = 43.f;
+    extractButton.height_mn = 42.f;
     extractButton.top_mn = self.navigationBar.bottom_mn + 17.f;
     extractButton.right_mn = scrollView.width_mn - 15.f;
     UIViewSetCornerRadius(extractButton, 5.f);
@@ -60,7 +60,7 @@
     textField.borderStyle = UITextBorderStyleNone;
     textField.keyboardType = UIKeyboardTypeURL;
     textField.returnKeyType = UIReturnKeySearch;
-    UIViewSetBorderRadius(textField, 5.f, .9f, [UIColor.grayColor colorWithAlphaComponent:.13f]);
+    UIViewSetBorderRadius(textField, 5.f, .9f, [UIColor.grayColor colorWithAlphaComponent:.12f]);
     UIView *leftView = [[UIView alloc] init];
     leftView.width_mn = 7.f;
     leftView.height_mn = textField.height_mn;

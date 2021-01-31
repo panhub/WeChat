@@ -7,9 +7,11 @@
 //
 
 #import "WXSelectCoverCell.h"
+#import "WXDataValueModel.h"
 
-@protocol WXSelectCoverCell <NSObject>
-
+@interface WXSelectCoverCell ()
+@property (nonatomic, strong) UIView *selectView;
+@property (nonatomic, strong) UIImageView *selectImageView;
 @end
 
 @implementation WXSelectCoverCell
@@ -20,13 +22,32 @@
         self.imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;
         self.imageView.clipsToBounds = YES;
+        
+        UIView *selectView = [[UIView alloc] initWithFrame:self.contentView.bounds];
+        selectView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:.65f];
+        selectView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        UIViewSetBorderRadius(selectView, 0.f, 1.5f, THEME_COLOR);
+        [self.contentView addSubview:selectView];
+        self.selectView = selectView;
+        
+        UIImageView *selectImageView = [UIImageView imageViewWithFrame:CGRectZero image:[MNBundle imageForResource:@"player_done"]];
+        [selectView addSubview:selectImageView];
+        self.selectImageView = selectImageView;
     }
     return self;
 }
 
-- (void)setImage:(UIImage *)image {
-    _image = image;
-    self.imageView.image = image;
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGFloat wh = floor(MIN(15.f, MIN(self.selectView.size_mn.width/2.f, self.selectView.size_mn.height/2.f)));
+    self.selectImageView.size_mn = CGSizeMake(wh, wh);
+    self.selectImageView.center_mn = self.selectView.bounds_center;
+}
+
+- (void)setModel:(WXDataValueModel *)model {
+    _model = model;
+    self.imageView.image = model.image;
+    self.selectView.hidden = !model.isSelected;
 }
 
 @end

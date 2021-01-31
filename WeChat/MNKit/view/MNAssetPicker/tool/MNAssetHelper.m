@@ -784,10 +784,14 @@ static MNAssetHelper *_helper;
 #if __has_include(<Photos/PHLivePhoto.h>)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
++ (void)writeLivePhoto:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completion {
+    [self writeLivePhotoWithImagePath:[livePhoto valueForKey:@"imageURL"] videoPath:[livePhoto valueForKey:@"videoURL"] completion:completion];
+}
+
 + (void)writeLivePhotoWithImagePath:(id)imagePath videoPath:(id)videoPath completion:(void(^)(NSString *, NSError *))completion {
-    NSURL *videoURL = [videoPath isKindOfClass:NSURL.class] ? videoPath : [NSURL fileURLWithPath:videoPath];
-    NSURL *imageURL = [imagePath isKindOfClass:NSURL.class] ? imagePath : [NSURL fileURLWithPath:imagePath];
-    if (![NSFileManager.defaultManager fileExistsAtPath:imageURL.path] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path]) {
+    NSURL *videoURL = [videoPath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:videoPath] : videoPath;
+    NSURL *imageURL = [imagePath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:imagePath] : imagePath;
+    if (!videoURL || !imageURL || ![NSFileManager.defaultManager fileExistsAtPath:imageURL.path] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path]) {
         if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"LivePhoto文件不存在"}]);
         return;
     }

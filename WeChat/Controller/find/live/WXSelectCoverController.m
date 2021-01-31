@@ -9,23 +9,26 @@
 #import "WXSelectCoverController.h"
 #import "WXSelectCoverView.h"
 #import "NSBundle+MNHelper.h"
+#import "WXDataValueModel.h"
 #import "MNFileHandle.h"
 #import "MNFileManager.h"
+#import "MNAsset.h"
+#import "MNAssetPreviewController.h"
 #import "MNAssetExporter+MNExportMetadata.h"
 
 #define MNVideoTailorMargin 15.f
 #define MNVideoTailorInterval 20.f
 #define MNVideoTailorButtonTag  100
 
-@interface WXSelectCoverController ()<MNPlayerDelegate, WXCoverViewDelegate>
+@interface WXSelectCoverController ()<MNPlayerDelegate, WXCoverViewDelegate, MNAssetPreviewDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UILabel *timeLabel;
 @property (nonatomic, strong) UIButton *doneButton;
 @property (nonatomic, strong) UIControl *playControl;
 @property (nonatomic, strong) MNPlayView *playView;
-@property (nonatomic, strong) MNCropView *cropView;
+@property (nonatomic, strong) MNLivePhoto *livePhoto;
 @property (nonatomic, strong) UIImageView *badgeView;
-@property (nonatomic, strong) UIButton *resolutionButton;
+@property (nonatomic, strong) CAShapeLayer *progressLayer;
 @property (nonatomic, strong) WXSelectCoverView *coverView;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 @end
@@ -50,7 +53,7 @@
     closeButton.bottom_mn = self.contentView.height_mn - MAX(MNVideoTailorMargin, MN_TAB_SAFE_HEIGHT + 7.f);
     closeButton.touchInset = UIEdgeInsetWith(-7.f);
     [closeButton setBackgroundImage:[closeButton backgroundImageForState:UIControlStateNormal] forState:UIControlStateHighlighted];
-    //[closeButton addTarget:self action:@selector(closeButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [closeButton addTarget:self action:@selector(closeButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:closeButton];
     
     UIButton *doneButton = [UIButton buttonWithFrame:CGRectZero image:[MNBundle imageForResource:@"player_done"] title:nil titleColor:nil titleFont:nil];
@@ -60,7 +63,7 @@
     doneButton.touchInset = closeButton.touchInset;
     doneButton.enabled = NO;
     [doneButton setBackgroundImage:[doneButton backgroundImageForState:UIControlStateNormal] forState:UIControlStateHighlighted];
-    //[doneButton addTarget:self action:@selector(doneButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [doneButton addTarget:self action:@selector(doneButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:doneButton];
     self.doneButton = doneButton;
     
@@ -77,7 +80,7 @@
     playControl.userInteractionEnabled = NO;
     playControl.backgroundColor = [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1.f];
     [playControl.layer setMaskRadius:4.f byCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft];
-    //[playControl addTarget:self action:@selector(playControlTouchUpInside) forControlEvents:UIControlEventTouchUpInside];
+    [playControl addTarget:self action:@selector(playControlTouchUpInside) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:playControl];
     self.playControl = playControl;
     
@@ -89,11 +92,9 @@
     [playControl addSubview:badgeView];
     self.badgeView = badgeView;
     
-    WXSelectCoverView *coverView = [[WXSelectCoverView alloc] initWithFrame:CGRectMake(playControl.right_mn + 1.3f, 0.f, doneButton.right_mn - playControl.right_mn - 1.3f, playControl.height_mn) size:self.naturalSize];
+    WXSelectCoverView *coverView = [[WXSelectCoverView alloc] initWithFrame:CGRectMake(playControl.right_mn + 2.f, 0.f, doneButton.right_mn - playControl.right_mn - 2.f, playControl.height_mn) videoPath:self.videoPath];
     coverView.delegate = self;
-    coverView.videoPath = self.videoPath;
     coverView.bottom_mn = playControl.bottom_mn;
-    coverView.userInteractionEnabled = NO;
     [self.contentView addSubview:coverView];
     self.coverView = coverView;
     
@@ -120,12 +121,21 @@
     playView.touchEnabled = NO;
     playView.autoresizingMask = UIViewAutoresizingNone;
     playView.center_mn = CGPointMake(self.contentView.width_mn/2.f, height/2.f + top);
-    playView.touchInset = UIEdgeInsetWith(-20.f);
     playView.backgroundColor = [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1.f];
     playView.backgroundImage = self.thumbnail;
-    UIViewSetBorderRadius(playView, 0.f, (MN_IS_LOW_SCALE ? 1.f : .8f), playView.backgroundColor);
     [self.contentView addSubview:playView];
     self.playView = playView;
+    
+    // 进度条
+    CAShapeLayer *progressLayer = [CAShapeLayer layer];
+    progressLayer.path = [UIBezierPath bezierPathWithRect:playView.bounds].CGPath;
+    progressLayer.lineWidth = 1.f;
+    progressLayer.fillColor = UIColor.clearColor.CGColor;
+    progressLayer.strokeColor = THEME_COLOR.CGColor;
+    progressLayer.strokeStart = 0.f;
+    progressLayer.strokeEnd = 0.f;
+    [playView.layer addSublayer:progressLayer];
+    self.progressLayer = progressLayer;
     
     // 加载动画
     UIActivityIndicatorView *indicatorView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -153,11 +163,10 @@
 #pragma mark - MNPlayerDelegate
 - (void)playerDidEndDecode:(MNPlayer *)player {
     self.doneButton.enabled = YES;
-    self.coverView.userInteractionEnabled = YES;
     self.playControl.userInteractionEnabled = YES;
     [self.indicatorView stopAnimating];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.playView.layer.contents = nil;
+        self.playView.backgroundImage = nil;
     });
 }
 
@@ -172,6 +181,9 @@
     if (components.count <= 1) return;
     NSString *duration = [NSDate timeStringWithInterval:@(player.currentTimeInterval)];
     self.timeLabel.text = [NSString stringWithFormat:@"%@/%@", duration, components.lastObject];
+    [CALayer performWithoutAnimation:^{
+        self.progressLayer.strokeEnd = player.progress;
+    }];
 }
 
 - (void)playerDidPlayFailure:(MNPlayer *)player {
@@ -199,20 +211,73 @@
         [weakself closeButtonTouchUpInside:nil];
     } ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:self.view];
 }
+/**选择截图*/
+- (void)coverViewDidSelectThumbnail:(WXDataValueModel *)model {
+    @weakify(self);
+    CGFloat progress = [model.value floatValue];
+    [self.player seekToProgress:progress completion:^(BOOL finished) {
+        if (!weakself.player.isPlaying && finished) {
+            [CALayer performWithoutAnimation:^{
+                weakself.progressLayer.strokeEnd = progress;
+            }];
+        }
+    }];
+}
+
+#pragma mark - MNAssetPreviewDelegate
+- (void)previewController:(MNAssetPreviewController *)previewController rightBarItemTouchUpInside:(UIControl *)sender {
+    @weakify(self);
+    @weakify(previewController);
+    [previewController.view showActivityDialog:@"请稍后"];
+    [MNAssetHelper writeLivePhoto:self.livePhoto.content completion:^(NSString * _Nullable identifier, NSError * _Nullable error) {
+        if (identifier.length <= 0 || error) {
+            [weakpreviewController.view showInfoDialog:@"LivePhoto保存失败"];
+        } else {
+            [weakpreviewController.view closeDialogWithCompletionHandler:^{
+                [weakself.livePhoto removeFiles];
+                UIViewController *vc = weakself.navigationController.viewControllers[[weakself.navigationController.viewControllers indexOfObject:weakself] - 1];
+                [weakself.navigationController popToViewController:vc animated:YES];
+            }];
+        }
+    }];
+}
 
 #pragma mark - Event
+- (void)playControlTouchUpInside {
+    if (self.player.isPlaying) {
+        [self.player pause];
+    } else {
+        [self.player play];
+    }
+}
+
 - (void)closeButtonTouchUpInside:(UIButton *)closeButton {
-//    if (self.player.isPlaying) [self.player pause];
-//    BOOL responds = NO;
-//    if (self.didCancelHandler) {
-//        responds = YES;
-//        self.didCancelHandler(self);
-//    }
-//    if ([self.delegate respondsToSelector:@selector(videoTailorControllerDidCancel:)]) {
-//        responds = YES;
-//        [self.delegate videoTailorControllerDidCancel:self];
-//    }
-//    if (!responds && self.navigationController) [self.navigationController popViewControllerAnimated:YES];
+    [self.player pause];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)doneButtonTouchUpInside:(UIButton *)closeButton {
+    if (self.player.isPlaying) [self.player pause];
+    if (self.livePhoto) [self.livePhoto removeFiles];
+    @weakify(self);
+    [self.view showProgressDialog:@"LivePhoto导出中"];
+    WXDataValueModel *model = self.coverView.coverModel;
+    [MNLivePhoto requestLivePhotoWithVideoFileAtPath:self.videoPath stillSeconds:[model.value floatValue]*self.duration progressHandler:^(float progress) {
+        [weakself.view updateDialogProgress:progress];
+    } completionHandler:^(MNLivePhoto *livePhoto) {
+        if (livePhoto) {
+            [weakself.view closeDialogWithCompletionHandler:^{
+                weakself.livePhoto = livePhoto;
+                MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:@[[MNAsset assetWithContent:livePhoto.content]]];
+                vc.delegate = weakself;
+                vc.cleanAssetWhenDealloc = YES;
+                vc.events = MNAssetPreviewEventDone;
+                [weakself.navigationController pushViewController:vc animated:YES];
+            }];
+        } else {
+            [weakself.view showInfoDialog:@"LivePhoto导出失败"];
+        }
+    }];
 }
 
 #pragma mark - Setter
@@ -223,6 +288,11 @@
         if (!self.thumbnail) self.thumbnail = [MNAssetExporter exportThumbnailOfVideoAtPath:videoPath];
         if (CGSizeEqualToSize(self.naturalSize, CGSizeZero)) self.naturalSize = [MNAssetExporter exportNaturalSizeOfVideoAtPath:videoPath];
     }
+}
+
+#pragma mark - dealloc
+- (void)dealloc {
+    if (self.livePhoto) [self.livePhoto removeFiles];
 }
 
 @end

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #if __has_include(<Photos/PHLivePhoto.h>)
+@class PHLivePhoto;
 
 @interface MNLivePhoto : NSObject
 /**
@@ -19,28 +20,33 @@
  */
 @property (nonatomic, copy, readonly) NSURL *imageURL;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_1
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
 /**
  LivePhoto
  */
-@property (nonatomic, strong, readonly) id content;
+@property (nonatomic, strong, readonly) PHLivePhoto *content;
+#pragma clang diagnostic pop
 
 /**
  生成LivePhoto<MNLivePhoto>
  @param videoPath 视频路径
  @param completionHandler 完成回调
  */
-+ (void)requestLivePhotoWithVideoResourceOfPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
                               completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler;
 
 /**
  生成LivePhoto<MNLivePhoto><进度>
  @param videoPath 视频路径
+ @param seconds 瞬时照片秒数
  @param progressHandler 进度回调
  @param completionHandler 完成回调
 */
-+ (void)requestLivePhotoWithVideoResourceOfPath:(NSString *)videoPath
-                                progressHandler:(void(^)(float  progress))progressHandler
-                              completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler;
++ (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
+                               stillSeconds:(NSTimeInterval)seconds
+                            progressHandler:(void(^)(float  progress))progressHandler
+                    completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler;
 #endif
 
 /**
@@ -48,23 +54,25 @@
  @param videoPath 视频路径
  @param completionHandler 完成回调
  */
-+ (void)requestLivePhotoWithVideoPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler;
 
 /**
  生成LivePhoto<本地路径><进度>
  @param videoPath 视频路径
+ @param seconds 瞬时照片秒数
  @param progressHandler 进度回调
  @param completionHandler 完成回调
 */
-+ (void)requestLivePhotoWithVideoPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
+                           stillSeconds:(NSTimeInterval)seconds
                       progressHandler:(void(^)(float  progress))progressHandler
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler;
 
 /**
  删除本地文件
  */
-- (void)removeContents;
+- (void)removeFiles;
 
 @end
 #endif

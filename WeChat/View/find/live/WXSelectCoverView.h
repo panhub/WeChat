@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-@class WXSelectCoverView;
+@class WXSelectCoverView, WXDataValueModel;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXCoverViewDelegate <NSObject>
 @optional
+/**选择截图*/
+- (void)coverViewDidSelectThumbnail:(WXDataValueModel *_Nonnull)model;
 /**开始加载截图*/
 - (void)coverViewBeginLoadThumbnails:(WXSelectCoverView *_Nonnull)coverView;
 /**已经加载截图*/
@@ -23,11 +25,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WXSelectCoverView : UIView
 
-@property (nonatomic, copy) NSString *videoPath;
+/**选择模型*/
+@property (nonatomic, readonly, nullable) WXDataValueModel *coverModel;
 
+/**交互代理*/
 @property (nonatomic, weak) id<WXCoverViewDelegate> delegate;
 
-- (instancetype)initWithFrame:(CGRect)frame size:(CGSize)coverSize;
+/**
+ 实例化封面视图
+ */
+- (instancetype)initWithFrame:(CGRect)frame videoPath:(NSString *)videoPath;
 
 /**
  加载视频截图

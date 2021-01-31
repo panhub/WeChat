@@ -381,7 +381,7 @@
 
 - (AVAssetWriterInputMetadataAdaptor *)writerInputMetadataAdaptor {
     NSDictionary *spec = @{
-                           (__bridge NSString *)kCMMetadataFormatDescriptionMetadataSpecificationKey_Identifier:[NSString stringWithFormat:@"%@/%@",kQuickTimeMetadataKey,kQuickTimeStillImageKey],
+                           (__bridge NSString *)kCMMetadataFormatDescriptionMetadataSpecificationKey_Identifier:[NSString stringWithFormat:@"%@/%@", kQuickTimeMetadataKey, kQuickTimeStillImageKey],
                            (__bridge NSString *)kCMMetadataFormatDescriptionMetadataSpecificationKey_DataType:@"com.apple.metadata.datatype.int8"
                            };
     CMFormatDescriptionRef desc = nil;

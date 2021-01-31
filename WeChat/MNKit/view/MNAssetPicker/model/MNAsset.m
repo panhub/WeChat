@@ -96,6 +96,7 @@
             model->_fileSize = videoSize ? videoSize.longLongValue : 0;
         }
     } else if ([content isKindOfClass:NSClassFromString(@"PHLivePhoto")]) {
+        model->_type = MNAssetTypeLivePhoto;
 #if __has_include(<Photos/PHLivePhoto.h>)
         if (@available(iOS 9.1, *)) {
             NSURL *videoURL = [content valueForKey:@"videoURL"];
@@ -114,7 +115,6 @@
             }
         }
 #endif
-        model->_type = MNAssetTypeLivePhoto;
     }
     model->_fileSizeString = model.fileSizeStringValue;
     return model;

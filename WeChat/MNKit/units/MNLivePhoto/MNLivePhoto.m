@@ -16,19 +16,18 @@
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_1
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
-+ (void)requestLivePhotoWithVideoResourceOfPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
                               completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler
 {
-    [self requestLivePhotoWithVideoResourceOfPath:videoPath
-                                  progressHandler:nil
-                                completionHandler:completionHandler];
+    [self requestLivePhotoWithVideoFileAtPath:videoPath stillSeconds:0.01f progressHandler:nil completionHandler:completionHandler];
 }
 
-+ (void)requestLivePhotoWithVideoResourceOfPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
+                                  stillSeconds:(NSTimeInterval)seconds
                                 progressHandler:(void(^)(float  progress))progressHandler
                               completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler
 {
-    [self requestLivePhotoWithVideoPath:videoPath progressHandler:^(float progress) {
+    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:seconds progressHandler:^(float progress) {
         if (progressHandler) progressHandler(MIN(.99f, progress));
     } completionHandler:^(NSString *jpgPath, NSString *movPath) {
         if (jpgPath && movPath) {
@@ -65,15 +64,14 @@
 #pragma clang diagnostic pop
 #endif
 
-+ (void)requestLivePhotoWithVideoPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler
 {
-    [self requestLivePhotoWithVideoPath:videoPath
-                        progressHandler:nil
-                      completionHandler:completionHandler];
+    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:0.01f progressHandler:nil completionHandler:completionHandler];
 }
 
-+ (void)requestLivePhotoWithVideoPath:(NSString *)videoPath
++ (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
+                           stillSeconds:(NSTimeInterval)seconds
                       progressHandler:(void(^)(float  progress))progressHandler
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler
 {
@@ -106,7 +104,8 @@
         generator.requestedTimeToleranceBefore = kCMTimeZero;
         generator.requestedTimeToleranceAfter = kCMTimeZero;
         generator.maximumSize = naturalSize;
-        CGImageRef imageRef = [generator copyCGImageAtTime:CMTimeMakeWithSeconds(.01f, videoAsset.duration.timescale) actualTime:NULL error:NULL];
+        
+        CGImageRef imageRef = [generator copyCGImageAtTime:CMTimeMakeWithSeconds(MAX(0.01f, MIN(CMTimeGetSeconds(videoAsset.duration), seconds)), videoAsset.duration.timescale) actualTime:NULL error:NULL];
         if (!imageRef) {
             NSLog(@"video thumbnail error");
             if (completionHandler) completionHandler(nil, nil);
@@ -141,9 +140,11 @@
     return [directories.lastObject stringByAppendingPathComponent:[NSString stringWithFormat:@"MNLivePhoto/%@.%@", name, extension]];
 }
 
-- (void)removeContents {
+- (void)removeFiles {
     if (self.videoURL) [NSFileManager.defaultManager removeItemAtURL:self.videoURL error:nil];
     if (self.imageURL) [NSFileManager.defaultManager removeItemAtURL:self.imageURL error:nil];
+    self->_videoURL = nil;
+    self->_videoURL = nil;
 }
 
 @end

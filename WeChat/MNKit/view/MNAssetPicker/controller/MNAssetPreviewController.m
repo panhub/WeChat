@@ -28,7 +28,6 @@
     if (self = [super init]) {
         self.assets = asset;
         self.events = MNAssetPreviewEventNone;
-        self.currentDisplayIndex = -1;
         self.statusBarHidden = UIApplication.sharedApplication.isStatusBarHidden;
     }
     return self;
