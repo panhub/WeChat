@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  标记展示它的imageView<预览时使用>
  */
-@property (nonatomic, weak, nullable) UIView *containerView;
+@property (nonatomic, weak, nullable) __kindof UIView *containerView;
 /**
  缩略图回调
  */

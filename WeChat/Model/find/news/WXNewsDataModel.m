@@ -23,7 +23,7 @@
     if (thumbnail_pic_s.length) [imgs addObject:thumbnail_pic_s];
     if (thumbnail_pic_s02.length) [imgs addObject:thumbnail_pic_s02];
     if (thumbnail_pic_s03.length) [imgs addObject:thumbnail_pic_s03];
-    m.imgs = imgs.count ? imgs.copy : nil;
+    m.imgs = imgs.count ? imgs : nil;
     return m;
 }
 

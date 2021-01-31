@@ -9,6 +9,7 @@
 #import "WXNewsCell.h"
 #import "WXNewsViewModel.h"
 #import "WXExtendViewModel.h"
+#import "UIImageView+WebCache.h"
 
 @interface WXNewsCell ()
 @property (nonatomic, strong) UILabel *dateLabel;
@@ -40,7 +41,8 @@
             imageView.contentMode = UIViewContentModeScaleAspectFill;
             imageView.clipsToBounds = YES;
             imageView.layer.cornerRadius = 4.f;
-            imageView.backgroundColor = UIColor.yellowColor;
+            imageView.userInteractionEnabled = YES;
+            [imageView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(imageViewTouchUpInside:), nil)];
             [self.contentView addSubview:imageView];
             [imageViews addObject:imageView];
         }
@@ -73,9 +75,32 @@
     [self.imageViews setValue:@(YES) forKey:@"hidden"];
     [viewModel.imageViewModels enumerateObjectsUsingBlock:^(WXExtendViewModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
-        self.imageViews[idx].hidden = NO;
-        
+        UIImageView *imageView = self.imageViews[idx];
+        imageView.frame = obj.frame;
+        imageView.hidden = NO;
+        [imageView sd_setImageWithURL:[NSURL URLWithString:obj.content] placeholderImage:nil];
     }];
+}
+
+- (void)imageViewTouchUpInside:(UITapGestureRecognizer *)recognizer {
+    UIImageView *imageView = (UIImageView *)recognizer.view;
+    if (!imageView.image) return;
+    NSArray <UIImageView *>*result = [self.imageViews filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.hidden == NO && self.image != nil"]];
+    if (result.count <= 0 || ![result containsObject:imageView]) return;
+    NSMutableArray <MNAsset *>*assets = @[].mutableCopy;
+    [result enumerateObjectsUsingBlock:^(UIImageView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        MNAsset *m = MNAsset.new;
+        m.thumbnail = obj.image;
+        m.content = obj.image;
+        m.type = MNAssetTypePhoto;
+        m.containerView = obj;
+        [assets addObject:m];
+    }];
+    MNAssetBrowser *browser = [[MNAssetBrowser alloc] initWithAssets:assets];
+    browser.statusBarHidden = NO;
+    browser.backgroundColor = UIColor.blackColor;
+    browser.statusBarStyle = UIStatusBarStyleLightContent;
+    [browser presentFromIndex:[result indexOfObject:imageView] animated:YES];
 }
 
 - (void)awakeFromNib {

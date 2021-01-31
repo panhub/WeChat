@@ -80,13 +80,12 @@ const CGFloat MNAssetBrowseDismissAnimationDuration = .46f;
     self.currentDisplayIndex = -1;
     self.tag = MNAssetBrowserTag;
     self.events = MNAssetBrowseEventNone;
-}
-
-- (void)createView {
-    
     self.statusBarOriginalStyle = [[UIApplication sharedApplication] statusBarStyle];
     self.statusBarOriginalHidden = [[UIApplication sharedApplication] isStatusBarHidden];
     self.statusBarStyle = self.statusBarOriginalStyle;
+}
+
+- (void)createView {
     
     UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
     backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;

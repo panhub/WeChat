@@ -31,18 +31,19 @@
     self.navigationBar.shadowView.hidden = YES;
     self.navigationBar.backgroundColor = UIColor.whiteColor;
     self.contentView.backgroundColor = UIColor.whiteColor;
-    
-    MNSegmentController *segmentController = [[MNSegmentController alloc] initWithFrame:self.contentView.bounds];
-    segmentController.delegate = self;
-    segmentController.dataSource = self;
-    self.segmentController = segmentController;
-    
-    [self addChildViewController:segmentController inView:self.contentView];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    MNSegmentController *segmentController = [[MNSegmentController alloc] initWithFrame:self.contentView.bounds];
+    segmentController.delegate = self;
+    segmentController.dataSource = self;
+    segmentController.fixedHeight = MN_NAV_BAR_HEIGHT;
+    self.segmentController = segmentController;
+    
+    [self addChildViewController:segmentController inView:self.contentView];
 }
 
 - (void)loadData {
@@ -57,6 +58,12 @@
 }
 
 #pragma mark - MNSegmentControllerDelegate && MNSegmentControllerDataSource
+- (UIView *)segmentControllerShouldLoadHeaderView:(MNSegmentController *)segmentController {
+    [self.navigationBar removeFromSuperview];
+    return self.navigationBar;
+}
+
+
 - (NSArray <NSString *>*)segmentControllerShouldLoadPageTitles:(MNSegmentController *)segmentController {
     NSMutableArray <NSString *>*titles = [NSMutableArray arrayWithCapacity:self.categorys.count];
     [self.categorys.copy enumerateObjectsUsingBlock:^(WXNewsCategory * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -77,21 +84,24 @@
     configuration.shadowMask = MNSegmentShadowMaskFit;
     configuration.backgroundColor = UIColor.whiteColor;
     configuration.titleFont = [UIFont systemFontOfSize:16.5f];
-    configuration.titleColor = UIColor.darkTextColor;
+    configuration.selectedTitleFont = [UIFont systemFontOfSize:16.5f];
+    configuration.titleColor = [UIColor.darkTextColor colorWithAlphaComponent:.93f];
     configuration.selectedColor = THEME_COLOR;
     configuration.shadowColor = THEME_COLOR;
     configuration.shadowSize = CGSizeMake(10.f, 2.f);
     configuration.separatorColor = [UIColor.grayColor colorWithAlphaComponent:.15f];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)segmentControllerPageDidScroll:(MNSegmentController *)segmentController {
+    CGFloat contentOffsetY = segmentController.contentOffset.y;
+    //contentOffsetY = MIN(contentOffsetY, MN_NAV_BAR_HEIGHT);
+    //self.navigationBar.alpha = (contentOffsetY - MN_NAV_BAR_HEIGHT)/MN_NAV_BAR_HEIGHT;
+    NSLog(@"%f", contentOffsetY);
 }
-*/
+
+#pragma mark - Super
+- (MNContentEdges)contentEdges {
+    return MNContentEdgeNone;
+}
 
 @end

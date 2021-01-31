@@ -9,6 +9,7 @@
 #import "WXNewsListController.h"
 #import "WXNewsCategory.h"
 #import "WXNewsDataModel.h"
+#import "WXNewsViewModel.h"
 #import "WXNewsRequest.h"
 #import "WXNewsCell.h"
 
@@ -42,6 +43,11 @@
     return self.httpRequest.dataArray.count;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    WXNewsViewModel *vm = self.httpRequest.dataArray[indexPath.row];
+    return vm.rowHeight;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WXNewsCell *cell = [[WXNewsCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"com.wx.news.identifier"];
     return cell;
@@ -49,6 +55,12 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(WXNewsCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     cell.viewModel = self.httpRequest.dataArray[indexPath.row];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    WXNewsViewModel *vm = self.httpRequest.dataArray[indexPath.row];
+    MNWebViewController *vc = [[MNWebViewController alloc] initWithUrl:vm.dataModel.url];
+    [self.parentViewController.navigationController pushViewController:vc animated:YES];
 }
 
 #pragma mark - MNSegmentSubpageDataSource
