@@ -4563,23 +4563,23 @@
 		E869C5CB2570EF610017025E /* MNAssetExport */ = {
 			isa = PBXGroup;
 			children = (
-				E869C5CC2570EF610017025E /* MNAssetExporter+MNExportSession.m */,
-				E869C5CD2570EF610017025E /* MNAssetExporter+MNExportMetadata.h */,
+				E869C5DA2570EF610017025E /* AVAsset+MNExportMetadata.h */,
 				E869C5CE2570EF610017025E /* AVAsset+MNExportMetadata.m */,
-				E869C5CF2570EF610017025E /* MNAssetExporter.h */,
-				E869C5D02570EF610017025E /* MNQRGenerator.h */,
-				E869C5D12570EF610017025E /* MNAssetExport.h */,
+				E869C5D82570EF610017025E /* AVAssetTrack+MNExportMetadata.h */,
 				E869C5D22570EF610017025E /* AVAssetTrack+MNExportMetadata.m */,
-				E869C5D32570EF610017025E /* MNVideoGenerator.m */,
-				E869C5D42570EF610017025E /* MNAssetExportSession.h */,
+				E869C5D12570EF610017025E /* MNAssetExport.h */,
+				E869C5CF2570EF610017025E /* MNAssetExporter.h */,
+				E869C5D92570EF610017025E /* MNAssetExporter.m */,
+				E869C5CD2570EF610017025E /* MNAssetExporter+MNExportMetadata.h */,
 				E869C5D52570EF610017025E /* MNAssetExporter+MNExportMetadata.m */,
 				E869C5D62570EF610017025E /* MNAssetExporter+MNExportSession.h */,
-				E869C5D72570EF610017025E /* MNQRGenerator.m */,
-				E869C5D82570EF610017025E /* AVAssetTrack+MNExportMetadata.h */,
-				E869C5D92570EF610017025E /* MNAssetExporter.m */,
-				E869C5DA2570EF610017025E /* AVAsset+MNExportMetadata.h */,
+				E869C5CC2570EF610017025E /* MNAssetExporter+MNExportSession.m */,
+				E869C5D42570EF610017025E /* MNAssetExportSession.h */,
 				E869C5DB2570EF610017025E /* MNAssetExportSession.m */,
+				E869C5D02570EF610017025E /* MNQRGenerator.h */,
+				E869C5D72570EF610017025E /* MNQRGenerator.m */,
 				E869C5DC2570EF610017025E /* MNVideoGenerator.h */,
+				E869C5D32570EF610017025E /* MNVideoGenerator.m */,
 			);
 			path = MNAssetExport;
 			sourceTree = "<group>";

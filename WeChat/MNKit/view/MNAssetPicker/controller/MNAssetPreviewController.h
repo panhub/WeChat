@@ -42,6 +42,9 @@ typedef NS_OPTIONS(NSInteger, MNAssetPreviewEvents) {
 /**当前展示索引*/
 @property (nonatomic, readonly) NSInteger currentDisplayIndex;
 
+/**是否允许自动播放*/
+@property (nonatomic, getter=isAllowsAutoPlaying) BOOL allowsAutoPlaying;
+
 /**交互代理*/
 @property (nonatomic, weak, nullable) id<MNAssetPreviewDelegate> delegate;
 

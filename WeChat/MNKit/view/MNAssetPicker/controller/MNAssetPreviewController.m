@@ -27,6 +27,8 @@
 - (instancetype)initWithAssets:(NSArray <MNAsset *>*)asset {
     if (self = [super init]) {
         self.assets = asset;
+        self.allowsAutoPlaying = YES;
+        self.currentDisplayIndex = NSIntegerMin;
         self.events = MNAssetPreviewEventNone;
         self.statusBarHidden = UIApplication.sharedApplication.isStatusBarHidden;
     }
@@ -133,7 +135,7 @@
 
 #pragma mark - MNAssetBrowseCellDelegate
 - (BOOL)assetBrowseCellShouldAutoPlaying:(MNAssetBrowseCell *)cell {
-    return YES;
+    return self.isAllowsAutoPlaying;
 }
 
 #pragma mark - 更新当前页
@@ -195,7 +197,6 @@
 }
 
 - (UIView *)navigationBarShouldCreateRightBarItem {
-    
     UIView *rightBarItem = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 25.f)];
     if (self.events & MNAssetPreviewEventSelect) {
         // 选择
@@ -224,6 +225,9 @@
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIControl *)rightItem {
     if ([self.delegate respondsToSelector:@selector(previewController:rightBarItemTouchUpInside:)]) {
+        if (rightItem.tag != MNAssetPreviewEventSelect) {
+            [[self cellForItemAtCurrentDisplayIndex] endDisplaying];
+        }
         [self.delegate previewController:self rightBarItemTouchUpInside:rightItem];
         if (rightItem.tag == MNAssetPreviewEventSelect) {
             MNAsset *asset = self.assets[self.currentDisplayIndex];

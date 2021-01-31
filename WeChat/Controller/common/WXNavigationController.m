@@ -23,8 +23,13 @@
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(nonnull UIViewController *)viewController animated:(BOOL)animated {
     if ([viewController isKindOfClass:MNExtendViewController.class]) {
         MNExtendViewController *vc = (MNExtendViewController *)viewController;
-        if ([vc respondsToSelector:@selector(navigationBarShouldDrawBackBarItem)] && [vc navigationBarShouldDrawBackBarItem] && ![vc respondsToSelector:@selector(navigationBarShouldCreateLeftBarItem)]) {
-            if (vc.isFirstAppear) vc.navigationBar.leftItemImage = [UIImage imageNamed:@"wx_common_back_black"];
+        if ([vc respondsToSelector:@selector(navigationBarShouldDrawBackBarItem)] && [vc navigationBarShouldDrawBackBarItem] && ![vc respondsToSelector:@selector(navigationBarShouldCreateLeftBarItem)] && vc.isFirstAppear) {
+            UIStatusBarStyle statusBarStyle = [vc preferredStatusBarStyle];
+            if (statusBarStyle == UIStatusBarStyleLightContent) {
+                vc.navigationBar.leftItemImage = [UIImage imageNamed:@"wx_common_back_white"];
+            } else {
+                vc.navigationBar.leftItemImage = [UIImage imageNamed:@"wx_common_back_black"];
+            }
         }
     }
 }

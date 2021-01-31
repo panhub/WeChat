@@ -215,7 +215,7 @@
 
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
     MNAssetPicker *picker = [[MNAssetPicker alloc] init];
-    picker.configuration.maxPickingCount = 1;
+    picker.configuration.maxPickingCount = 10;
     picker.configuration.maxExportPixel = 100.f;
     picker.configuration.allowsCapturing = NO;
     picker.configuration.allowsPreviewing = YES;

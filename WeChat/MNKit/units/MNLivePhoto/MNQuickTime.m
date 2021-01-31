@@ -32,6 +32,7 @@
     self = [super init];
     if (self) {
         self.frameRate = 30;
+        self.stillDuration = 0.7f;
         self.identifier = [[NSNumber numberWithLongLong:NSDate.date.timeIntervalSince1970*1000] stringValue];
     }
     return self;
@@ -230,7 +231,7 @@
     [assetWriter startSessionAtSourceTime:kCMTimeZero];
     
     // 开始后再追加
-    AVTimedMetadataGroup *metadataGroup = [[AVTimedMetadataGroup alloc] initWithItems:@[[self metadataForStillImageTime]] timeRange:CMTimeRangeMake(kCMTimeZero, CMTimeMakeWithSeconds(1.f, videoTrack.timeRange.duration.timescale))];
+    AVTimedMetadataGroup *metadataGroup = [[AVTimedMetadataGroup alloc] initWithItems:@[[self metadataForStillImageTime]] timeRange:CMTimeRangeMake(kCMTimeZero, CMTimeMakeWithSeconds(self.stillDuration, videoTrack.timeRange.duration.timescale))];
     [adapter appendTimedMetadataGroup:metadataGroup];
     
     dispatch_group_t group = dispatch_group_create();

@@ -330,7 +330,7 @@
     } else if (self.asset.type == MNAssetTypeLivePhoto) {
         if (@available(iOS 9.1, *)) {
             PHLivePhotoView *livePhotoView = (PHLivePhotoView *)self.livePhotoView;
-            [livePhotoView stopPlayback];
+            if (livePhotoView.livePhoto) [livePhotoView stopPlayback];
         }
     }
 }

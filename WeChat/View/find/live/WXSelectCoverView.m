@@ -25,6 +25,8 @@
         itemSize = CGSizeMultiplyToHeight(itemSize, self.height_mn);
         itemSize.width = floor(itemSize.width);
         
+        self.videoPath = videoPath;
+        
         self.backgroundColor = [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1.f];
         
         UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];

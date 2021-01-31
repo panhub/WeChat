@@ -42,6 +42,8 @@ typedef void(^MNMovExportCompletionHandler)(MNMovExportStatus status, NSError *_
 @interface MNQuickTime : NSObject
 /**视频帧率<15-60>*/
 @property (nonatomic) int frameRate;
+/**瞬时图动画时长*/
+@property (nonatomic) Float64 stillDuration;
 /**错误信息*/
 @property (nonatomic, copy, readonly) NSError *error;
 /**视频输出路径*/

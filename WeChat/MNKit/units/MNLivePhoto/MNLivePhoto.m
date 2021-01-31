@@ -19,16 +19,19 @@
 + (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
                               completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler
 {
-    [self requestLivePhotoWithVideoFileAtPath:videoPath stillSeconds:0.01f progressHandler:nil completionHandler:completionHandler];
+    [self requestLivePhotoWithVideoFileAtPath:videoPath stillSeconds:0.01f stillDuration:0.7f progressHandler:nil completionHandler:completionHandler];
 }
 
 + (void)requestLivePhotoWithVideoFileAtPath:(NSString *)videoPath
                                   stillSeconds:(NSTimeInterval)seconds
+                                    stillDuration:(Float64)duration
                                 progressHandler:(void(^)(float  progress))progressHandler
                               completionHandler:(void(^)(MNLivePhoto *livePhoto))completionHandler
 {
-    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:seconds progressHandler:^(float progress) {
-        if (progressHandler) progressHandler(MIN(.99f, progress));
+    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:seconds stillDuration:duration progressHandler:^(float progress) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (progressHandler) progressHandler(MIN(.99f, progress));
+        });
     } completionHandler:^(NSString *jpgPath, NSString *movPath) {
         if (jpgPath && movPath) {
             [PHLivePhoto requestLivePhotoWithResourceFileURLs:@[[NSURL fileURLWithPath:jpgPath], [NSURL fileURLWithPath:movPath]] placeholderImage:[UIImage imageWithContentsOfFile:jpgPath] targetSize:CGSizeZero contentMode:PHImageContentModeAspectFit resultHandler:^(PHLivePhoto * _Nullable livePhoto, NSDictionary * _Nonnull info) {
@@ -48,16 +51,22 @@
                     photo->_videoURL = videoURL;
                     photo->_imageURL = imageURL;
                     photo->_content = livePhoto;
-                    if (progressHandler) progressHandler(1.f);
-                    if (completionHandler) completionHandler(photo);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (progressHandler) progressHandler(1.f);
+                        if (completionHandler) completionHandler(photo);
+                    });
                 } else {
                     [NSFileManager.defaultManager removeItemAtPath:jpgPath error:nil];
                     [NSFileManager.defaultManager removeItemAtPath:movPath error:nil];
-                    if (completionHandler) completionHandler(nil);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completionHandler) completionHandler(nil);
+                    });
                 }
             }];
         } else {
-            if (completionHandler) completionHandler(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completionHandler) completionHandler(nil);
+            });
         }
     }];
 }
@@ -67,11 +76,12 @@
 + (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler
 {
-    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:0.01f progressHandler:nil completionHandler:completionHandler];
+    [self requestLivePhotoWithVideoAtPath:videoPath stillSeconds:0.01f stillDuration:0.7f progressHandler:nil completionHandler:completionHandler];
 }
 
 + (void)requestLivePhotoWithVideoAtPath:(NSString *)videoPath
                            stillSeconds:(NSTimeInterval)seconds
+                              stillDuration:(Float64)duration
                       progressHandler:(void(^)(float  progress))progressHandler
                     completionHandler:(void(^)(NSString *jpgPath, NSString *movPath))completionHandler
 {
@@ -128,6 +138,7 @@
         MNQuickTime *QuickTime = [[MNQuickTime alloc] initWithVideoAsset:videoAsset];
         QuickTime.identifier = identifier;
         QuickTime.outputPath = movPath;
+        QuickTime.stillDuration = duration;
         [QuickTime exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:^(MNMovExportStatus status, NSError * _Nullable error) {
             BOOL succeed = status == MNMovExportStatusCompleted;
             if (completionHandler) if (completionHandler) completionHandler(succeed?jpgPath:nil, succeed?movPath:nil);
