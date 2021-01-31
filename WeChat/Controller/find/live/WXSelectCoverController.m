@@ -262,7 +262,7 @@
     @weakify(self);
     [self.view showProgressDialog:@"LivePhoto导出中"];
     WXDataValueModel *model = self.coverView.coverModel;
-    [MNLivePhoto requestLivePhotoWithVideoFileAtPath:self.videoPath stillSeconds:[model.value floatValue]*self.duration  stillDuration:.7f progressHandler:^(float progress) {
+    [MNLivePhoto requestLivePhotoWithVideoFileAtPath:self.videoPath stillSeconds:[model.value floatValue]*self.duration  stillDuration:.6f progressHandler:^(float progress) {
         [weakself.view updateDialogProgress:progress];
     } completionHandler:^(MNLivePhoto *livePhoto) {
         if (livePhoto) {
