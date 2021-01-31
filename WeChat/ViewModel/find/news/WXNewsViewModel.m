@@ -22,7 +22,7 @@
         
         // 标题
         NSMutableAttributedString *title = dataModel.title.attributedString.mutableCopy;
-        [title addAttribute:NSFontAttributeName value:UIFontRegular(16.5f) range:title.rangeOfAll];
+        [title addAttribute:NSFontAttributeName value:UIFontRegular(17.f) range:title.rangeOfAll];
         [title addAttribute:NSForegroundColorAttributeName value:[UIColor.darkTextColor colorWithAlphaComponent:.93f] range:title.rangeOfAll];
         CGSize titleSize = [title sizeOfLimitWidth:maxW];
         titleSize.width = maxW;
@@ -35,7 +35,7 @@
         self.titleViewModel = titleViewModel;
         
         // 缩略图
-        CGFloat m = 15.f;
+        CGFloat m = 13.f;
         CGFloat w = floor((maxW - m*2.f)/3.f);
         CGFloat top = CGRectGetMaxY(titleViewModel.frame);
         CGFloat append = CGRectGetHeight(titleViewModel.frame) > 0.f ? 16.f : 0.f;

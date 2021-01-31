@@ -83,8 +83,8 @@
     configuration.contentMode = MNSegmentContentModeFill;
     configuration.shadowMask = MNSegmentShadowMaskFit;
     configuration.backgroundColor = UIColor.whiteColor;
-    configuration.titleFont = [UIFont systemFontOfSize:16.5f];
-    configuration.selectedTitleFont = [UIFont systemFontOfSize:16.5f];
+    configuration.titleFont = [UIFont systemFontOfSize:17.f];
+    configuration.selectedTitleFont = [UIFont systemFontOfSize:17.f];
     configuration.titleColor = [UIColor.darkTextColor colorWithAlphaComponent:.93f];
     configuration.selectedColor = THEME_COLOR;
     configuration.shadowColor = THEME_COLOR;

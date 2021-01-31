@@ -36,6 +36,7 @@
     self.tableView.frame = self.contentView.bounds;
     self.tableView.backgroundColor = UIColor.whiteColor;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    //self.tableView.separatorColor = [UIColor.grayColor colorWithAlphaComponent:.15f];
 }
 
 #pragma mark - UITableViewDataSource &  UITableViewDelegate

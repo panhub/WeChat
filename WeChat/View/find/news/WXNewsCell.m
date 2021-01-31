@@ -50,7 +50,7 @@
         
         UIView *separator = UIView.new;
         separator.width_mn = self.contentView.width_mn;
-        separator.height_mn = MN_IS_LOW_SCALE ? 1.f : .8f;
+        separator.height_mn = MN_IS_LOW_SCALE ? 1.f : .7f;
         separator.bottom_mn = self.contentView.height_mn;
         separator.autoresizingMask = UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth;
         separator.backgroundColor = [UIColor.grayColor colorWithAlphaComponent:.15f];
