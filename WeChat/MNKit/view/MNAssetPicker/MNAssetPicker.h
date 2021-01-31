@@ -64,12 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  弹出选择器
  @param parentController 容器控制器
+ @param animated 是否动态弹出
  @param pickingHandler 选择回调
  @param cancelHandler 取消回调
  */
 - (void)presentInController:(UIViewController * _Nullable)parentController
-            pickingHandler:(void(^)(MNAssetPicker *picker, NSArray <MNAsset *>*_Nullable assets))pickingHandler
-             cancelHandler:(void(^_Nullable)(MNAssetPicker *picker))cancelHandler;
+                   animated:(BOOL)animated
+             pickingHandler:(void(^)(MNAssetPicker *picker, NSArray <MNAsset *>*_Nullable assets))pickingHandler
+              cancelHandler:(void(^_Nullable)(MNAssetPicker *picker))cancelHandler;
 
 @end
 NS_ASSUME_NONNULL_END

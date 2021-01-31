@@ -719,7 +719,7 @@
     layout.footerReferenceSize = CGSizeZero;
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
     layout.itemSize = CGSizeMake(floor(wh), floor(wh));
-    CGFloat bottom = self.configuration.maxPickingCount > 1 ? MN_TAB_SAFE_HEIGHT + 50.f : 0.f;
+    CGFloat bottom = self.configuration.maxPickingCount > 1 ? MN_TAB_SAFE_HEIGHT + 50.f : MN_TAB_SAFE_HEIGHT;
     layout.sectionInset = UIEdgeInsetsMake(self.navigationBar.height_mn, 0.f, bottom, 0.f);
     return layout;
 }

@@ -14,7 +14,7 @@
 #import "WXVideoCropController.h"
 #import "MNAssetExporter.h"
 
-@interface WXAppletViewController ()<UITextFieldDelegate, MNAssetPickerDelegate, WXAppletResultDelegate>
+@interface WXAppletViewController ()<UITextFieldDelegate, WXAppletResultDelegate>
 @property (nonatomic, strong) NSArray <NSArray <WXDataValueModel *>*>*dataArray;
 @end
 
@@ -153,42 +153,31 @@
 - (void)execute:(WXDataValueModel *)model {
     NSString *value = kTransform(NSString *, model.value);
     if ([value isEqualToString:WXLivePhotoMakerControllerName]) {
-        [self selectVideo];
+        @weakify(self);
+        [self selectAsset:^(MNAssetPickConfiguration *configuration) {
+            configuration.allowsPickingGif = NO;
+            configuration.allowsPickingPhoto = NO;
+            configuration.allowsPickingVideo = YES;
+            configuration.allowsPickingLivePhoto = NO;
+        } resultHandler:^(MNAssetPicker *picker, NSArray<MNAsset *> *assets) {
+            @strongify(self);
+            WXSelectCoverController *vc = [[WXSelectCoverController alloc] initWithVideoPath:assets.firstObject.content];
+            [self.navigationController pushViewController:vc animated:YES];
+        }];
     } else {
         Class cls = NSClassFromString(value);
-        if (!cls) return;
-        UIViewControllerPush(model.value, YES);
+        if (cls) UIViewControllerPush(model.value, YES);
     }
 }
 
-- (void)selectVideo {
+- (void)selectAsset:(void(^)(MNAssetPickConfiguration *))configurationHandler resultHandler:(void(^)(MNAssetPicker *, NSArray <MNAsset *>*))resultHandler {
     MNAssetPicker *imagePicker = [[MNAssetPicker alloc] init];
-    imagePicker.configuration.delegate = self;
-    imagePicker.configuration.allowsPreviewing = YES;
-    imagePicker.configuration.allowsPickingGif = NO;
-    imagePicker.configuration.allowsPickingPhoto = NO;
-    imagePicker.configuration.allowsPickingVideo = YES;
-    imagePicker.configuration.allowsPickingLivePhoto = NO;
-    imagePicker.configuration.allowsCapturing = NO;
-    imagePicker.configuration.allowsEditing = YES;
-    imagePicker.configuration.minExportDuration = 3.f;
-    imagePicker.configuration.maxExportDuration = 30.f;
     imagePicker.configuration.maxPickingCount = 1;
-    [self.navigationController presentViewController:imagePicker animated:YES completion:nil];
-}
-
-#pragma mark - MNAssetPickerDelegate
-- (void)assetPickerDidCancel:(MNAssetPicker *)picker {
-    [picker dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)assetPicker:(MNAssetPicker *)picker didFinishPickingAssets:(NSArray <MNAsset *>*)assets {
-    @weakify(self);
-    [picker dismissViewControllerAnimated:YES completion:^{
-        @strongify(self);
-        WXSelectCoverController *vc = [[WXSelectCoverController alloc] initWithVideoPath:assets.firstObject.content];
-        [self.navigationController pushViewController:vc animated:YES];
-    }];
+    imagePicker.configuration.allowsEditing = NO;
+    imagePicker.configuration.allowsCapturing = NO;
+    imagePicker.configuration.allowsPreviewing = NO;
+    if (configurationHandler) configurationHandler(imagePicker.configuration);
+    [imagePicker presentWithPickingHandler:resultHandler cancelHandler:nil];
 }
 
 #pragma mark - UIScrollViewDelegate

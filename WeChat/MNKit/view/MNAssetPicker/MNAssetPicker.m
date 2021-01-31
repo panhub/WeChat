@@ -16,6 +16,7 @@
 
 @interface MNAssetPicker ()<MNCameraControllerDelegate, MNAssetPickerDelegate,  MNImageCropDelegate, MNVideoTailorDelegate, UIViewControllerTransitioningDelegate>
 @property (nonatomic) MNAssetPickerType type;
+@property (nonatomic, getter=isAnimated) BOOL animated;
 @property (nonatomic, copy) void (^cancelHandler) (MNAssetPicker *picker);
 @property (nonatomic, copy) void (^pickingHandler) (MNAssetPicker *picker, NSArray <MNAsset *>*assets);
 @end
@@ -53,18 +54,20 @@
 }
 
 - (void)presentWithPickingHandler:(void(^)(MNAssetPicker *picker, NSArray <MNAsset *>*assets))pickingHandler cancelHandler:(void(^)(MNAssetPicker *picker))cancelHandler {
-    [self presentInController:nil pickingHandler:pickingHandler cancelHandler:cancelHandler];
+    [self presentInController:nil animated:YES pickingHandler:pickingHandler cancelHandler:cancelHandler];
 }
 
 - (void)presentInController:(UIViewController *)parentController
-            pickingHandler:(void(^)(MNAssetPicker *picker, NSArray <MNAsset *>*assets))pickingHandler
-             cancelHandler:(void(^)(MNAssetPicker *picker))cancelHandler {
+                   animated:(BOOL)animated
+             pickingHandler:(void(^)(MNAssetPicker *picker, NSArray <MNAsset *>*assets))pickingHandler
+              cancelHandler:(void(^)(MNAssetPicker *picker))cancelHandler {
     if (!parentController) parentController = self.forwardViewController;
     if (!parentController) return;
     self.configuration.delegate = self;
+    self.animated = animated;
     self.cancelHandler = cancelHandler;
     self.pickingHandler = pickingHandler;
-    [parentController presentViewController:self animated:YES completion:nil];
+    [parentController presentViewController:self animated:(animated && UIApplication.sharedApplication.applicationState == UIApplicationStateActive) completion:nil];
 }
 
 #pragma mark - MNCameraControllerDelegate
@@ -151,7 +154,7 @@
 #pragma mark - MNAssetPickerDelegate
 - (void)assetPickerDidCancel:(MNAssetPicker *)picker {
     __weak typeof(self) weakself = self;
-    [self dismissViewControllerAnimated:(UIApplication.sharedApplication.applicationState == UIApplicationStateActive) completion:^{
+    [self dismissViewControllerAnimated:(self.isAnimated && UIApplication.sharedApplication.applicationState == UIApplicationStateActive) completion:^{
         __strong typeof(self) self = weakself;
         if (self.cancelHandler) {
             self.cancelHandler(self);
@@ -161,7 +164,7 @@
 
 - (void)assetPicker:(MNAssetPicker *)picker didFinishPickingAssets:(NSArray<MNAsset *>*)assets {
     __weak typeof(self) weakself = self;
-    [self dismissViewControllerAnimated:(UIApplication.sharedApplication.applicationState == UIApplicationStateActive) completion:^{
+    [self dismissViewControllerAnimated:(self.isAnimated && UIApplication.sharedApplication.applicationState == UIApplicationStateActive) completion:^{
         __strong typeof(self) self = weakself;
         if (self.pickingHandler) {
             self.pickingHandler(self, (assets && assets.count) ? assets : nil);

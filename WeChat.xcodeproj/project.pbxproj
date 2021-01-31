@@ -96,7 +96,6 @@
 		201DAF0222E894410063E88A /* WXMineInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9322E894400063E88A /* WXMineInfoController.m */; };
 		201DAF0322E894410063E88A /* WXMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9422E894400063E88A /* WXMineViewController.m */; };
 		201DAF0422E894410063E88A /* WXAlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9722E894400063E88A /* WXAlbumViewController.m */; };
-		201DAF0522E894410063E88A /* WXTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9922E894400063E88A /* WXTestViewController.m */; };
 		201DAF0622E894410063E88A /* WXAppletResultController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9A22E894400063E88A /* WXAppletResultController.m */; };
 		201DAF0722E894410063E88A /* WXMomentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9D22E894400063E88A /* WXMomentViewController.m */; };
 		201DAF0822E894410063E88A /* WXNewMomentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAE9F22E894400063E88A /* WXNewMomentController.m */; };
@@ -1046,7 +1045,6 @@
 		201DAE9422E894400063E88A /* WXMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMineViewController.m; sourceTree = "<group>"; };
 		201DAE9622E894400063E88A /* WXAlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAlbumViewController.h; sourceTree = "<group>"; };
 		201DAE9722E894400063E88A /* WXAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAlbumViewController.m; sourceTree = "<group>"; };
-		201DAE9922E894400063E88A /* WXTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestViewController.m; sourceTree = "<group>"; };
 		201DAE9A22E894400063E88A /* WXAppletResultController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAppletResultController.m; sourceTree = "<group>"; };
 		201DAE9C22E894400063E88A /* WXNewMomentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXNewMomentController.h; sourceTree = "<group>"; };
 		201DAE9D22E894400063E88A /* WXMomentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMomentViewController.m; sourceTree = "<group>"; };
@@ -1054,7 +1052,6 @@
 		201DAE9F22E894400063E88A /* WXNewMomentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNewMomentController.m; sourceTree = "<group>"; };
 		201DAEA022E894400063E88A /* WXFindViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXFindViewController.h; sourceTree = "<group>"; };
 		201DAEA122E894400063E88A /* WXAppletViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppletViewController.h; sourceTree = "<group>"; };
-		201DAEA222E894400063E88A /* WXTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestViewController.h; sourceTree = "<group>"; };
 		201DAEA422E894400063E88A /* WXMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMapViewController.h; sourceTree = "<group>"; };
 		201DAEA522E894400063E88A /* WXMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMapViewController.m; sourceTree = "<group>"; };
 		201DAEA722E894400063E88A /* WXCookListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCookListController.h; sourceTree = "<group>"; };
@@ -3034,8 +3031,6 @@
 				201DAEB122E894400063E88A /* WXAppletViewController.m */,
 				201DAEAD22E894400063E88A /* WXAppletResultController.h */,
 				201DAE9A22E894400063E88A /* WXAppletResultController.m */,
-				201DAEA222E894400063E88A /* WXTestViewController.h */,
-				201DAE9922E894400063E88A /* WXTestViewController.m */,
 				E88676DF25C54CD6004C859F /* qsy */,
 				201DAE9B22E894400063E88A /* moment */,
 				BF7B525823E5CC44003DA959 /* music */,
@@ -6797,7 +6792,6 @@
 				E8F253AC257904DF00A05A13 /* MNGarageBand.m in Sources */,
 				E869C8ED2570EF670017025E /* MNAssetExporter+MNExportSession.m in Sources */,
 				2055D69E22E007180012E43E /* UIControl+YYAdd.m in Sources */,
-				201DAF0522E894410063E88A /* WXTestViewController.m in Sources */,
 				E869C93D2570EF670017025E /* MNEmojiManager.m in Sources */,
 				2042BAE222F0161F00F65033 /* WXEmoticonViewController.m in Sources */,
 				E869C91B2570EF670017025E /* MNURLSession.m in Sources */,

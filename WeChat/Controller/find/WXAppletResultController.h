@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXAppletResultDelegate <NSObject>
 @required
+/**选择项*/
 - (void)appletResultDidSelectModel:(WXDataValueModel *)model;
 @end
 

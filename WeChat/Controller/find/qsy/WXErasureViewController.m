@@ -129,6 +129,17 @@
     scrollView.contentSize = contentSize;
 }
 
+- (void)handEvents {
+    [super handEvents];
+    @weakify(self);
+    [self handNotification:UIApplicationDidBecomeActiveNotification eventHandler:^(NSNotification *_Nonnull notify) {
+        @strongify(self);
+        if (self.isAppear && self.contentView.isDialoging == NO) {
+            [self check];
+        }
+    }];
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (self.isFirstAppear && self.regular.length) {
@@ -304,6 +315,5 @@
 - (MNTransitionAnimator *)popTransitionAnimator {
     return [MNTransitionAnimator animatorWithType:MNControllerTransitionTypePushModal];
 }
-
 
 @end
