@@ -11,13 +11,13 @@
 @interface MNException : NSObject
 
 /**设置异常邮件的收件人*/
-void MNExceptionEmailSetRecipients (NSString *recipients);
+FOUNDATION_EXPORT void MNExceptionEmailSetRecipient (NSString *_Nullable);
 
 /**UncaughtException*/
-void MNInstallUncaughtExceptionHandler(void);
-void MNUninstallUncaughtExceptionHandler(void);
+FOUNDATION_EXPORT void MNInstallUncaughtExceptionHandler(void);
+FOUNDATION_EXPORT void MNUninstallUncaughtExceptionHandler(void);
 
 /**SignalException*/
-void MNInstallSignalExceptionHandler(void);
+FOUNDATION_EXPORT void MNInstallSignalExceptionHandler(void);
 
 @end

@@ -99,7 +99,7 @@
 #import "MNKeychain.h"
 #import "MNFileManager.h"
 #import "MNLayoutConstraint.h"
-#import "MNEmail.h"
+#import "MNMail.h"
 #import "MNLaunchImage.h"
 #import "MNException.h"
 #import "MNAuthenticator.h"

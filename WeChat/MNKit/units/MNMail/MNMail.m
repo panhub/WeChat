@@ -1,34 +1,41 @@
 //
-//  MNEmail.m
+//  MNMail.m
 //  MNKit
 //
 //  Created by Vincent on 2018/7/25.
 //  Copyright © 2018年 小斯. All rights reserved.
 //
 
-#import "MNEmail.h"
+#import "MNMail.h"
 
-@interface MNEmail ()
+@interface MNMail ()
 
 @end
 
-@implementation MNEmail
+@implementation MNMail
 
-MNEmail* MNEmailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *copiers, NSString *subject, NSString *body) {
-    MNEmail *email = [MNEmail new];
-    email.recipients = recipients;
-    email.copiers = copiers;
-    email.subject = subject;
-    email.body = body;
-    return email;
+MNMail* MNMailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *copiers, NSString *subject, NSString *body) {
+    MNMail *mail = [MNMail new];
+    mail.recipients = recipients;
+    mail.copiers = copiers;
+    mail.subject = subject;
+    mail.body = body;
+    return mail;
 }
 
-/**
- 发送邮件
- */
 - (void)send {
-    if (![MFMailComposeViewController canSendMail]) return;
-    if (!self.recipients || self.recipients.count <= 0 || self.body.length <= 0) return;
+    [self sendWithCompletionHandler:nil];
+}
+
+- (void)sendWithCompletionHandler:(void(^)(BOOL))completionHandler {
+    if (![MFMailComposeViewController canSendMail]) {
+        if (completionHandler) completionHandler(NO);
+        return;
+    }
+    if (!self.recipients || self.recipients.count <= 0 || self.body.length <= 0) {
+        if (completionHandler) completionHandler(NO);
+        return;
+    }
     if (self.subject.length <= 0) self.subject = @"MNKit Email";
     NSMutableString *string = [[NSMutableString alloc] init];
     [string appendFormat:@"mailto:%@", [self.recipients componentsJoinedByString:@","]];
@@ -37,20 +44,30 @@ MNEmail* MNEmailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *cop
     if (self.copiers.copy) [string appendFormat:@"&cc=%@", [self.copiers componentsJoinedByString:@","]];
     NSString *url = [string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *URL = [NSURL URLWithString:url];
-    if ([[UIApplication sharedApplication] canOpenURL:URL]) {
-        [[UIApplication sharedApplication] openURL:URL];
+    if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 100000) {
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:completionHandler];
+        } else {
+            BOOL result = [[UIApplication sharedApplication] openURL:URL];
+            if (completionHandler) completionHandler(result);
+        }
+    } else if ([[UIApplication sharedApplication] canOpenURL:URL]) {
+        BOOL result = [[UIApplication sharedApplication] openURL:URL];
+        if (completionHandler) completionHandler(result);
+    } else {
+        if (completionHandler) completionHandler(NO);
     }
 }
 
 @end
 
 
-@implementation UIViewController (MNEmail)
+@implementation UIViewController (MNMail)
 /**
  发送邮件
  @param email 邮件实例
  */
-- (void)sendEmail:(MNEmail *)email {
+- (void)sendMail:(MNMail *)email {
     if (![MFMailComposeViewController canSendMail]) return;
     if (email.recipients.count <= 0 || email.body.length <= 0) return;
     if (email.subject.length <= 0) email.subject = @"MNKit Email";

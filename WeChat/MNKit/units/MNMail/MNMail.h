@@ -1,5 +1,5 @@
 //
-//  MNEmail.h
+//  MNMail.h
 //  MNKit
 //
 //  Created by Vincent on 2018/7/25.
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MNEmail : NSObject
+@interface MNMail : NSObject
 
 /**收件人(多位用","分割)*/
 @property (nonatomic, copy) NSArray<NSString *> *recipients;
@@ -30,19 +30,22 @@ NS_ASSUME_NONNULL_BEGIN
  @param body 内容
  @return 邮件实例
  */
-FOUNDATION_EXPORT MNEmail * MNEmailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *copiers, NSString *subject, NSString *body);
+FOUNDATION_EXPORT MNMail * MNMailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *_Nullable copiers, NSString *_Nullable subject, NSString *body);
 
 /**发送邮件*/
 - (void)send;
+
+/**发送邮件*/
+- (void)sendWithCompletionHandler:(void(^_Nullable)(BOOL))completionHandler;
 
 @end
 
 
 
-@interface UIViewController (MNEmail)<MFMailComposeViewControllerDelegate>
+@interface UIViewController (MNMail)<MFMailComposeViewControllerDelegate>
 
 /**发送邮件*/
-- (void)sendEmail:(MNEmail *)email;
+- (void)sendMail:(MNMail *)email;
 
 @end
 

@@ -514,7 +514,7 @@
 		E869C9022570EF670017025E /* NSObject+MNSQLField.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6002570EF620017025E /* NSObject+MNSQLField.m */; };
 		E869C9032570EF670017025E /* MNDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6022570EF620017025E /* MNDatabase.m */; };
 		E869C9042570EF670017025E /* NSDictionary+MNSQLStatement.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6042570EF620017025E /* NSDictionary+MNSQLStatement.m */; };
-		E869C9052570EF670017025E /* MNEmail.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6072570EF620017025E /* MNEmail.m */; };
+		E869C9052570EF670017025E /* MNMail.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6072570EF620017025E /* MNMail.m */; };
 		E869C9062570EF670017025E /* MNQuickTime.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6092570EF620017025E /* MNQuickTime.m */; };
 		E869C9072570EF670017025E /* MNJPEG.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C60D2570EF620017025E /* MNJPEG.m */; };
 		E869C9082570EF670017025E /* MNLivePhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C60E2570EF620017025E /* MNLivePhoto.m */; };
@@ -1877,8 +1877,8 @@
 		E869C6022570EF620017025E /* MNDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNDatabase.m; sourceTree = "<group>"; };
 		E869C6032570EF620017025E /* NSObject+MNSQLField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MNSQLField.h"; sourceTree = "<group>"; };
 		E869C6042570EF620017025E /* NSDictionary+MNSQLStatement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MNSQLStatement.m"; sourceTree = "<group>"; };
-		E869C6062570EF620017025E /* MNEmail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNEmail.h; sourceTree = "<group>"; };
-		E869C6072570EF620017025E /* MNEmail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNEmail.m; sourceTree = "<group>"; };
+		E869C6062570EF620017025E /* MNMail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNMail.h; sourceTree = "<group>"; };
+		E869C6072570EF620017025E /* MNMail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNMail.m; sourceTree = "<group>"; };
 		E869C6092570EF620017025E /* MNQuickTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNQuickTime.m; sourceTree = "<group>"; };
 		E869C60A2570EF620017025E /* MNJPEG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNJPEG.h; sourceTree = "<group>"; };
 		E869C60B2570EF620017025E /* MNLivePhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNLivePhoto.h; sourceTree = "<group>"; };
@@ -4697,8 +4697,8 @@
 		E869C6052570EF620017025E /* MNMail */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6062570EF620017025E /* MNEmail.h */,
-				E869C6072570EF620017025E /* MNEmail.m */,
+				E869C6062570EF620017025E /* MNMail.h */,
+				E869C6072570EF620017025E /* MNMail.m */,
 			);
 			path = MNMail;
 			sourceTree = "<group>";
@@ -6925,7 +6925,7 @@
 				2055D8E022E021A40012E43E /* SDWebImageCompat.m in Sources */,
 				BF375BD923E3E506008F36C3 /* WXShakeViewController.m in Sources */,
 				E88676E225C54D12004C859F /* WXErasureViewController.m in Sources */,
-				E869C9052570EF670017025E /* MNEmail.m in Sources */,
+				E869C9052570EF670017025E /* MNMail.m in Sources */,
 				E869C8D12570EF670017025E /* MNWebUserContentController.m in Sources */,
 				201DB08822E8953C0063E88A /* WXPayHeaderView.m in Sources */,
 				E869C9422570EF670017025E /* NSAttributedString+MNEmojiHelper.m in Sources */,

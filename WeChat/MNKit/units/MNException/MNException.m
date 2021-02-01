@@ -7,23 +7,18 @@
 //
 
 #import "MNException.h"
-#import "MNEmail.h"
+#import "MNMail.h"
 #import "NSBundle+MNHelper.h"
 #import "UIDevice+MNHelper.h"
 #include <execinfo.h>
 
 static NSUncaughtExceptionHandler MNUncaughtExceptionHandler;
 static NSUncaughtExceptionHandler *MNOriginalUncaughtExceptionHandler;
-static NSString *MNExceptionEmailRecipients = @"fengpanboy@icloud.com";
+static NSString *MNExceptionEmailRecipient = @"";
 
-void MNExceptionEmailSetRecipients (NSString *recipients) {
-    if (recipients.length <= 0) return;
-    MNExceptionEmailRecipients = recipients;
+void MNExceptionEmailSetRecipient (NSString *recipient) {
+    MNExceptionEmailRecipient = recipient ? : @"";
 }
-
-@interface MNException ()
-
-@end
 
 @implementation MNException
 
@@ -59,7 +54,7 @@ void MNUncaughtExceptionHandler(NSException *exception) {
     [body appendFormat:@"<b>System Version：</b>%@\n\n", IOS_VERSION()];
     [body appendFormat:@"%@", content];
     //发送邮件
-    MNExceptionSendEmail(body);
+    MNExceptionSendMail(body);
 }
 
 #pragma mark - SignalException
@@ -91,12 +86,13 @@ void MNSignalExceptionHandler(int signal) {
         [body appendFormat:@"%s\n", strs[i]];
     }
     //发送邮件
-    MNExceptionSendEmail(body);
+    MNExceptionSendMail(body);
 }
 
 #pragma mark - 发送异常邮件
-void MNExceptionSendEmail (NSString *body) {
-    MNEmail *email = MNEmailCreate(MNExceptionEmailRecipients, nil, @"MNKit Exception", body);
+static void MNExceptionSendMail (NSString *body) {
+    if (MNExceptionEmailRecipient.length <= 0 || body.length <= 0) return;
+    MNMail *email = MNMailCreate(@[MNExceptionEmailRecipient], nil, @"MNKit Exception", body.copy);
     [email send];
 }
 
