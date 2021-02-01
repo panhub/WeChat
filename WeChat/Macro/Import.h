@@ -13,7 +13,7 @@
 #import "WXPreference.h"
 #import "WechatHelper.h"
 #import "MNTextField.h"
-#import "MNMobRequest.h"
+#import "WXJHRequest.h"
 #import "WechatDelegate.h"
 
 #import "SDAutoLayout.h"

@@ -6,9 +6,9 @@
 //  Copyright © 2018年 小斯. All rights reserved.
 //  城市列表查询
 
-#import "MNMobRequest.h"
+#import "WXJHRequest.h"
 @class WXCityModel;
 
-@interface WXCityRequest : MNMobRequest
+@interface WXCityRequest : WXJHRequest
 
 @end

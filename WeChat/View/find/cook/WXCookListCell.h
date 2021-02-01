@@ -7,13 +7,14 @@
 //  菜谱菜单Cell
 
 #import "MNCollectionViewCell.h"
-@class WXCookModel;
+@class WXCook;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WXCookListCell : MNCollectionViewCell
 
-@property (nonatomic, strong) WXCookModel *model;
+/**数据模型*/
+@property (nonatomic, strong) WXCook *model;
 
 @end
 

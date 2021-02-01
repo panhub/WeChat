@@ -1,12 +1,12 @@
 //
-//  WXCookModel.m
+//  WXCook.m
 //  MNChat
 //
 //  Created by Vincent on 2019/6/19.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "WXCookModel.h"
+#import "WXCook.h"
 
 @implementation WXCookMethod
 
@@ -45,22 +45,33 @@
 
 @end
 
-@implementation WXCookModel
+@implementation WXCookStep
++ (instancetype)modelWithDictionary:(NSDictionary *)dic {
+    WXCookStep *m = WXCookStep.new;
+    m.img = [NSDictionary stringValueWithDictionary:dic forKey:@"img"];
+    m.step = [NSDictionary stringValueWithDictionary:dic forKey:@"step"];
+    return m;
+}
+
+@end
+
+@implementation WXCook
 + (instancetype)modelWithDictionary:(NSDictionary *)dictionary {
-    NSString *name = [NSDictionary stringValueWithDictionary:dictionary forKey:@"name"];
-    NSString *ctgTitles = [NSDictionary stringValueWithDictionary:dictionary forKey:@"ctgTitles"];
-    NSString *thumbnail = [NSDictionary stringValueWithDictionary:dictionary forKey:@"thumbnail"];
-    if (name.length <= 0 || ctgTitles.length <= 0 || thumbnail.length <= 0) return nil;
-    NSDictionary *dic = [NSDictionary dictionaryValueWithDictionary:dictionary forKey:@"recipe"];
-    WXCookRecipe *recipe = [WXCookRecipe modelWithDictionary:dic];
-    if (!recipe) return nil;
-    WXCookModel *model = [WXCookModel new];
-    model.name = name;
-    model.titles = ctgTitles;
-    model.thumbnail = thumbnail;
-    model.recipe = recipe;
-    model.cids = [NSDictionary arrayValueWithDictionary:dictionary forKey:@"ctgIds"];
-    model.menuId = [NSDictionary stringValueWithDictionary:dictionary forKey:@"menuId"];
+    WXCook *model = [WXCook new];
+    model.cid = [NSDictionary stringValueWithDictionary:dictionary forKey:@"id"];
+    model.title = [NSDictionary stringValueWithDictionary:dictionary forKey:@"title"];
+    model.imtro = [NSDictionary stringValueWithDictionary:dictionary forKey:@"imtro"];
+    model.tags = [[NSDictionary stringValueWithDictionary:dictionary forKey:@"tags"] componentsSeparatedByString:@","];
+    model.ingredients = [[NSDictionary stringValueWithDictionary:dictionary forKey:@"ingredients"] componentsSeparatedByString:@";"];
+    model.burdens = [[NSDictionary stringValueWithDictionary:dictionary forKey:@"burden"] componentsSeparatedByString:@";"];
+    model.albums = [NSDictionary arrayValueWithDictionary:dictionary forKey:@"albums"];
+    NSMutableArray <WXCookStep *>*array = @[].mutableCopy;
+    NSArray <NSDictionary *>*steps = [NSDictionary arrayValueWithDictionary:dictionary forKey:@"steps"];
+    [steps enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        WXCookStep *m = [WXCookStep modelWithDictionary:obj];
+        [array addObject:m];
+    }];
+    model.steps = array;
     return model;
 }
 @end

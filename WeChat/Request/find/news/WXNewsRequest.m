@@ -13,10 +13,10 @@
 @implementation WXNewsRequest
 - (instancetype)init {
     if (self = [super init]) {
-        self.url = @"http://v.juhe.cn/toutiao/index?type=top&key=APPKEY";
-        self.cachePolicy = MNURLDataCachePolicyElseLoad;
-        self.cacheTimeOutInterval = 60.f*60.f*24.f*30.f;
         self.timeoutInterval = 10.f;
+        self.url = @"http://v.juhe.cn/toutiao/index";
+        self.cacheTimeOutInterval = 60.f*60.f*24.f*30.f;
+        self.cachePolicy = MNURLDataCachePolicyElseLoad;
     }
     return self;
 }

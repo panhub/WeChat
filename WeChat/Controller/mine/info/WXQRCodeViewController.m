@@ -7,7 +7,7 @@
 //
 
 #import "WXQRCodeViewController.h"
-#import "MNMobRequest.h"
+#import "WXJHRequest.h"
 
 NSString * const WXQRCodeMetadataPrefix = @"com.wx.qrcode.metadata.prefix";
 

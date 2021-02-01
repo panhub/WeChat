@@ -6,11 +6,12 @@
 //  Copyright © 2019 Vincent. All rights reserved.
 //  菜谱请求
 
-#import "MNMobRequest.h"
-#import "WXCookModel.h"
+#import "WXJHRequest.h"
+@class WXCookMenu;
 
-@interface WXCookRequest : MNMobRequest
+@interface WXCookRequest : WXJHRequest
 
-- (instancetype)initWithCid:(NSString *)cid;
+/**依据菜谱名查询菜谱列表*/
+- (instancetype)initWithMenu:(WXCookMenu *)menu;
 
 @end

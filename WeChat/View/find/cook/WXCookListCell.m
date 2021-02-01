@@ -7,7 +7,7 @@
 //
 
 #import "WXCookListCell.h"
-#import "WXCookModel.h"
+#import "WXCook.h"
 
 @implementation WXCookListCell
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -33,7 +33,7 @@
     return self;
 }
 
-- (void)setModel:(WXCookModel *)model {
+- (void)setModel:(WXCook *)model {
     _model = model;
     self.titleLabel.text = model.name;
     self.detailLabel.text = model.titles;

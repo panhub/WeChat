@@ -1,5 +1,5 @@
 //
-//  MNMobRequest.h
+//  WXJHRequest.h
 //  MNChat
 //
 //  Created by Vincent on 2019/3/12.
@@ -8,6 +8,6 @@
 
 #import "MNHTTPDataRequest.h"
 
-@interface MNMobRequest : MNHTTPDataRequest
+@interface WXJHRequest : MNHTTPDataRequest
 
 @end

@@ -8,10 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WXCookName : NSObject
-
+@interface WXCookMenu : NSObject
+/**ID*/
 @property (nonatomic, strong) NSString *cid;
+/**标题*/
 @property (nonatomic, strong) NSString *name;
+
 @property (nonatomic, strong) NSString *parent;
 
 + (instancetype)modelWithDictionary:(NSDictionary *)dic;
@@ -19,12 +21,16 @@
 @end
 
 @interface WXCookSort : NSObject
+/**ID*/
+@property (nonatomic, copy) NSString *cid;
+/**标题*/
+@property (nonatomic, copy) NSString *title;
+/**菜单*/
+@property (nonatomic, copy) NSArray <WXCookMenu *>*list;
 
-@property (nonatomic, strong) NSString *cid;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *parent;
-
-@property (nonatomic, strong) NSArray <WXCookName *>*sorts;
+@property (nonatomic, strong) NSArray <WXCookMenu *>*sorts;
 
 + (instancetype)modelWithDictionary:(NSDictionary *)dic;
 

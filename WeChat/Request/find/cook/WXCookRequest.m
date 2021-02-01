@@ -7,41 +7,79 @@
 //
 
 #import "WXCookRequest.h"
+#import "WXCookSort.h"
+#import "WXCook.h"
 
 @interface WXCookRequest ()
-@property (nonatomic, copy) NSString *cid;
+@property (nonatomic, strong) WXCookMenu *menu;
 @end
 
-#define WXCookRequestSize    30
+#define WXCookPageSize    20
 
 @implementation WXCookRequest
-- (instancetype)initWithCid:(NSString *)cid {
+- (instancetype)initWithMenu:(WXCookMenu *)menu {
     if (self = [super init]) {
-        self.cid = cid;
-        self.pagingEnabled = YES;
-        self.url = @"http://apicloud.mob.com/v1/cook/menu/search";
-        self.cacheTimeOutInterval = 10.f;
-        self.cachePolicy = MNURLDataCachePolicyNever;
+        self.menu = menu;
+        self.timeoutInterval = 10.f;
+        self.url = @"http://apis.juhe.cn/cook/query";
+        self.cacheTimeOutInterval = 60.f*60.f*24.f*30.f;
+        self.cachePolicy = MNURLDataCachePolicyElseLoad;
     }
     return self;
 }
 
-- (void)loadData:(MNURLRequestStartCallback)startCallback completion:(MNURLRequestFinishCallback)finishCallback {
-    self.parameter = @{@"key":MobAppKey, @"cid":self.cid, @"size":NSStringWithFormat(@"%@", @(WXCookRequestSize))};
-    [super loadData:startCallback completion:finishCallback];
+- (void)handQuery {
+    [super handQuery];
+    NSMutableDictionary *query = [NSMutableDictionary dictionaryWithDictionary:self.query ? : @{}];
+    if (self.menu) [query setObject:self.menu.name forKey:@"menu"];
+    [query setObject:@"json" forKey:@"dtype"];
+    [query setObject:@"6f2afb00fbb3b72f311f914f8f692132" forKey:@"key"];
+    [query setObject:@(MAX(self.dataArray.count, 1)).stringValue forKey:@"pn"];
+    [query setObject:@(WXCookPageSize).stringValue forKey:@"rn"];
+    self.query = query;
+}
+
+- (void)didFinishWithSupposedResponse:(MNURLResponse *)response {
+    [super didFinishWithSupposedResponse:response];
+    if (response.code != MNURLResponseCodeSucceed) return;
+    NSDictionary *json = response.data;
+    NSString *error_code = [NSDictionary stringValueWithDictionary:json forKey:@"error_code" def:@""];
+    // 服务器级错误
+    NSInteger code = error_code.integerValue;
+    if (code == 204601) {
+        response.code = code;
+        response.message = @"菜谱名称不能为空";
+    } else if (code == 204602) {
+        response.code = code;
+        response.message = @"查询不到相关信息";
+    } else if (code == 204603) {
+        response.code = code;
+        response.message = @"菜谱名过长";
+    } else if (code == 204604) {
+        response.code = code;
+        response.message = @"错误的标签ID";
+    } else if (code == 204605) {
+        response.code = code;
+        response.message = @"查询不到数据";
+    } else if (code == 204606) {
+        response.code = code;
+        response.message = @"错误的菜谱ID";
+    } else if (code == 10008) {
+        response.code = code;
+        response.message = @"被禁止的IP";
+    }
 }
 
 - (void)didSucceedWithResponseObject:(id)responseObject {
     [super didSucceedWithResponseObject:responseObject];
     NSDictionary *result = [NSDictionary dictionaryValueWithDictionary:responseObject forKey:@"result"];
-    NSUInteger total = [NSDictionary integerValueWithDictionary:result forKey:@"total"];
-    NSUInteger curPage = [NSDictionary integerValueWithDictionary:result forKey:@"curPage"];
-    NSArray <NSDictionary *>*list = [NSDictionary arrayValueWithDictionary:result forKey:@"list"];
-    [list enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        WXCookModel *model = [WXCookModel modelWithDictionary:obj];
-        if (model) [self.dataArray addObject:model];
+    NSInteger total = [NSDictionary integerValueWithDictionary:result forKey:@"totalNum"];
+    NSArray <NSDictionary *>*data = [NSDictionary arrayValueWithDictionary:result forKey:@"data"];
+    [data enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        WXCook *model = [WXCook modelWithDictionary:obj];
+        [self.dataArray addObject:model];
     }];
-    self.more = curPage*WXCookRequestSize < total;
+    self.more = self.dataArray.count < total;
     self.page ++;
 }
 

@@ -6,11 +6,11 @@
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "MNMobRequest.h"
+#import "WXJHRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WXWeatherRequest : MNMobRequest
+@interface WXWeatherRequest : WXJHRequest
 
 - (instancetype)initWithCity:(NSString *)city district:(NSString *)district;
 

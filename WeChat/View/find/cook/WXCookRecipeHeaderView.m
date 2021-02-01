@@ -7,7 +7,7 @@
 //
 
 #import "WXCookRecipeHeaderView.h"
-#import "WXCookModel.h"
+#import "WXCook.h"
 
 @interface WXCookRecipeHeaderView ()
 @property (nonatomic, strong) WXCookRecipe *model;

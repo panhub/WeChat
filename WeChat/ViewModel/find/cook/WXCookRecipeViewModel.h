@@ -7,7 +7,7 @@
 //  
 
 #import <Foundation/Foundation.h>
-#import "WXCookModel.h"
+#import "WXCook.h"
 #import "WXCookMethodViewModel.h"
 
 @interface WXCookRecipeViewModel : NSObject

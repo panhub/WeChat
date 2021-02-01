@@ -7,12 +7,13 @@
 //  菜单List
 
 #import "MNListViewController.h"
+@class WXCookMenu;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WXCookListController : MNListViewController
 
-- (instancetype)initWithFrame:(CGRect)frame cid:(NSString *)cid;
+- (instancetype)initWithFrame:(CGRect)frame menu:(WXCookMenu *)menu;
 
 @end
 

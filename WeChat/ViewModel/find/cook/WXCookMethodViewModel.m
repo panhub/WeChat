@@ -7,7 +7,7 @@
 //
 
 #import "WXCookMethodViewModel.h"
-#import "WXCookModel.h"
+#import "WXCook.h"
 
 @implementation WXCookMethodViewModel
 - (instancetype)initWithMethod:(WXCookMethod *)model {

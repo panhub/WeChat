@@ -19,7 +19,7 @@
 @implementation WXCookViewController
 - (instancetype)init {
     if (self = [super init]) {
-        self.httpRequest = [WXCookSortRequest new];
+        self.httpRequest = WXCookSortRequest.new;
     }
     return self;
 }
@@ -27,12 +27,8 @@
 - (void)createView {
     [super createView];
     
-    self.contentView.backgroundColor = UIColorWithSingleRGB(51.f);
-    
     self.navigationBar.translucent = NO;
-    self.navigationBar.backgroundColor = UIColorWithSingleRGB(51.f);
-    //self.navigationBar.shadowColor = UIColorWithSingleRGB(61.f);
-    self.navigationBar.titleColor = [UIColor whiteColor];
+    self.navigationBar.backgroundColor = UIColor.whiteColor;
     self.navigationBar.shadowView.hidden = YES;
     self.navigationBar.rightBarItem.hidden = YES;
 }
@@ -43,19 +39,19 @@
 }
 
 - (NSArray <NSString *>*)segmentControllerShouldLoadPageTitles:(MNSegmentController *)segmentController {
-    WXCookSort *model = [self.httpRequest.dataArray objectAtIndex:self.sortIndex];
-    self.title = model.name;
-    NSMutableArray <NSString *>*titles = [NSMutableArray arrayWithCapacity:model.sorts.count];
-    [model.sorts enumerateObjectsUsingBlock:^(WXCookName * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    WXCookSort *sort = [self.httpRequest.dataArray objectAtIndex:self.sortIndex];
+    self.title = sort.title;
+    NSMutableArray <NSString *>*titles = [NSMutableArray arrayWithCapacity:sort.list.count];
+    [sort.list enumerateObjectsUsingBlock:^(WXCookMenu * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [titles addObject:obj.name];
     }];
     return titles.copy;
 }
 
 - (UIViewController *)segmentController:(MNSegmentController *)segmentController childControllerOfPageIndex:(NSUInteger)pageIndex {
-    WXCookSort *model = [self.httpRequest.dataArray objectAtIndex:self.sortIndex];
-    WXCookName *cook = model.sorts[pageIndex];
-    WXCookListController *vc = [[WXCookListController alloc] initWithFrame:segmentController.view.bounds cid:cook.cid];
+    WXCookSort *sort = [self.httpRequest.dataArray objectAtIndex:self.sortIndex];
+    WXCookMenu *menu = sort.list[pageIndex];
+    WXCookListController *vc = [[WXCookListController alloc] initWithFrame:segmentController.view.bounds menu:menu];
     return vc;
 }
 
@@ -64,12 +60,13 @@
     configuration.titleMargin = 45.f;
     configuration.contentMode = MNSegmentContentModeFill;
     configuration.shadowMask = MNSegmentShadowMaskFit;
-    configuration.backgroundColor = UIColorWithSingleRGB(51.f);
-    configuration.titleFont = UIFontSystem(16.5f);
-    configuration.titleColor = [UIColor whiteColor];
+    configuration.backgroundColor = UIColor.whiteColor;
+    configuration.titleFont = [UIFont systemFontOfSize:17.f];
+    configuration.selectedTitleFont = [UIFont systemFontOfSize:17.f];
+    configuration.titleColor = [UIColor.darkTextColor colorWithAlphaComponent:.9f];
     configuration.selectedColor = THEME_COLOR;
-    configuration.shadowColor = UIColorWithSingleRGB(51.f);
-    configuration.separatorColor = UIColorWithSingleRGB(51.f);
+    configuration.shadowColor = THEME_COLOR;
+    configuration.separatorColor = [UIColor.grayColor colorWithAlphaComponent:.15f];
 }
 
 - (void)segmentControllerProfileViewDidScroll:(MNSegmentController *)segmentController {

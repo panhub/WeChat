@@ -7,6 +7,7 @@
 //
 
 #import "WXCookListController.h"
+#import "WXCookSort.h"
 #import "WXCookRecipeController.h"
 #import "WXCookRequest.h"
 #import "WXCookListCell.h"
@@ -16,11 +17,11 @@
 @end
 
 @implementation WXCookListController
-- (instancetype)initWithFrame:(CGRect)frame cid:(NSString *)cid {
+- (instancetype)initWithFrame:(CGRect)frame menu:(WXCookMenu *)menu {
     if (self = [super initWithFrame:frame]) {
         self.loadMoreEnabled = YES;
         self.pullRefreshEnabled = YES;
-        self.httpRequest = [[WXCookRequest alloc] initWithCid:cid];
+        self.httpRequest = [[WXCookRequest alloc] initWithMenu:menu];
     }
     return self;
 }
@@ -52,12 +53,12 @@
     cell.model = self.httpRequest.dataArray[indexPath.item];
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.item >= self.httpRequest.dataArray.count) return;
-    WXCookModel *model = self.httpRequest.dataArray[indexPath.row];
-    WXCookRecipeController *vc = [[WXCookRecipeController alloc] initWithRecipeModel:model.recipe];
-    [self.navigationController pushViewController:vc animated:YES];
-}
+//- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+//    if (indexPath.item >= self.httpRequest.dataArray.count) return;
+//    WXCook *cook = self.httpRequest.dataArray[indexPath.row];
+//    WXCookRecipeController *vc = [[WXCookRecipeController alloc] initWithRecipeModel:cook.recipe];
+//    [self.navigationController pushViewController:vc animated:YES];
+//}
 
 #pragma mark - MNSegmentSubpageDataSource
 - (UIScrollView *)segmentSubpageScrollView {

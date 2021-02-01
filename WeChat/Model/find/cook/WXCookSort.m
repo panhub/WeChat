@@ -8,40 +8,28 @@
 
 #import "WXCookSort.h"
 
-@implementation WXCookName
+@implementation WXCookMenu
 + (instancetype)modelWithDictionary:(NSDictionary *)dic {
-    NSDictionary *categoryInfo = [NSDictionary dictionaryValueWithDictionary:dic forKey:@"categoryInfo"];
-    NSString *cid = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"ctgId"];
-    NSString *name = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"name"];
-    NSString *parent = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"parentId"];
-    if (cid.length <= 0 || name.length <= 0) return nil;
-    WXCookName *model = [WXCookName new];
-    model.cid = cid;
-    model.name = name;
-    model.parent = parent;
+    WXCookMenu *model = [WXCookMenu new];
+    model.cid = [NSDictionary stringValueWithDictionary:dic forKey:@"id"];
+    model.name = [NSDictionary stringValueWithDictionary:dic forKey:@"name"];
     return model;
 }
 @end
 
 @implementation WXCookSort
 + (instancetype)modelWithDictionary:(NSDictionary *)dic {
-    NSArray <NSDictionary *>*childs = [NSDictionary arrayValueWithDictionary:dic forKey:@"childs"];
-    if (childs.count <= 0) return nil;
-    NSDictionary *categoryInfo = [NSDictionary dictionaryValueWithDictionary:dic forKey:@"categoryInfo"];
-    NSMutableArray <WXCookName *>*sorts = [NSMutableArray arrayWithCapacity:childs.count];
-    [childs enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        WXCookName *model = [WXCookName modelWithDictionary:obj];
-        if (model) [sorts addObject:model];
-    }];
-    if (sorts.count <= 0) return nil;
     WXCookSort *model = [WXCookSort new];
-    model.sorts = sorts.copy;
-    model.cid = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"ctgId"];
-    model.name = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"name"];
-    model.parent = [NSDictionary stringValueWithDictionary:categoryInfo forKey:@"parentId"];
+    model.cid = [NSDictionary stringValueWithDictionary:dic forKey:@"id"];
+    model.title = [NSDictionary stringValueWithDictionary:dic forKey:@"name"];
+    NSMutableArray <WXCookMenu *>*array = @[].mutableCopy;
+    NSArray <NSDictionary *>*list = [NSDictionary arrayValueWithDictionary:dic forKey:@"list"];
+    [list enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        WXCookMenu *m = [WXCookMenu modelWithDictionary:obj];
+        [array addObject:m];
+    }];
+    model.list = array.copy;
     return model;
 }
-
-
 
 @end

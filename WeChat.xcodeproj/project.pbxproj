@@ -141,7 +141,7 @@
 		201DAF6422E8945F0063E88A /* WXMoment.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF4222E8945F0063E88A /* WXMoment.m */; };
 		201DAF6522E8945F0063E88A /* WXMapLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF4922E8945F0063E88A /* WXMapLocation.m */; };
 		201DAF6622E8945F0063E88A /* WXCookSort.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF4D22E8945F0063E88A /* WXCookSort.m */; };
-		201DAF6722E8945F0063E88A /* WXCookModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF4E22E8945F0063E88A /* WXCookModel.m */; };
+		201DAF6722E8945F0063E88A /* WXCook.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF4E22E8945F0063E88A /* WXCook.m */; };
 		201DAF6822E8945F0063E88A /* WXCityModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF5122E8945F0063E88A /* WXCityModel.m */; };
 		201DAF6922E8945F0063E88A /* WXWeatherModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF5222E8945F0063E88A /* WXWeatherModel.m */; };
 		201DAF6A22E8945F0063E88A /* WXSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAF5722E8945F0063E88A /* WXSession.m */; };
@@ -383,7 +383,7 @@
 		20A92A7122F5C91300868FBE /* TAAbstractDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 20A92A6722F5C91300868FBE /* TAAbstractDotView.m */; };
 		20A92A7422F5C96E00868FBE /* WXCookHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 20A92A7322F5C96E00868FBE /* WXCookHeaderView.m */; };
 		20A92A8522F737E100868FBE /* WXAllEmoticonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 20A92A8422F737E100868FBE /* WXAllEmoticonCell.m */; };
-		20CA0590227BFC1800663073 /* MNMobRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 20CA058E227BFC1800663073 /* MNMobRequest.m */; };
+		20CA0590227BFC1800663073 /* WXJHRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 20CA058E227BFC1800663073 /* WXJHRequest.m */; };
 		20DBB61C22388F3800032C02 /* WechatHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 20DBB61B22388F3800032C02 /* WechatHelper.m */; };
 		20E1A38E223147B700D0DBAF /* WXUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 20E1A38D223147B700D0DBAF /* WXUser.m */; };
 		20E4712122EB399700BD125A /* WXMomentRemindView.m in Sources */ = {isa = PBXBuildFile; fileRef = 20E4711F22EB399700BD125A /* WXMomentRemindView.m */; };
@@ -1137,9 +1137,9 @@
 		201DAF4722E8945F0063E88A /* WXMoment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMoment.h; sourceTree = "<group>"; };
 		201DAF4922E8945F0063E88A /* WXMapLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMapLocation.m; sourceTree = "<group>"; };
 		201DAF4A22E8945F0063E88A /* WXMapLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMapLocation.h; sourceTree = "<group>"; };
-		201DAF4C22E8945F0063E88A /* WXCookModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCookModel.h; sourceTree = "<group>"; };
+		201DAF4C22E8945F0063E88A /* WXCook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCook.h; sourceTree = "<group>"; };
 		201DAF4D22E8945F0063E88A /* WXCookSort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCookSort.m; sourceTree = "<group>"; };
-		201DAF4E22E8945F0063E88A /* WXCookModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCookModel.m; sourceTree = "<group>"; };
+		201DAF4E22E8945F0063E88A /* WXCook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCook.m; sourceTree = "<group>"; };
 		201DAF4F22E8945F0063E88A /* WXCookSort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCookSort.h; sourceTree = "<group>"; };
 		201DAF5122E8945F0063E88A /* WXCityModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCityModel.m; sourceTree = "<group>"; };
 		201DAF5222E8945F0063E88A /* WXWeatherModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXWeatherModel.m; sourceTree = "<group>"; };
@@ -1623,8 +1623,8 @@
 		20A92A7322F5C96E00868FBE /* WXCookHeaderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXCookHeaderView.m; sourceTree = "<group>"; };
 		20A92A8322F737E100868FBE /* WXAllEmoticonCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXAllEmoticonCell.h; sourceTree = "<group>"; };
 		20A92A8422F737E100868FBE /* WXAllEmoticonCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXAllEmoticonCell.m; sourceTree = "<group>"; };
-		20CA058E227BFC1800663073 /* MNMobRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNMobRequest.m; sourceTree = "<group>"; };
-		20CA058F227BFC1800663073 /* MNMobRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNMobRequest.h; sourceTree = "<group>"; };
+		20CA058E227BFC1800663073 /* WXJHRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXJHRequest.m; sourceTree = "<group>"; };
+		20CA058F227BFC1800663073 /* WXJHRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJHRequest.h; sourceTree = "<group>"; };
 		20DBB61A22388F3800032C02 /* WechatHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WechatHelper.h; sourceTree = "<group>"; };
 		20DBB61B22388F3800032C02 /* WechatHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WechatHelper.m; sourceTree = "<group>"; };
 		20E1A38C223147B700D0DBAF /* WXUser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXUser.h; sourceTree = "<group>"; };
@@ -3285,10 +3285,10 @@
 		201DAF4B22E8945F0063E88A /* cook */ = {
 			isa = PBXGroup;
 			children = (
-				201DAF4C22E8945F0063E88A /* WXCookModel.h */,
-				201DAF4D22E8945F0063E88A /* WXCookSort.m */,
-				201DAF4E22E8945F0063E88A /* WXCookModel.m */,
+				201DAF4C22E8945F0063E88A /* WXCook.h */,
+				201DAF4E22E8945F0063E88A /* WXCook.m */,
 				201DAF4F22E8945F0063E88A /* WXCookSort.h */,
+				201DAF4D22E8945F0063E88A /* WXCookSort.m */,
 			);
 			path = cook;
 			sourceTree = "<group>";
@@ -3328,9 +3328,9 @@
 			isa = PBXGroup;
 			children = (
 				201DAF7022E8952C0063E88A /* WXCookSortRequest.h */,
-				201DAF6D22E8952C0063E88A /* WXCookRequest.m */,
-				201DAF6F22E8952C0063E88A /* WXCookRequest.h */,
 				201DAF6E22E8952C0063E88A /* WXCookSortRequest.m */,
+				201DAF6F22E8952C0063E88A /* WXCookRequest.h */,
+				201DAF6D22E8952C0063E88A /* WXCookRequest.m */,
 			);
 			path = cook;
 			sourceTree = "<group>";
@@ -4170,8 +4170,8 @@
 		20CA058D227BFC1800663073 /* base */ = {
 			isa = PBXGroup;
 			children = (
-				20CA058F227BFC1800663073 /* MNMobRequest.h */,
-				20CA058E227BFC1800663073 /* MNMobRequest.m */,
+				20CA058F227BFC1800663073 /* WXJHRequest.h */,
+				20CA058E227BFC1800663073 /* WXJHRequest.m */,
 			);
 			path = base;
 			sourceTree = "<group>";
@@ -6480,7 +6480,7 @@
 				201DB08422E8953C0063E88A /* WXBankCardView.m in Sources */,
 				201DB06322E8953C0063E88A /* WXChatLocationHeaderView.m in Sources */,
 				E8F253CD257911E000A05A13 /* WXLaunchController.m in Sources */,
-				201DAF6722E8945F0063E88A /* WXCookModel.m in Sources */,
+				201DAF6722E8945F0063E88A /* WXCook.m in Sources */,
 				2055D8EE22E021A40012E43E /* SDWebImageWebPCoder.m in Sources */,
 				E869C98D2570EF670017025E /* MNAssetPreviewController.m in Sources */,
 				E869CA372570EF680017025E /* MJRefreshAutoStateFooter.m in Sources */,
@@ -6603,7 +6603,7 @@
 				201DAEFC22E894410063E88A /* WXBankCardBindController.m in Sources */,
 				E869C9192570EF670017025E /* MNNetworkReachability.m in Sources */,
 				BFDF922E23EEE563009AC1C2 /* WXMusicViewController.m in Sources */,
-				20CA0590227BFC1800663073 /* MNMobRequest.m in Sources */,
+				20CA0590227BFC1800663073 /* WXJHRequest.m in Sources */,
 				E869C8F82570EF670017025E /* MNAuthenticator.m in Sources */,
 				201DAF6622E8945F0063E88A /* WXCookSort.m in Sources */,
 				E869C8F72570EF670017025E /* MNLayoutConstraint.m in Sources */,
