@@ -23,8 +23,8 @@
 @property (nonatomic, strong) AVAssetWriterInput *audioInput;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *videoOutput;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *audioOutput;
-@property (nonatomic, copy) MNMovExportProgressHandler progressHandler;
-@property (nonatomic, copy) MNMovExportCompletionHandler completionHandler;
+@property (nonatomic, copy) MNQuickExportProgressHandler progressHandler;
+@property (nonatomic, copy) MNQuickExportCompletionHandler completionHandler;
 @end
 
 @implementation MNQuickTime
@@ -58,13 +58,13 @@
     return [self initWithVideoURL:[NSURL fileURLWithPath:videoPath]];
 }
 
-- (void)exportAsynchronouslyWithCompletionHandler:(MNMovExportCompletionHandler)completionHandler
+- (void)exportAsynchronouslyWithCompletionHandler:(MNQuickExportCompletionHandler)completionHandler
 {
     [self exportAsynchronouslyWithProgressHandler:nil completionHandler:completionHandler];
 }
 
-- (void)exportAsynchronouslyWithProgressHandler:(MNMovExportProgressHandler)progressHandler
-                              completionHandler:(MNMovExportCompletionHandler)completionHandler
+- (void)exportAsynchronouslyWithProgressHandler:(MNQuickExportProgressHandler)progressHandler
+                              completionHandler:(MNQuickExportCompletionHandler)completionHandler
 {
     if (self.status == MNMovExportStatusExporting) return;
     self.error = nil;

@@ -31,13 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 进度回调
 @param progress 进度信息
 */
-typedef void(^MNMovExportProgressHandler)(float progress);
+typedef void(^MNQuickExportProgressHandler)(float progress);
 /**
  输出回调
  @param status 视频路径
  @param error 错误信息(nullable)
  */
-typedef void(^MNMovExportCompletionHandler)(MNMovExportStatus status, NSError *_Nullable error);
+typedef void(^MNQuickExportCompletionHandler)(MNMovExportStatus status, NSError *_Nullable error);
 
 @interface MNQuickTime : NSObject
 /**视频帧率<15-60>*/
@@ -81,15 +81,15 @@ typedef void(^MNMovExportCompletionHandler)(MNMovExportStatus status, NSError *_
  异步处理视频为mov格式
  @param completionHandler 结束回调
  */
-- (void)exportAsynchronouslyWithCompletionHandler:(nullable MNMovExportCompletionHandler)completionHandler;
+- (void)exportAsynchronouslyWithCompletionHandler:(nullable MNQuickExportCompletionHandler)completionHandler;
 
 /**
  异步处理视频为mov格式
  @param progressHandler 进度回调
  @param completionHandler 完成回调
  */
-- (void)exportAsynchronouslyWithProgressHandler:(nullable MNMovExportProgressHandler)progressHandler
-                              completionHandler:(nullable MNMovExportCompletionHandler)completionHandler;
+- (void)exportAsynchronouslyWithProgressHandler:(nullable MNQuickExportProgressHandler)progressHandler
+                              completionHandler:(nullable MNQuickExportCompletionHandler)completionHandler;
 
 /**
  取消

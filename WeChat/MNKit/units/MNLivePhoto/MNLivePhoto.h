@@ -39,7 +39,7 @@
 /**
  生成LivePhoto<MNLivePhoto><进度>
  @param videoPath 视频路径
- @param seconds 瞬时照片秒数
+ @param seconds 瞬时照片所在秒数
  @param duration 瞬时照片持续时长
  @param progressHandler 进度回调
  @param completionHandler 完成回调 Float64 stillDuration
@@ -62,7 +62,7 @@
 /**
  生成LivePhoto<本地路径><进度>
  @param videoPath 视频路径
- @param seconds 瞬时照片秒数
+ @param seconds 瞬时照片所在秒数
  @param duration 瞬时照片持续时长
  @param progressHandler 进度回调
  @param completionHandler 完成回调
