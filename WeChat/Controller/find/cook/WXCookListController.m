@@ -31,7 +31,7 @@
 
     self.collectionView.frame = self.contentView.bounds;
     self.collectionView.showsVerticalScrollIndicator = NO;
-    self.contentView.backgroundColor = UIColorWithSingleRGB(51.f);
+    self.contentView.backgroundColor = UIColor.whiteColor;
     [self.collectionView registerClass:[WXCookListCell class] forCellWithReuseIdentifier:MNCollectionElementCellReuseIdentifier];
 }
 
@@ -76,30 +76,16 @@
 
 - (UICollectionViewLayout *)collectionViewLayout {
     MNCollectionVerticalLayout *layout = [MNCollectionVerticalLayout layout];
-    layout.minimumLineSpacing = 10.f;
-    layout.minimumInteritemSpacing = 10.f;
+    layout.minimumLineSpacing = 8.f;
+    layout.minimumInteritemSpacing = 8.f;
     layout.numberOfFormation = 2;
-    layout.sectionInset = UIEdgeInsetsMake(0.f, 10.f, 0.f, 10.f);
+    layout.sectionInset = UIEdgeInsetsMake(8.f, 8.f, MN_TAB_SAFE_HEIGHT, 8.f);
     layout.itemSize = CGSizeMake(1.f, 1.f);
     return layout;
 }
 
-- (void)prepareLoadData:(__kindof MNHTTPDataRequest *)request {
-    if (request.isFirstLoading) {
-        [self.contentView showDotDialog];
-    }
-}
-
 - (void)showEmptyViewNeed:(BOOL)isNeed image:(UIImage *)image message:(NSString *)message title:(NSString *)title type:(MNEmptyEventType)type {
     [super showEmptyViewNeed:isNeed image:[MNBundle imageForResource:@"empty_data_jd"] message:@"获取数据失败" title:@"点击重试" type:MNEmptyEventTypeReload];
-}
-
-- (NSString *)refreshHeaderClass {
-    return @"MNRefreshDotHeader";
-}
-
-- (NSString *)refreshFooterClass {
-    return @"MNRefreshDotFooter";
 }
 
 @end

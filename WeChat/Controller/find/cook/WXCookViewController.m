@@ -158,7 +158,7 @@
 }
 
 - (void)prepareLoadData:(__kindof MNHTTPDataRequest *)request {
-    [self.contentView showDotDialog];
+    if (!self.contentView.isDialoging) [self.contentView showWechatDialog];
 }
 
 - (BOOL)loadDataFinishWithRequest:(__kindof MNHTTPDataRequest *)request {
@@ -171,7 +171,7 @@
 }
 
 - (void)showEmptyViewNeed:(BOOL)isNeed image:(UIImage *)image message:(NSString *)message title:(NSString *)title type:(MNEmptyEventType)type {
-    [super showEmptyViewNeed:isNeed image:[MNBundle imageForResource:@"empty_data_jd"] message:@"获取数据失败" title:@"点击重试" type:MNEmptyEventTypeReload];
+    [super showEmptyViewNeed:isNeed image:[MNBundle imageForResource:@"empty_data_jd"] message:message title:@"点击重试" type:MNEmptyEventTypeReload];
 }
 
 @end

@@ -13,14 +13,12 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         
-        self.contentView.backgroundColor = UIColorWithSingleRGB(51.f);
+        self.contentView.backgroundColor = UIColor.whiteColor;
+        UIViewSetBorderRadius(self.contentView, 5.f, 1.f, [UIColor.grayColor colorWithAlphaComponent:.1f]);
         
         self.imageView.frame = self.contentView.bounds;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        
-        UIImageView *imageView = [UIImageView imageViewWithFrame:CGRectMake(0.f, self.contentView.height_mn/2.f, self.contentView.width_mn, self.contentView.height_mn/2.f) image:[MNBundle imageForResource:@"mask_bottom"]];
-        imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [self.contentView addSubview:imageView];
+        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         
         self.detailLabel.frame = CGRectMake(7.f, self.contentView.height_mn - 18.f, self.contentView.width_mn - 12.f, 13.f);
         self.detailLabel.font = UIFontSystem(self.detailLabel.height_mn);
@@ -35,12 +33,8 @@
 
 - (void)setModel:(WXCook *)model {
     _model = model;
-    self.titleLabel.text = model.name;
-    self.detailLabel.text = model.titles;
-    if (model.recipe.img.length > 0) {
-        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.recipe.img] placeholderImage:nil];
-    } else {
-        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.thumbnail] placeholderImage:nil];
+    if (model.albums.count) {
+        [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.albums.firstObject] placeholderImage:nil];
     }
 }
 

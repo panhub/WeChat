@@ -17,6 +17,27 @@
     return self;
 }
 
+#pragma mark - 请求链接
+- (void)handCacheUrl {
+    NSMutableString *url = self.url.mutableCopy;
+    if (url.length <= 0) {
+        self.cacheForUrl = nil;
+        return;
+    }
+    NSString *query = ((NSDictionary *)self.query).queryValue;
+    if (query.length <= 0) {
+        if ([url containsString:@"?"]) {
+            [url appendString:@"&"];
+        } else {
+            [url appendString:@"?"];
+        }
+        [url appendString:query];
+        self.cacheForUrl = url;
+    } else {
+        self.cacheForUrl = url;
+    }
+}
+
 #pragma mark - 请求结束
 - (void)didFinishWithSupposedResponse:(MNURLResponse *)response {
     NSDictionary *json = response.data;

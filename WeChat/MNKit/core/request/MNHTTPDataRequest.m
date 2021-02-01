@@ -25,6 +25,7 @@
     [self handQuery];
     [self handBody];
     [self handHeaderField];
+    [self handCacheUrl];
     [super loadData:startCallback completion:finishCallback];
 }
 
@@ -38,6 +39,8 @@
 - (void)handBody {}
 
 - (void)handHeaderField {}
+
+- (void)handCacheUrl {}
 
 - (void)setParameter:(id)parameter {
     if (self.method == MNURLHTTPMethodGet) {

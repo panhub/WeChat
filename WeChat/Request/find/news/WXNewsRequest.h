@@ -6,11 +6,11 @@
 //  Copyright © 2021 Vincent. All rights reserved.
 //  新闻列表请求
 
-#import "MNHTTPDataRequest.h"
+#import "WXJHRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WXNewsRequest : MNHTTPDataRequest
+@interface WXNewsRequest : WXJHRequest
 
 /**新闻类型*/
 @property (nonatomic, copy) NSString *type;

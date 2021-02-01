@@ -24,8 +24,8 @@
 - (void)handQuery {
     [super handQuery];
     NSMutableDictionary *query = [NSMutableDictionary dictionaryWithDictionary:self.query ? : @{}];
-    if (self.type.length > 0) [query setObject:self.type forKey:@"type"];
     [query setObject:@"f95a1f98e4a55ea8e27233cb4d57d962" forKey:@"key"];
+    if (self.type.length > 0) [query setObject:self.type forKey:@"type"];
     self.query = query;
 }
 

@@ -31,9 +31,9 @@
 - (void)handQuery {
     [super handQuery];
     NSMutableDictionary *query = [NSMutableDictionary dictionaryWithDictionary:self.query ? : @{}];
-    if (self.menu) [query setObject:self.menu.name forKey:@"menu"];
     [query setObject:@"json" forKey:@"dtype"];
     [query setObject:@"6f2afb00fbb3b72f311f914f8f692132" forKey:@"key"];
+    if (self.menu) [query setObject:self.menu.name forKey:@"menu"];
     [query setObject:@(MAX(self.dataArray.count, 1)).stringValue forKey:@"pn"];
     [query setObject:@(WXCookPageSize).stringValue forKey:@"rn"];
     self.query = query;

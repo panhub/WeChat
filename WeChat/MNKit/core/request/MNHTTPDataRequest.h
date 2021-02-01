@@ -41,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handHeaderField;
 
 /**
+ 处理缓存链接
+ */
+- (void)handCacheUrl;
+
+/**
  标记开始刷新数据
  */
 - (void)prepareReloadData;
