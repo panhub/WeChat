@@ -40,7 +40,7 @@
     MNSegmentController *segmentController = [[MNSegmentController alloc] initWithFrame:self.contentView.bounds];
     segmentController.delegate = self;
     segmentController.dataSource = self;
-    segmentController.fixedHeight = MN_NAV_BAR_HEIGHT;
+    segmentController.fixedHeight = MN_STATUS_BAR_HEIGHT;
     self.segmentController = segmentController;
     
     [self addChildViewController:segmentController inView:self.contentView];
@@ -94,9 +94,10 @@
 
 - (void)segmentControllerPageDidScroll:(MNSegmentController *)segmentController {
     CGFloat contentOffsetY = segmentController.contentOffset.y;
-    //contentOffsetY = MIN(contentOffsetY, MN_NAV_BAR_HEIGHT);
-    //self.navigationBar.alpha = (contentOffsetY - MN_NAV_BAR_HEIGHT)/MN_NAV_BAR_HEIGHT;
-    NSLog(@"%f", contentOffsetY);
+    contentOffsetY += segmentController.profileView.height_mn;
+    contentOffsetY = MIN(contentOffsetY, segmentController.fixedHeight);
+    contentOffsetY = segmentController.fixedHeight - contentOffsetY;
+    self.navigationBar.leftBarItem.alpha = self.navigationBar.titleView.alpha = contentOffsetY/segmentController.fixedHeight;
 }
 
 #pragma mark - Super
