@@ -121,27 +121,26 @@
             if (completionHandler) completionHandler(nil, nil);
             return;
         }
-        UIImage *thumbnailImage = [UIImage imageWithCGImage:imageRef];
+        UIImage *stillImage = [UIImage imageWithCGImage:imageRef];
         // 标识
-        NSString *identifier = NSUUID.UUID.UUIDString;
-        identifier = [identifier stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        NSString *identifier = [[NSNumber numberWithLongLong:NSDate.date.timeIntervalSince1970*1000] stringValue];
         // JPG图片
-        NSString *jpgPath = [self generateFilePathWithName:identifier extension:@"JPG"];
-        MNJPEG *JPEG = [[MNJPEG alloc] initWithImage:thumbnailImage];
+        NSString *jpgPath = [MNLivePhoto generateFilePathWithName:identifier extension:@"jpg"];
+        MNJPEG *JPEG = [[MNJPEG alloc] initWithImage:stillImage];
         if ([JPEG writeToFile:jpgPath withIdentifier:identifier] == NO) {
             NSLog(@"write jpeg error");
             if (completionHandler) completionHandler(nil, nil);
             return;
         }
         // MOV视频
-        NSString *movPath = [MNLivePhoto generateFilePathWithName:identifier extension:@"MOV"];
+        NSString *movPath = [MNLivePhoto generateFilePathWithName:identifier extension:@"mov"];
         MNQuickTime *QuickTime = [[MNQuickTime alloc] initWithVideoAsset:videoAsset];
         QuickTime.identifier = identifier;
         QuickTime.outputPath = movPath;
         QuickTime.stillDuration = duration;
         [QuickTime exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:^(MNMovExportStatus status, NSError * _Nullable error) {
             BOOL succeed = status == MNMovExportStatusCompleted;
-            if (completionHandler) if (completionHandler) completionHandler(succeed?jpgPath:nil, succeed?movPath:nil);
+            if (completionHandler) if (completionHandler) completionHandler(succeed ? jpgPath : nil, succeed ? movPath : nil);
         }];
     });
 }

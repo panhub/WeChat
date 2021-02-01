@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param imageData 图片二进制流
  @return JPEG图片
  */
-- (instancetype)initWithData:(NSData *)imageData;
+- (instancetype)initWithImageData:(NSData *)imageData;
 /**
  依据图片路径实例化
  @param filePath 图片路径

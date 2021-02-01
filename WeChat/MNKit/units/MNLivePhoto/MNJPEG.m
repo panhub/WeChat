@@ -13,7 +13,7 @@
 #define MNJPEGMakeNoteIdentifier    @"17"
 
 @implementation MNJPEG
-- (instancetype)initWithData:(NSData *)imageData {
+- (instancetype)initWithImageData:(NSData *)imageData {
     if (!imageData) return nil;
     self = [super init];
     if (!self) return nil;
@@ -22,11 +22,11 @@
 }
 
 - (instancetype)initWithImage:(UIImage *)image {
-    return [self initWithData:UIImageJPEGRepresentation(image, 1.f)];
+    return [self initWithImageData:UIImageJPEGRepresentation(image, 1.f)];
 }
 
 - (instancetype)initWithContentsOfFile:(NSString *)filePath {
-    return [self initWithData:[NSData dataWithContentsOfFile:filePath]];
+    return [self initWithImageData:[NSData dataWithContentsOfFile:filePath]];
 }
 
 - (BOOL)writeToFile:(NSString *)filePath withIdentifier:(NSString *)identifier {
