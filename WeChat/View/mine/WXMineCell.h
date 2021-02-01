@@ -1,8 +1,8 @@
 //
-//  WXAppletListCell.h
+//  WXMineCell.h
 //  MNChat
 //
-//  Created by Vincent on 2019/6/19.
+//  Created by Vincent on 2019/4/1.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
@@ -11,9 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WXAppletListCell : MNTableViewCell
+@interface WXMineCell : MNTableViewCell
 
-@property (nonatomic, strong) WXDataValueModel *model;
+@property (nonatomic, weak) WXDataValueModel *model;
 
 @end
 

@@ -198,7 +198,7 @@
 		201DB07F22E8953C0063E88A /* WXAboutListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFE222E8953C0063E88A /* WXAboutListCell.m */; };
 		201DB08022E8953C0063E88A /* WXAboutHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFE322E8953C0063E88A /* WXAboutHeaderView.m */; };
 		201DB08122E8953C0063E88A /* WXSetingListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFE522E8953C0063E88A /* WXSetingListCell.m */; };
-		201DB08222E8953C0063E88A /* WXMineListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFE722E8953C0063E88A /* WXMineListCell.m */; };
+		201DB08222E8953C0063E88A /* WXMineCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFE722E8953C0063E88A /* WXMineCell.m */; };
 		201DB08322E8953C0063E88A /* WXBankCardAlertViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFEC22E8953C0063E88A /* WXBankCardAlertViewCell.m */; };
 		201DB08422E8953C0063E88A /* WXBankCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFEE22E8953C0063E88A /* WXBankCardView.m */; };
 		201DB08522E8953C0063E88A /* WXBankCardListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DAFF022E8953C0063E88A /* WXBankCardListCell.m */; };
@@ -219,8 +219,8 @@
 		201DB09422E8953C0063E88A /* WXAlbumListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB00E22E8953C0063E88A /* WXAlbumListCell.m */; };
 		201DB09522E8953C0063E88A /* WXAlbumTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01022E8953C0063E88A /* WXAlbumTableHeaderView.m */; };
 		201DB09622E8953C0063E88A /* WXAlbumPictureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01222E8953C0063E88A /* WXAlbumPictureView.m */; };
-		201DB09722E8953C0063E88A /* WXFindListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01522E8953C0063E88A /* WXFindListCell.m */; };
-		201DB09822E8953C0063E88A /* WXAppletListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01622E8953C0063E88A /* WXAppletListCell.m */; };
+		201DB09722E8953C0063E88A /* WXFindCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01522E8953C0063E88A /* WXFindCell.m */; };
+		201DB09822E8953C0063E88A /* WXAppletCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01622E8953C0063E88A /* WXAppletCell.m */; };
 		201DB09922E8953C0063E88A /* WXMomentPictureItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01822E8953C0063E88A /* WXMomentPictureItem.m */; };
 		201DB09A22E8953C0063E88A /* WXAddMomentTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01922E8953C0063E88A /* WXAddMomentTableView.m */; };
 		201DB09B22E8953C0063E88A /* WXMomentHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 201DB01A22E8953C0063E88A /* WXMomentHeaderView.m */; };
@@ -1253,7 +1253,7 @@
 		201DAFE422E8953C0063E88A /* WXSetingFooterCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSetingFooterCell.h; sourceTree = "<group>"; };
 		201DAFE522E8953C0063E88A /* WXSetingListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSetingListCell.m; sourceTree = "<group>"; };
 		201DAFE622E8953C0063E88A /* WXAboutListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAboutListCell.h; sourceTree = "<group>"; };
-		201DAFE722E8953C0063E88A /* WXMineListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMineListCell.m; sourceTree = "<group>"; };
+		201DAFE722E8953C0063E88A /* WXMineCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMineCell.m; sourceTree = "<group>"; };
 		201DAFE822E8953C0063E88A /* WXMineHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMineHeaderView.h; sourceTree = "<group>"; };
 		201DAFEA22E8953C0063E88A /* WXAuthListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAuthListCell.h; sourceTree = "<group>"; };
 		201DAFEB22E8953C0063E88A /* WXChangeListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXChangeListCell.h; sourceTree = "<group>"; };
@@ -1287,7 +1287,7 @@
 		201DB00822E8953C0063E88A /* WXMineInfoHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMineInfoHeaderView.m; sourceTree = "<group>"; };
 		201DB00922E8953C0063E88A /* WXMineInfoListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMineInfoListCell.h; sourceTree = "<group>"; };
 		201DB00A22E8953C0063E88A /* WXMineInfoHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMineInfoHeaderView.h; sourceTree = "<group>"; };
-		201DB00B22E8953C0063E88A /* WXMineListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMineListCell.h; sourceTree = "<group>"; };
+		201DB00B22E8953C0063E88A /* WXMineCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXMineCell.h; sourceTree = "<group>"; };
 		201DB00C22E8953C0063E88A /* WXMineHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMineHeaderView.m; sourceTree = "<group>"; };
 		201DB00E22E8953C0063E88A /* WXAlbumListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAlbumListCell.m; sourceTree = "<group>"; };
 		201DB00F22E8953C0063E88A /* WXAlbumPictureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAlbumPictureView.h; sourceTree = "<group>"; };
@@ -1295,8 +1295,8 @@
 		201DB01122E8953C0063E88A /* WXAlbumListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAlbumListCell.h; sourceTree = "<group>"; };
 		201DB01222E8953C0063E88A /* WXAlbumPictureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAlbumPictureView.m; sourceTree = "<group>"; };
 		201DB01322E8953C0063E88A /* WXAlbumTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAlbumTableHeaderView.h; sourceTree = "<group>"; };
-		201DB01522E8953C0063E88A /* WXFindListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFindListCell.m; sourceTree = "<group>"; };
-		201DB01622E8953C0063E88A /* WXAppletListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAppletListCell.m; sourceTree = "<group>"; };
+		201DB01522E8953C0063E88A /* WXFindCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFindCell.m; sourceTree = "<group>"; };
+		201DB01622E8953C0063E88A /* WXAppletCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAppletCell.m; sourceTree = "<group>"; };
 		201DB01822E8953C0063E88A /* WXMomentPictureItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMomentPictureItem.m; sourceTree = "<group>"; };
 		201DB01922E8953C0063E88A /* WXAddMomentTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAddMomentTableView.m; sourceTree = "<group>"; };
 		201DB01A22E8953C0063E88A /* WXMomentHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXMomentHeaderView.m; sourceTree = "<group>"; };
@@ -1335,12 +1335,12 @@
 		201DB03D22E8953C0063E88A /* WXCookRecipeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCookRecipeCell.h; sourceTree = "<group>"; };
 		201DB03E22E8953C0063E88A /* WXCookRecipeBriefView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCookRecipeBriefView.m; sourceTree = "<group>"; };
 		201DB03F22E8953C0063E88A /* WXCookRecipeHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCookRecipeHeaderView.h; sourceTree = "<group>"; };
-		201DB04022E8953C0063E88A /* WXAppletListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppletListCell.h; sourceTree = "<group>"; };
+		201DB04022E8953C0063E88A /* WXAppletCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppletCell.h; sourceTree = "<group>"; };
 		201DB04222E8953C0063E88A /* WXWatchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXWatchView.m; sourceTree = "<group>"; };
 		201DB04322E8953C0063E88A /* WXWatchPointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXWatchPointer.h; sourceTree = "<group>"; };
 		201DB04422E8953C0063E88A /* WXWatchPointer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXWatchPointer.m; sourceTree = "<group>"; };
 		201DB04522E8953C0063E88A /* WXWatchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXWatchView.h; sourceTree = "<group>"; };
-		201DB04622E8953C0063E88A /* WXFindListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXFindListCell.h; sourceTree = "<group>"; };
+		201DB04622E8953C0063E88A /* WXFindCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXFindCell.h; sourceTree = "<group>"; };
 		201DB04822E8953C0063E88A /* WXCityListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCityListCell.h; sourceTree = "<group>"; };
 		201DB04922E8953C0063E88A /* WXCityListSectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCityListSectionHeaderView.h; sourceTree = "<group>"; };
 		201DB04A22E8953C0063E88A /* WXCityListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCityListCell.m; sourceTree = "<group>"; };
@@ -3483,8 +3483,8 @@
 			children = (
 				201DAFE822E8953C0063E88A /* WXMineHeaderView.h */,
 				201DB00C22E8953C0063E88A /* WXMineHeaderView.m */,
-				201DB00B22E8953C0063E88A /* WXMineListCell.h */,
-				201DAFE722E8953C0063E88A /* WXMineListCell.m */,
+				201DB00B22E8953C0063E88A /* WXMineCell.h */,
+				201DAFE722E8953C0063E88A /* WXMineCell.m */,
 				201DAFDB22E8953C0063E88A /* collect */,
 				201DAFDE22E8953C0063E88A /* seting */,
 				201DAFE922E8953C0063E88A /* pay */,
@@ -3587,10 +3587,10 @@
 		201DB01422E8953C0063E88A /* find */ = {
 			isa = PBXGroup;
 			children = (
-				201DB04622E8953C0063E88A /* WXFindListCell.h */,
-				201DB01522E8953C0063E88A /* WXFindListCell.m */,
-				201DB04022E8953C0063E88A /* WXAppletListCell.h */,
-				201DB01622E8953C0063E88A /* WXAppletListCell.m */,
+				201DB04622E8953C0063E88A /* WXFindCell.h */,
+				201DB01522E8953C0063E88A /* WXFindCell.m */,
+				201DB04022E8953C0063E88A /* WXAppletCell.h */,
+				201DB01622E8953C0063E88A /* WXAppletCell.m */,
 				E89F38BF25C6F2F7001D2E0A /* news */,
 				BF7B525723E5CC23003DA959 /* music */,
 				BFDBA2B22394FE0500AB3290 /* crop */,
@@ -6270,7 +6270,7 @@
 				E869C9372570EF670017025E /* MNEmojiDeleteButton.m in Sources */,
 				201DB05022E8953C0063E88A /* WXContactsCell.m in Sources */,
 				E869C97E2570EF670017025E /* MNCompleteDialog.m in Sources */,
-				201DB09722E8953C0063E88A /* WXFindListCell.m in Sources */,
+				201DB09722E8953C0063E88A /* WXFindCell.m in Sources */,
 				BFA5079B23D6DD5A00F2CD17 /* WXContactsSelectController.m in Sources */,
 				201DAE4A22E893F40063E88A /* WXMomentViewModel.m in Sources */,
 				E869C94F2570EF670017025E /* MNRecordView.m in Sources */,
@@ -6746,7 +6746,7 @@
 				E869C9D22570EF680017025E /* UIView+MNLayout.m in Sources */,
 				BF7B2ED623EC6553003D923F /* WXCallButton.m in Sources */,
 				E869C9C82570EF670017025E /* UIImage+MNFont.m in Sources */,
-				201DB09822E8953C0063E88A /* WXAppletListCell.m in Sources */,
+				201DB09822E8953C0063E88A /* WXAppletCell.m in Sources */,
 				E869C9CD2570EF670017025E /* UIFont+MNHelper.m in Sources */,
 				E869C9542570EF670017025E /* MNLinkTableConfiguration.m in Sources */,
 				2055D69622E007180012E43E /* UIApplication+YYAdd.m in Sources */,
@@ -6862,7 +6862,7 @@
 				201DB05822E8953C0063E88A /* WXAddUserHeaderView.m in Sources */,
 				E869C9552570EF670017025E /* MNLinkViewController.m in Sources */,
 				E869C8EC2570EF670017025E /* MNPlayer.m in Sources */,
-				201DB08222E8953C0063E88A /* WXMineListCell.m in Sources */,
+				201DB08222E8953C0063E88A /* WXMineCell.m in Sources */,
 				E869C94B2570EF670017025E /* MNCardLayout.m in Sources */,
 				20E4712D22EC5A4C00BD125A /* WXMomentRemindController.m in Sources */,
 				E89F38B825C6EE7E001D2E0A /* WXNewsViewModel.m in Sources */,

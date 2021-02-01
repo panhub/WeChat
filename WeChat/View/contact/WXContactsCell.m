@@ -32,9 +32,9 @@
         UIViewSetCornerRadius(self.imgView, 4.f);
         self.imgView.image = [UIImage imageWithColor:VIEW_COLOR];
         
-        self.titleLabel.frame = CGRectMake(self.imgView.right_mn + 10.f, 0.f, self.contentView.width_mn - self.imgView.right_mn - 20.f, 19.f);
+        self.titleLabel.left_mn = self.imgView.right_mn + 10.f;
         self.titleLabel.font = [UIFont systemFontOfSize:17.f];
-        self.titleLabel.textColor = UIColorWithAlpha([UIColor darkTextColor], .8f);
+        self.titleLabel.textColor = [UIColor.darkTextColor colorWithAlphaComponent:.8f];
         
         selectView.centerY_mn = self.imgView.centerY_mn = self.titleLabel.centerY_mn = self.contentView.height_mn/2.f;
         
@@ -46,6 +46,8 @@
 - (void)setUser:(WXUser *)user {
     _user = user;
     self.titleLabel.text = user.name;
+    [self.titleLabel sizeToFit];
+    self.titleLabel.centerY_mn = self.imgView.centerY_mn;
     self.imgView.image = user.avatar ? : [UIImage imageNamed:@"common_head_placeholder"];
 }
 
@@ -62,9 +64,7 @@
         self.titleLabel.left_mn = self.imgView.right_mn + 10.f;
         self.titleLabel.width_mn = self.contentView.width_mn - self.titleLabel.left_mn - self.selectView.left_mn;
         self.separatorInset = UIEdgeInsetsMake(0.f, self.titleLabel.left_mn, 0.f, 0.f);
-    } completion:^(BOOL finished) {
-        
-    }];
+    } completion:nil];
 }
 
 - (void)setSelected:(BOOL)selected {

@@ -8,7 +8,7 @@
 
 #import "WXAppletResultController.h"
 #import "WXDataValueModel.h"
-#import "WXAppletListCell.h"
+#import "WXAppletCell.h"
 
 @interface WXAppletResultController ()
 @property (nonatomic, strong) NSMutableArray <WXDataValueModel *>*dataArray;
@@ -55,9 +55,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WXAppletListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.applet.result.cell"];
+    WXAppletCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.applet.result.cell"];
     if (!cell) {
-        cell = [[WXAppletListCell alloc] initWithReuseIdentifier:@"com.wx.applet.result.cell" size:tableView.rowSize];
+        cell = [[WXAppletCell alloc] initWithReuseIdentifier:@"com.wx.applet.result.cell" size:tableView.rowSize];
     }
     WXDataValueModel *model = self.dataArray[indexPath.row];
     cell.model = model;

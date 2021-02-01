@@ -228,12 +228,12 @@
 - (void)previewController:(MNAssetPreviewController *)previewController rightBarItemTouchUpInside:(UIControl *)sender {
     @weakify(self);
     @weakify(previewController);
-    [previewController.view showActivityDialog:@"请稍后"];
+    [previewController.view showWechatDialog];
     [MNAssetHelper writeLivePhoto:self.livePhoto.content completion:^(NSString * _Nullable identifier, NSError * _Nullable error) {
         if (identifier.length <= 0 || error) {
-            [weakpreviewController.view showInfoDialog:@"LivePhoto保存失败"];
+            [weakpreviewController.view showErrorDialog:@"LivePhoto保存失败"];
         } else {
-            [weakpreviewController.view closeDialogWithCompletionHandler:^{
+            [weakpreviewController.view showCompletedDialog:@"已保存至系统相册" completionHandler:^{
                 [weakself.livePhoto removeFiles];
                 UIViewController *vc = weakself.navigationController.viewControllers[[weakself.navigationController.viewControllers indexOfObject:weakself] - 1];
                 [weakself.navigationController popToViewController:vc animated:YES];

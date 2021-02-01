@@ -10,7 +10,7 @@
 #import "WXAppletResultController.h"
 #import "WXSelectCoverController.h"
 #import "WXDataValueModel.h"
-#import "WXAppletListCell.h"
+#import "WXAppletCell.h"
 #import "MNAssetExporter.h"
 
 @interface WXAppletViewController ()<UITextFieldDelegate, WXAppletResultDelegate>
@@ -127,9 +127,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WXAppletListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.applet.cell"];
+    WXAppletCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.applet.cell"];
     if (!cell) {
-        cell = [[WXAppletListCell alloc] initWithReuseIdentifier:@"com.wx.applet.cell" size:tableView.rowSize];
+        cell = [[WXAppletCell alloc] initWithReuseIdentifier:@"com.wx.applet.cell" size:tableView.rowSize];
     }
     WXDataValueModel *model = self.dataArray[indexPath.section][indexPath.row];
     cell.model = model;

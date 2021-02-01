@@ -8,7 +8,7 @@
 
 #import "WXMineViewController.h"
 #import "WXMineHeaderView.h"
-#import "WXMineListCell.h"
+#import "WXMineCell.h"
 #import "WXDataValueModel.h"
 #import "WXMineInfoController.h"
 #import "WXPayViewController.h"
@@ -100,9 +100,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WXMineListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.mine.list.cell"];
+    WXMineCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.mine.list.cell"];
     if (!cell) {
-        cell = [[WXMineListCell alloc] initWithReuseIdentifier:@"com.wx.mine.list.cell" size:CGSizeMake(tableView.width_mn, tableView.rowHeight)];
+        cell = [[WXMineCell alloc] initWithReuseIdentifier:@"com.wx.mine.list.cell" size:CGSizeMake(tableView.width_mn, tableView.rowHeight)];
     }
     WXDataValueModel *model = self.dataArray[indexPath.section][indexPath.row];
     cell.model = model;

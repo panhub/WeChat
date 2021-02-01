@@ -8,7 +8,7 @@
 
 #import "WXFindViewController.h"
 #import "WXMusicPlayController.h"
-#import "WXFindListCell.h"
+#import "WXFindCell.h"
 #import "WXDataValueModel.h"
 #import "WXTabBarController.h"
 #import "WXSong.h"
@@ -107,9 +107,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WXFindListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.find.cell"];
+    WXFindCell *cell = [tableView dequeueReusableCellWithIdentifier:@"com.wx.find.cell"];
     if (!cell) {
-        cell = [[WXFindListCell alloc] initWithReuseIdentifier:@"com.wx.find.cell" size:CGSizeMake(tableView.width_mn, tableView.rowHeight)];
+        cell = [[WXFindCell alloc] initWithReuseIdentifier:@"com.wx.find.cell" size:CGSizeMake(tableView.width_mn, tableView.rowHeight)];
     }
     WXDataValueModel *model = self.dataArray[indexPath.section][indexPath.row];
     cell.model = model;

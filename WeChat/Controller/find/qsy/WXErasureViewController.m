@@ -151,14 +151,12 @@
     @weakify(self);
     [ZMTokenRequest.new loadData:^{
         @strongify(self);
-        [self.contentView showActivityDialog:@"请稍后"];
+        [self.contentView showWechatDialog];
     } completion:^(MNURLResponse * _Nonnull r) {
         if (r.code == MNURLResponseCodeSucceed) {
             [ZMRegularRequest.new loadData:^{
                 @strongify(self);
-                if (![self.contentView updateDialogMessage:@"请稍后"]) {
-                    [self.contentView showActivityDialog:@"请稍后"];
-                }
+                if (!self.contentView.isDialoging) [self.contentView showWechatDialog];
             } completion:^(MNURLResponse * _Nonnull response) {
                 if (response.code == MNURLResponseCodeSucceed) {
                     @strongify(self);
@@ -212,7 +210,7 @@
     if (string.length <= 0) return;
     @weakify(self);
     [[[ZMVideoUrlRequest alloc] initWithVideoUrl:string] loadData:^{
-        [weakself.contentView showActivityDialog:@"请稍后"];
+        [weakself.contentView showWechatDialog];
     } completion:^(MNURLResponse * _Nonnull response) {
         if (response.code == MNURLResponseCodeSucceed) {
             [weakself download:kTransform(ZMVideoUrlRequest *, response.request).downloadUrl];
@@ -261,8 +259,9 @@
 }
 
 - (void)videoTailorController:(MNVideoTailorController *_Nonnull)tailorController didTailoringVideoAtPath:(NSString *_Nonnull)videoPath {
+    @weakify(self);
     @weakify(tailorController);
-    [tailorController.view showActivityDialog:@"视频保存中"];
+    [tailorController.view showWechatDialog];
     [MNAssetHelper writeVideoToAlbum:videoPath completionHandler:^(NSString * _Nullable identifier, NSError * _Nullable error) {
         if (!identifier || error) {
             [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
@@ -271,7 +270,8 @@
             [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
             [NSFileManager.defaultManager removeItemAtPath:weaktailorController.videoPath error:nil];
             [weaktailorController.view showCompletedDialog:@"已保存至系统相册" completionHandler:^{
-                [weaktailorController.navigationController popViewControllerAnimated:YES];
+                UIViewController *vc = weakself.navigationController.viewControllers[[weakself.navigationController.viewControllers indexOfObject:weakself] - 1];
+                [weaktailorController.navigationController popToViewController:vc animated:YES];
             }];
         }
     }];

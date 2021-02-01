@@ -1,28 +1,29 @@
 //
-//  WXFindListCell.m
+//  WXFindCell.m
 //  MNChat
 //
 //  Created by Vincent on 2019/3/6.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "WXFindListCell.h"
+#import "WXFindCell.h"
 #import "WXDataValueModel.h"
 
-@interface WXFindListCell ()
+@interface WXFindCell ()
 @property (nonatomic, strong) UILabel *badgeLabel;
 @end
 
-@implementation WXFindListCell
+@implementation WXFindCell
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier size:(CGSize)size {
     if (self = [super initWithReuseIdentifier:reuseIdentifier size:size]) {
         
         self.imgView.frame = CGRectMake(10.f, MEAN(self.contentView.height_mn - 30.f), 30.f, 30.f);
         
-        self.titleLabel.font = MN_TAB_SAFE_HEIGHT > 0.f ? UIFontRegular(16.f) : UIFontRegular(17.f);
-        self.titleLabel.textColor = UIColorWithAlpha([UIColor darkTextColor], .85f);
-        self.titleLabel.frame = CGRectMake(self.imgView.right_mn + 10.f, MEAN(self.contentView.height_mn - 19.f), 120.f, MN_TAB_SAFE_HEIGHT > 0.f ? 18.f : 19.f);
+        self.titleLabel.font = [UIFont systemFontOfSize:17.f];
+        self.titleLabel.numberOfLines = 1;
+        self.titleLabel.textColor = [UIColor.darkTextColor colorWithAlphaComponent:.85f];
+        self.titleLabel.left_mn = self.imgView.right_mn + 10.f;
         
         UIImage *image = UIImageNamed(@"wx_common_list_arrow");
         CGSize size = CGSizeMultiplyToWidth(image.size, 25.f);
@@ -54,8 +55,9 @@
 - (void)setModel:(WXDataValueModel *)model {
     _model = model;
     self.imgView.image = [UIImage imageNamed:model.img];
-    self.titleLabel.width_mn = [NSString stringSize:model.title font:self.titleLabel.font].width;
     self.titleLabel.text = model.title;
+    [self.titleLabel sizeToFit];
+    self.titleLabel.centerY_mn = self.contentView.height_mn/2.f;
     NSString *badge = model.userInfo;
     if (badge.length && badge.integerValue > 0) {
         if (badge.length <= 1) {

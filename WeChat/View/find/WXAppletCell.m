@@ -1,19 +1,19 @@
 //
-//  WXAppletListCell.m
+//  WXAppletCell.m
 //  MNChat
 //
 //  Created by Vincent on 2019/6/19.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "WXAppletListCell.h"
+#import "WXAppletCell.h"
 #import "WXDataValueModel.h"
 
-@interface WXAppletListCell ()
+@interface WXAppletCell ()
 
 @end
 
-@implementation WXAppletListCell
+@implementation WXAppletCell
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier size:(CGSize)size {
     if (self = [super initWithReuseIdentifier:reuseIdentifier size:size]) {
