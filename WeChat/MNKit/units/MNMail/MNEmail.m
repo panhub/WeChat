@@ -13,18 +13,11 @@
 @end
 
 @implementation MNEmail
-/**
- 制作邮件
- @param recipients 收件人
- @param copier 抄送人
- @param subject 主题
- @param body 内容
- @return 邮件实例
- */
-MNEmail* MNEmailCreate(NSString *recipients, NSString *copier, NSString *subject, NSString *body) {
+
+MNEmail* MNEmailCreate(NSArray<NSString *> *recipients, NSArray<NSString *> *copiers, NSString *subject, NSString *body) {
     MNEmail *email = [MNEmail new];
     email.recipients = recipients;
-    email.copier = copier;
+    email.copiers = copiers;
     email.subject = subject;
     email.body = body;
     return email;
@@ -35,13 +28,13 @@ MNEmail* MNEmailCreate(NSString *recipients, NSString *copier, NSString *subject
  */
 - (void)send {
     if (![MFMailComposeViewController canSendMail]) return;
-    if (_recipients.length <= 0 || _body.length <= 0) return;
-    if (_subject.length <= 0) _subject = @"MNKit Email";
-    NSMutableString *string = [[NSMutableString alloc]init];
-    [string appendFormat:@"mailto:%@",_recipients];
-    [string appendFormat:@"?subject=%@",_subject];
-    [string appendFormat:@"&body=%@",_body];
-    if (_copier.length > 0) [string appendFormat:@"&cc=%@",_copier];
+    if (!self.recipients || self.recipients.count <= 0 || self.body.length <= 0) return;
+    if (self.subject.length <= 0) self.subject = @"MNKit Email";
+    NSMutableString *string = [[NSMutableString alloc] init];
+    [string appendFormat:@"mailto:%@", [self.recipients componentsJoinedByString:@","]];
+    [string appendFormat:@"?subject=%@", self.subject];
+    [string appendFormat:@"&body=%@", self.body];
+    if (self.copiers.copy) [string appendFormat:@"&cc=%@", [self.copiers componentsJoinedByString:@","]];
     NSString *url = [string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *URL = [NSURL URLWithString:url];
     if ([[UIApplication sharedApplication] canOpenURL:URL]) {
@@ -59,20 +52,17 @@ MNEmail* MNEmailCreate(NSString *recipients, NSString *copier, NSString *subject
  */
 - (void)sendEmail:(MNEmail *)email {
     if (![MFMailComposeViewController canSendMail]) return;
-    if (email.recipients.length <= 0 || email.body.length <= 0) return;
+    if (email.recipients.count <= 0 || email.body.length <= 0) return;
     if (email.subject.length <= 0) email.subject = @"MNKit Email";
     // 邮件服务器
-    MFMailComposeViewController *compose = [[MFMailComposeViewController alloc] init];
-    [compose setMailComposeDelegate:self];//代理
-    [compose setSubject:email.subject]; //主题
-    [compose setToRecipients:[email.recipients componentsSeparatedByString:@","]];//收件人
-    if (email.copier.length >= 0) {
-        [compose setCcRecipients:[email.copier componentsSeparatedByString:@","]];//抄送人
-    }
-    [compose setMessageBody:email.body isHTML:NO];
+    MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
+    [mailController setMailComposeDelegate:self];//代理
+    [mailController setSubject:email.subject]; //主题
+    [mailController setToRecipients:email.recipients];//收件人
+    if (email.copiers.count) [mailController setCcRecipients:email.copiers]; // 抄送人
+    [mailController setMessageBody:email.body isHTML:NO]; // 内容
     /**HTML格式*/
     //@"<html><body><p>Hello</p><p>World！</p></body></html>"
-    
     /*
      UIImage *image = [UIImage imageNamed:@"image"];
      NSData *imageData = UIImagePNGRepresentation(image);
@@ -80,9 +70,9 @@ MNEmail* MNEmailCreate(NSString *recipients, NSString *copier, NSString *subject
      
      NSString *file = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];
      NSData *pdf = [NSData dataWithContentsOfFile:file];
-     [mailCompose addAttachmentData:pdf mimeType:@"" fileName:@"7天精通IOS233333"];
+     [mailCompose addAttachmentData:pdf mimeType:@"" fileName:@"7天精通"];
      */
-    [self presentViewController:compose animated:YES completion:nil];
+    [self presentViewController:mailController animated:YES completion:nil];
 }
 
 ///代理回调

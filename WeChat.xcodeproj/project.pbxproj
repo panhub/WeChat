@@ -4499,7 +4499,7 @@
 				E869C5F82570EF620017025E /* MNScanner */,
 				E869C5FB2570EF620017025E /* MNAppRequest */,
 				E869C5FE2570EF620017025E /* MNDatabase */,
-				E869C6052570EF620017025E /* MNEmail */,
+				E869C6052570EF620017025E /* MNMail */,
 				E869C6082570EF620017025E /* MNLivePhoto */,
 				E869C60F2570EF620017025E /* MNHTTPRequest */,
 				E869C6242570EF620017025E /* MNWeakProxy */,
@@ -4694,13 +4694,13 @@
 			path = MNDatabase;
 			sourceTree = "<group>";
 		};
-		E869C6052570EF620017025E /* MNEmail */ = {
+		E869C6052570EF620017025E /* MNMail */ = {
 			isa = PBXGroup;
 			children = (
 				E869C6062570EF620017025E /* MNEmail.h */,
 				E869C6072570EF620017025E /* MNEmail.m */,
 			);
-			path = MNEmail;
+			path = MNMail;
 			sourceTree = "<group>";
 		};
 		E869C6082570EF620017025E /* MNLivePhoto */ = {
