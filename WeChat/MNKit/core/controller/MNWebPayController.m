@@ -9,23 +9,12 @@
 #import "MNWebPayController.h"
 #import "UIApplication+MNHelper.h"
 #import "NSObject+MNHelper.h"
-#import "UIView+MNLoadDialog.h"
 
-static NSString *MNWebPayScheme = @"MNKit";
-static NSString *MNWebPayDomain = @"MNWebPayDomain://";
+static NSString *MNAliPayScheme = @"com.mn.webpay";
+static NSString *MNWechatPayDomain = @"www.mn.webpay://";
 NSNotificationName const MNWebPayFinishNotificationName = @"com.mn.web.pay.finish.notification.name";
 
 #define MNWebPayBase64Decoding(string) [[NSString alloc] initWithData:[[NSData alloc] initWithBase64EncodedString:string options:NSDataBase64DecodingIgnoreUnknownCharacters] encoding:NSUTF8StringEncoding]
-
-void MNWebPaySetDomain (NSString *domain) {
-    if (!domain || domain.length <= 0) return;
-    MNWebPayDomain = domain.copy;
-}
-
-void MNWebPaySetScheme (NSString *scheme) {
-    if (!scheme || scheme.length <= 0) return;
-    MNWebPayScheme = scheme.copy;
-}
 
 @interface MNWebPayController ()
 // 标记是否允许打开URL
@@ -43,7 +32,6 @@ void MNWebPaySetScheme (NSString *scheme) {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     // 添加支付结果检查通知
-    self.webView.hidden = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(finish:)
                                                  name:MNWebPayFinishNotificationName
@@ -83,11 +71,11 @@ void MNWebPaySetScheme (NSString *scheme) {
             self.allowsOpenURL = NO;
             NSRange range = [url rangeOfString:MNWebPayBase64Decoding(@"JnJlZGlyZWN0X3VybD0=")];
             if (range.location != NSNotFound) url = [url substringToIndex:range.location];
-            NSMutableURLRequest *mutableRequest = [[NSMutableURLRequest alloc] init];
-            mutableRequest.allHTTPHeaderFields = request.allHTTPHeaderFields;
-            //[mutableRequest setValue:MNWebPayDomain forHTTPHeaderField:MNWebPayBase64Decoding(@"UmVmZXJlcg==")];
+            NSMutableURLRequest *mutableRequest = request.mutableCopy;
             mutableRequest.URL = [NSURL URLWithString:url];
-            [self loadRequest:mutableRequest.copy];
+            mutableRequest.allHTTPHeaderFields = request.allHTTPHeaderFields;
+            [mutableRequest setValue:MNWechatPayDomain forHTTPHeaderField:MNWebPayBase64Decoding(@"UmVmZXJlcg==")];
+            [webView loadRequest:mutableRequest.copy];
             if (decisionHandler) decisionHandler(WKNavigationActionPolicyCancel);
         } else if ([url containsString:MNWebPayBase64Decoding(@"YWxpcGF5Oi8v")]) {
             //先解码
@@ -97,7 +85,7 @@ void MNWebPaySetScheme (NSString *scheme) {
             //工具类将json字符串转成字典(自行替换)
             NSDictionary *value = ((NSString *)(components.lastObject)).JsonValue;
             NSMutableDictionary *dic = value.mutableCopy;
-            [dic setObject:MNWebPayScheme forKey:MNWebPayBase64Decoding(@"ZnJvbUFwcFVybFNjaGVtZQ==")];
+            [dic setObject:MNAliPayScheme forKey:MNWebPayBase64Decoding(@"ZnJvbUFwcFVybFNjaGVtZQ==")];
             //拼接前面的域名并编码
             NSString *aliUrl = [[NSString stringWithFormat:@"%@?%@",components.firstObject, dic.JsonString] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
             __weak typeof(self) weakself = self;
@@ -115,20 +103,10 @@ void MNWebPaySetScheme (NSString *scheme) {
     }
 }
 
-- (NSURLRequest *)shouldLoadRequest:(id)req {
-    NSURLRequest *request = [super shouldLoadRequest:req];
-    if (request) {
-        NSMutableURLRequest *mutableRequest = request.mutableCopy;
-        [mutableRequest setValue:MNWebPayDomain forHTTPHeaderField:MNWebPayBase64Decoding(@"UmVmZXJlcg==")];
-        request = mutableRequest.copy;
-    }
-    return request;
-}
-
 #pragma mark - 支付回调处理
 + (BOOL)handOpenURL:(NSURL *)URL {
     NSString *url = URL.absoluteString;
-    if ([url containsString:MNWebPayDomain] || [url containsString:MNWebPayBase64Decoding(@"c2FmZXBheQ==")]) {
+    if ([url containsString:MNWechatPayDomain] || [url containsString:MNWebPayBase64Decoding(@"c2FmZXBheQ==")]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:MNWebPayFinishNotificationName object:url];
         return YES;
     }
@@ -136,14 +114,24 @@ void MNWebPaySetScheme (NSString *scheme) {
 }
 
 - (void)finish:(NSNotification *)notify {
-    // 代理回调
-    if ([self.payDelegate respondsToSelector:@selector(webPayControllerDidFinishPayment:)]) {
-        [self.payDelegate webPayControllerDidFinishPayment:self];
-    }
     // block回调
     if (self.didFinishPayHandler) {
         self.didFinishPayHandler(self);
     }
+    // 代理回调
+    if ([self.payDelegate respondsToSelector:@selector(webPayControllerDidFinishPayment:)]) {
+        [self.payDelegate webPayControllerDidFinishPayment:self];
+    }
+}
+
++ (void)setDomain:(NSString *)domain {
+    if (!domain || domain.length <= 0) return;
+    MNWechatPayDomain = domain.copy;
+}
+
++ (void)setScheme:(NSString *)scheme {
+    if (!scheme || scheme.length <= 0) return;
+    MNAliPayScheme = scheme.copy;
 }
 
 #pragma mark - Navigation

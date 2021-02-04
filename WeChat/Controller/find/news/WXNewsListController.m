@@ -14,7 +14,7 @@
 #import "WXNewsCell.h"
 
 @interface WXNewsListController ()<MNSegmentSubpageDataSource>
-//@property (nonatomic, )
+
 @end
 
 @implementation WXNewsListController
@@ -72,6 +72,10 @@
 #pragma mark - Super
 - (BOOL)isChildViewController {
     return YES;
+}
+
+- (void)prepareLoadData:(__kindof MNHTTPDataRequest *)request {
+    if (!self.contentView.isDialoging) [self.contentView showWechatDialog];
 }
 
 @end

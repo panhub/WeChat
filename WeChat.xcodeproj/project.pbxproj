@@ -4480,10 +4480,12 @@
 		E869C5A72570EF610017025E /* units */ = {
 			isa = PBXGroup;
 			children = (
+				E869C6052570EF620017025E /* MNMail */,
+				E869C5AB2570EF610017025E /* MNException */,
+				E869C6082570EF620017025E /* MNLivePhoto */,
 				E805C5F425ABF75C004F55A7 /* MNPurchase */,
 				E8F253A7257904DF00A05A13 /* MNGarageBand */,
 				E869C5A82570EF610017025E /* MNAudioRecorder */,
-				E869C5AB2570EF610017025E /* MNException */,
 				E869C5AE2570EF610017025E /* MNKeychain */,
 				E869C5B12570EF610017025E /* MNLaunchImage */,
 				E869C5BF2570EF610017025E /* MNLocalEvaluation */,
@@ -4499,8 +4501,6 @@
 				E869C5F82570EF620017025E /* MNScanner */,
 				E869C5FB2570EF620017025E /* MNAppRequest */,
 				E869C5FE2570EF620017025E /* MNDatabase */,
-				E869C6052570EF620017025E /* MNMail */,
-				E869C6082570EF620017025E /* MNLivePhoto */,
 				E869C60F2570EF620017025E /* MNHTTPRequest */,
 				E869C6242570EF620017025E /* MNWeakProxy */,
 				E869C6272570EF620017025E /* MNAddressBook */,
@@ -5234,19 +5234,19 @@
 		E869C6F92570EF630017025E /* modal */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6FA2570EF630017025E /* MNMenuTransitionAnimator.h */,
-				E869C6FB2570EF630017025E /* MNDefaultModelTransitionAnimator.m */,
-				E869C6FC2570EF630017025E /* MN3DMenuTransitionAnimator.m */,
-				E869C6FD2570EF630017025E /* MNSheetTransitionAnimator.h */,
-				E869C6FE2570EF630017025E /* MNAlertTransitionAnimator.m */,
-				E869C6FF2570EF630017025E /* MN3DTransitionAnimator.m */,
-				E869C7002570EF630017025E /* MNMaskTransitionAnimator.m */,
-				E869C7012570EF630017025E /* MNMenuTransitionAnimator.m */,
-				E869C7022570EF630017025E /* MNDefaultModelTransitionAnimator.h */,
 				E869C7032570EF630017025E /* MN3DMenuTransitionAnimator.h */,
-				E869C7042570EF630017025E /* MNMaskTransitionAnimator.h */,
+				E869C6FC2570EF630017025E /* MN3DMenuTransitionAnimator.m */,
 				E869C7052570EF630017025E /* MN3DTransitionAnimator.h */,
+				E869C6FF2570EF630017025E /* MN3DTransitionAnimator.m */,
 				E869C7062570EF630017025E /* MNAlertTransitionAnimator.h */,
+				E869C6FE2570EF630017025E /* MNAlertTransitionAnimator.m */,
+				E869C7022570EF630017025E /* MNDefaultModelTransitionAnimator.h */,
+				E869C6FB2570EF630017025E /* MNDefaultModelTransitionAnimator.m */,
+				E869C7042570EF630017025E /* MNMaskTransitionAnimator.h */,
+				E869C7002570EF630017025E /* MNMaskTransitionAnimator.m */,
+				E869C6FA2570EF630017025E /* MNMenuTransitionAnimator.h */,
+				E869C7012570EF630017025E /* MNMenuTransitionAnimator.m */,
+				E869C6FD2570EF630017025E /* MNSheetTransitionAnimator.h */,
 				E869C7072570EF630017025E /* MNSheetTransitionAnimator.m */,
 			);
 			path = modal;

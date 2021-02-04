@@ -11,15 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- WX回调我方域名<example:// 或 example>
-*/
-UIKIT_EXTERN void MNWebPaySetDomain (NSString *);
-/**
- ZFB回调我方APP标识<URL type 标识>
-*/
-UIKIT_EXTERN void MNWebPaySetScheme (NSString *);
-
 @protocol MNWebPayDelegate <NSObject>
 @optional
 - (void)webPayControllerDidFinishPayment:(MNWebPayController *)payController;
@@ -42,6 +33,18 @@ UIKIT_EXTERN void MNWebPaySetScheme (NSString *);
  @return 是否处理
  */
 + (BOOL)handOpenURL:(NSURL *)URL;
+
+/**
+ 设置微信支付时回调我方域名
+ @param domain 回调域名
+ */
++ (void)setDomain:(NSString *)domain;
+
+/**
+ 设置支付宝支付时回调我方应用标识
+ @param scheme 应用标识
+ */
++ (void)setScheme:(NSString *)scheme;
 
 @end
 
