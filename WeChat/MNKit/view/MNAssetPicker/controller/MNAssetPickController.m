@@ -609,7 +609,7 @@
 
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    NSLog(@"相册内容变动");
+    NSLog(@"====相册内容变动====");
 }
 
 #pragma mark - MNNavigationBarDelegate

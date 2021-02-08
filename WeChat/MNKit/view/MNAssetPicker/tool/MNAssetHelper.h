@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Write
 /**
  存储图片
- @param image 图片<UIImage, NSData>
+ @param image 图片<UIImage, NSData, NSString, NSURL>
  @param completionHandler 完成回调
 */
 + (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler;
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  存储图片/视频
- @param assets 资源集合<UIImage, NSData, NSString, NSURL, NSArray<LivePhoto图片路径, 视频路径>>
+ @param assets 资源集合<UIImage, NSData, NSString, NSURL, PHLivePhoto>
  @param albumName 相册名
  @param completion 完成回调
  */

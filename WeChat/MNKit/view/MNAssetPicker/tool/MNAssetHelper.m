@@ -642,10 +642,20 @@ static MNAssetHelper *_helper;
 #pragma mark - Write
 + (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
 {
-    if (image && [image isKindOfClass:NSString.class] && [NSFileManager.defaultManager fileExistsAtPath:(NSString *)image]) {
-        image = [UIImage imageWithContentsOfFile:(NSString *)image];
+    if ([image isKindOfClass:NSString.class] && [NSFileManager.defaultManager fileExistsAtPath:(NSString *)image]) {
+        if ([((NSString *)image).pathExtension.lowercaseString isEqualToString:@"gif"]) {
+            image = [NSURL fileURLWithPath:(NSString *)image];
+        } else {
+            image = [UIImage imageWithContentsOfFile:(NSString *)image];
+        }
+    } else if ([image isKindOfClass:NSURL.class] && [NSFileManager.defaultManager fileExistsAtPath:((NSURL *)image).path]) {
+        if (![((NSURL *)image).path.pathExtension.lowercaseString isEqualToString:@"gif"]) {
+            image = [UIImage imageWithContentsOfFile:((NSURL *)image).path];
+        }
+    } else if ([image isKindOfClass:NSData.class]) {
+        image = [UIImage imageWithData:(NSData *)image];
     }
-    if (!image || (![image isKindOfClass:UIImage.class] && ![image isKindOfClass:NSString.class] && ![image isKindOfClass:NSData.class])) {
+    if (!image || (![image isKindOfClass:UIImage.class] && ![image isKindOfClass:NSURL.class])) {
         if (completionHandler) completionHandler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"图片不存在"}]);
         return;
     }
@@ -685,25 +695,34 @@ static MNAssetHelper *_helper;
                 [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
                     [assets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * _Nonnull stop) {
                         PHObjectPlaceholder *placeholder;
-                        if ([obj isKindOfClass:NSString.class]) obj = [NSURL fileURLWithPath:(NSString *)obj];
-                        if ([obj isKindOfClass:NSData.class]) obj = [UIImage imageWithData:(NSData *)obj];
-                        if ([obj isKindOfClass:NSURL.class] && ![NSFileManager.defaultManager fileExistsAtPath:((NSURL*)obj).path]) return;
+                        if ([obj isKindOfClass:NSString.class]) {
+                            if ([NSFileManager.defaultManager fileExistsAtPath:(NSString *)obj]) {
+                                obj = [NSURL fileURLWithPath:(NSString *)obj];
+                            } else return;
+                        } else if ([obj isKindOfClass:NSData.class]) {
+                            obj = [UIImage imageWithData:(NSData *)obj];
+                        } else if ([obj isKindOfClass:NSURL.class] && ![NSFileManager.defaultManager fileExistsAtPath:((NSURL*)obj).path]) return;
                         if ([obj isKindOfClass:NSURL.class]) {
-                            placeholder = [[PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:(NSURL *)obj] placeholderForCreatedAsset];
+                            if ([((NSURL *)obj).path.pathExtension.lowercaseString isEqualToString:@"gif"]) {
+                                placeholder = [[PHAssetChangeRequest creationRequestForAssetFromImageAtFileURL:(NSURL *)obj] placeholderForCreatedAsset];
+                            } else {
+                                placeholder = [[PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:(NSURL *)obj] placeholderForCreatedAsset];
+                            }
                         } else if ([obj isKindOfClass:UIImage.class]) {
                             placeholder = [[PHAssetChangeRequest creationRequestForAssetFromImage:(UIImage *)obj] placeholderForCreatedAsset];
                         }
     #if __has_include(<Photos/PHLivePhoto.h>)
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wunguarded-availability"
-                        else if ([obj isKindOfClass:NSArray.class] && [obj count] == 2) {
-                            NSArray *array = (NSArray *)obj;
-                            NSURL *firstURL = [array.firstObject isKindOfClass:NSURL.class] ? array.firstObject : [NSURL fileURLWithPath:array.firstObject];
-                            NSURL *lastURL = [array.lastObject isKindOfClass:NSURL.class] ? array.lastObject : [NSURL fileURLWithPath:array.lastObject];
-                            PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
-                            [request addResourceWithType:([firstURL.pathExtension.lowercaseString isEqualToString:@"mov"] ? PHAssetResourceTypePairedVideo : PHAssetResourceTypePhoto) fileURL:firstURL options:nil];
-                            [request addResourceWithType:([lastURL.pathExtension.lowercaseString isEqualToString:@"mov"] ? PHAssetResourceTypePairedVideo : PHAssetResourceTypePhoto) fileURL:lastURL options:nil];
-                            placeholder = [request placeholderForCreatedAsset];
+                        else if ([obj isKindOfClass:PHLivePhoto.class]) {
+                            NSURL *videoURL = [obj valueForKey:@"videoURL"];
+                            NSURL *imageURL = [obj valueForKey:@"imageURL"];
+                            if ([NSFileManager.defaultManager fileExistsAtPath:videoURL.path] && [NSFileManager.defaultManager fileExistsAtPath:imageURL.path]) {
+                                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+                                [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:nil];
+                                [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
+                                placeholder = [request placeholderForCreatedAsset];
+                            }
                         }
     #pragma clang diagnostic pop
     #endif

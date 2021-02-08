@@ -4,7 +4,7 @@
 //
 //  Created by Vincent on 2018/7/16.
 //  Copyright © 2018年 小斯. All rights reserved.
-//  录音 .wav(Win) .aiff(OS)
+//  录音 .wav
 
 #import <Foundation/Foundation.h>
 @class MNAudioRecorder;

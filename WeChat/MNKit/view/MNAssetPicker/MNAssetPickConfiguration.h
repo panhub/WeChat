@@ -41,10 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
  是否允许编辑<"maxPickingCount==1"有效>
  */
 @property (nonatomic, getter=isAllowsEditing) BOOL allowsEditing;
-/**
- 是否允许拍照/录像 <不完善 default NO>
- */
-@property (nonatomic, getter=isAllowsCapturing) BOOL allowsCapturing;
 #ifdef __IPHONE_9_0
 /**
  是否允许显示文件大小
@@ -55,6 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
 视频拍摄最大长度 <default 60s>
 */
 @property (nonatomic) NSTimeInterval maxCaptureDuration;
+/**
+ 是否允许拍照/录像 <不完善 default NO>
+ */
+@property (nonatomic, getter=isAllowsCapturing) BOOL allowsCapturing;
 /**
  是否允许存储拍照/录像到系统相册 <default YES>
  */
