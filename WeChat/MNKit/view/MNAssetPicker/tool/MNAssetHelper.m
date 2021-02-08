@@ -708,7 +708,7 @@ static MNAssetHelper *_helper;
 #endif
 
 #pragma mark - Write
-+ (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
++ (void)writeImageToAlbum:(id)image completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
 {
     if ([image isKindOfClass:NSString.class] && [NSFileManager.defaultManager fileExistsAtPath:(NSString *)image]) {
         if ([((NSString *)image).pathExtension.lowercaseString isEqualToString:@"gif"]) {
@@ -732,7 +732,7 @@ static MNAssetHelper *_helper;
     }];
 }
 
-+ (void)writeVideoToAlbum:(id)videoPath completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
++ (void)writeVideoToAlbum:(id)videoPath completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
 {
     if (!videoPath || (![videoPath isKindOfClass:NSString.class] && ![videoPath isKindOfClass:NSURL.class])) {
         if (completionHandler) completionHandler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"视频文件不存在"}]);

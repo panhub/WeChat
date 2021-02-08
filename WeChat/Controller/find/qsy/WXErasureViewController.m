@@ -262,7 +262,7 @@
     @weakify(self);
     @weakify(tailorController);
     [tailorController.view showWechatDialog];
-    [MNAssetHelper writeVideoToAlbum:videoPath completionHandler:^(NSString * _Nullable identifier, NSError * _Nullable error) {
+    [MNAssetHelper writeVideoToAlbum:videoPath completion:^(NSString * _Nullable identifier, NSError * _Nullable error) {
         if (!identifier || error) {
             [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
             [weaktailorController.view showErrorDialog:@"保存视频失败"];

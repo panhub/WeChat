@@ -130,14 +130,14 @@ NS_ASSUME_NONNULL_BEGIN
  @param image 图片<UIImage, NSData, NSString, NSURL>
  @param completionHandler 完成回调
 */
-+ (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler;
++ (void)writeImageToAlbum:(id)image completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler;
 
 /**
  存储视频
  @param videoPath 视频路径<NSString, NSURL>
  @param completionHandler 完成回调
  */
-+ (void)writeVideoToAlbum:(id)videoPath completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler;
++ (void)writeVideoToAlbum:(id)videoPath completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler;
 
 /**
  存储图片/视频

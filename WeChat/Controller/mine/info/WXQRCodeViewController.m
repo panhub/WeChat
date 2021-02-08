@@ -123,7 +123,7 @@ NSString * const WXQRCodeMetadataPrefix = @"com.wx.qrcode.metadata.prefix";
         if (buttonIndex == 0) {
             [self createQRCodeWithColor:UIColorRandom()];
         } else {
-            [MNAssetHelper writeImageToAlbum:self.imageView.image completionHandler:^(NSString * _Nullable identifier, NSError * _Nullable error) {
+            [MNAssetHelper writeImageToAlbum:self.imageView.image completion:^(NSString * _Nullable identifier, NSError * _Nullable error) {
                 if (error || identifier.length <= 0) {
                     [self.view showInfoDialog:@"保存失败"];
                 } else {
