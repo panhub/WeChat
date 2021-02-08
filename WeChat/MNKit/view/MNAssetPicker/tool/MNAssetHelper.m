@@ -240,7 +240,11 @@ static MNAssetHelper *_helper;
             if (model.asset) {
                 if (@available(iOS 9.0, *)) {
                     NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:model.asset];
-                    model.fileSize = resources.count ? [[resources.firstObject valueForKey:@"fileSize"] longLongValue] : 0;
+                    long long fileSize = 0;
+                    for (PHAssetResource *resource in resources) {
+                        fileSize += [[resource valueForKey:@"fileSize"] longLongValue];
+                    }
+                    model.fileSize = fileSize;
                 } else {
                     model.fileSize = 0;
                 }

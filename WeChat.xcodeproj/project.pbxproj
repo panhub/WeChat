@@ -837,6 +837,8 @@
 		E89522FC2578945800F2513B /* xvidcore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C52578945700F2513B /* xvidcore.framework */; };
 		E89522FD2578945800F2513B /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C62578945700F2513B /* mobileffmpeg.framework */; };
 		E89522FE2578945800F2513B /* libwebp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E89522C72578945700F2513B /* libwebp.framework */; };
+		E89DA94A25D0CA76003ED10E /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E89DA94825D0CA76003ED10E /* libmp3lame.a */; };
+		E89DA94D25D0CA8B003ED10E /* MNLame.m in Sources */ = {isa = PBXBuildFile; fileRef = E89DA94C25D0CA8B003ED10E /* MNLame.m */; };
 		E89F388B25C6E69B001D2E0A /* WXNewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F388A25C6E69B001D2E0A /* WXNewsViewController.m */; };
 		E89F389525C6E735001D2E0A /* WXNewsRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F389425C6E735001D2E0A /* WXNewsRequest.m */; };
 		E89F389F25C6E77F001D2E0A /* WXNewsDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F389E25C6E77F001D2E0A /* WXNewsDataModel.m */; };
@@ -846,7 +848,6 @@
 		E89F38C225C6F321001D2E0A /* WXNewsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E89F38C125C6F321001D2E0A /* WXNewsCell.m */; };
 		E8F253AB257904DF00A05A13 /* band.band in Resources */ = {isa = PBXBuildFile; fileRef = E8F253A8257904DF00A05A13 /* band.band */; };
 		E8F253AC257904DF00A05A13 /* MNGarageBand.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253A9257904DF00A05A13 /* MNGarageBand.m */; };
-		E8F253B82579055100A05A13 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F253B42579055100A05A13 /* libmp3lame.a */; };
 		E8F253B92579055100A05A13 /* ExtAudioConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253B62579055100A05A13 /* ExtAudioConverter.m */; };
 		E8F253C42579105A00A05A13 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8F253C32579105A00A05A13 /* LaunchScreen.storyboard */; };
 		E8F253CD257911E000A05A13 /* WXLaunchController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F253CC257911E000A05A13 /* WXLaunchController.m */; };
@@ -2490,6 +2491,10 @@
 		E89522C52578945700F2513B /* xvidcore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = xvidcore.framework; sourceTree = "<group>"; };
 		E89522C62578945700F2513B /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
 		E89522C72578945700F2513B /* libwebp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libwebp.framework; sourceTree = "<group>"; };
+		E89DA94825D0CA76003ED10E /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
+		E89DA94925D0CA76003ED10E /* lame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lame.h; sourceTree = "<group>"; };
+		E89DA94B25D0CA8B003ED10E /* MNLame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNLame.h; sourceTree = "<group>"; };
+		E89DA94C25D0CA8B003ED10E /* MNLame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNLame.m; sourceTree = "<group>"; };
 		E89F2413240E48A70060358E /* Import.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Import.h; sourceTree = "<group>"; };
 		E89F2414240E49120060358E /* Macro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
 		E89F388925C6E69B001D2E0A /* WXNewsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNewsViewController.h; sourceTree = "<group>"; };
@@ -2509,8 +2514,6 @@
 		E8F253A8257904DF00A05A13 /* band.band */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = band.band; sourceTree = "<group>"; };
 		E8F253A9257904DF00A05A13 /* MNGarageBand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNGarageBand.m; sourceTree = "<group>"; };
 		E8F253AA257904DF00A05A13 /* MNGarageBand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNGarageBand.h; sourceTree = "<group>"; };
-		E8F253B42579055100A05A13 /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
-		E8F253B52579055100A05A13 /* lame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lame.h; sourceTree = "<group>"; };
 		E8F253B62579055100A05A13 /* ExtAudioConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtAudioConverter.m; sourceTree = "<group>"; };
 		E8F253B72579055100A05A13 /* ExtAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtAudioConverter.h; sourceTree = "<group>"; };
 		E8F253C32579105A00A05A13 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
@@ -2568,7 +2571,7 @@
 				E8FD03472430CA0D00841036 /* MAMapKit.framework in Frameworks */,
 				E89522D22578945800F2513B /* libavformat.framework in Frameworks */,
 				E8FD03442430CA0D00841036 /* AMapLocationKit.framework in Frameworks */,
-				E8F253B82579055100A05A13 /* libmp3lame.a in Frameworks */,
+				E89DA94A25D0CA76003ED10E /* libmp3lame.a in Frameworks */,
 				E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */,
 				2004560C222D3FEE001E65D2 /* Intents.framework in Frameworks */,
 				2004560D222D3FEE001E65D2 /* IntentsUI.framework in Frameworks */,
@@ -4517,8 +4520,8 @@
 		E869C5A82570EF610017025E /* MNAudioRecorder */ = {
 			isa = PBXGroup;
 			children = (
-				E869C5A92570EF610017025E /* MNAudioRecorder.m */,
 				E869C5AA2570EF610017025E /* MNAudioRecorder.h */,
+				E869C5A92570EF610017025E /* MNAudioRecorder.m */,
 			);
 			path = MNAudioRecorder;
 			sourceTree = "<group>";
@@ -4622,8 +4625,8 @@
 		E869C5E42570EF610017025E /* MNAuthenticator */ = {
 			isa = PBXGroup;
 			children = (
-				E869C5E52570EF610017025E /* MNAuthenticator.m */,
 				E869C5E62570EF610017025E /* MNAuthenticator.h */,
+				E869C5E52570EF610017025E /* MNAuthenticator.m */,
 			);
 			path = MNAuthenticator;
 			sourceTree = "<group>";
@@ -5491,8 +5494,6 @@
 				E869C78C2570EF640017025E /* MNAlbumView.m */,
 				E869C78D2570EF640017025E /* MNAssetBrowseCell.h */,
 				E869C7772570EF640017025E /* MNAssetBrowseCell.m */,
-				E869C7942570EF640017025E /* MNAssetSelectButton.h */,
-				E869C7852570EF640017025E /* MNAssetSelectButton.m */,
 				E869C7832570EF640017025E /* MNAssetBrowser.h */,
 				E869C7962570EF640017025E /* MNAssetBrowser.m */,
 				E869C78F2570EF640017025E /* MNAssetCell.h */,
@@ -5501,6 +5502,8 @@
 				E869C7862570EF640017025E /* MNAssetProgressView.m */,
 				E869C7842570EF640017025E /* MNAssetScrollView.h */,
 				E869C7952570EF640017025E /* MNAssetScrollView.m */,
+				E869C7942570EF640017025E /* MNAssetSelectButton.h */,
+				E869C7852570EF640017025E /* MNAssetSelectButton.m */,
 				E869C7982570EF640017025E /* MNAssetSelectCell.h */,
 				E869C7812570EF640017025E /* MNAssetSelectCell.m */,
 				E869C78A2570EF640017025E /* MNAssetSelectControl.h */,
@@ -5778,6 +5781,7 @@
 		E869C83E2570EF650017025E /* vendor */ = {
 			isa = PBXGroup;
 			children = (
+				E89DA94725D0CA76003ED10E /* Lame */,
 				E895228F2578945700F2513B /* FFmpeg */,
 				E869C83F2570EF650017025E /* JPImageresizerView */,
 				E869C8822570EF660017025E /* MNSocialShare */,
@@ -5991,6 +5995,17 @@
 			path = FFmpeg;
 			sourceTree = "<group>";
 		};
+		E89DA94725D0CA76003ED10E /* Lame */ = {
+			isa = PBXGroup;
+			children = (
+				E89DA94B25D0CA8B003ED10E /* MNLame.h */,
+				E89DA94C25D0CA8B003ED10E /* MNLame.m */,
+				E89DA94825D0CA76003ED10E /* libmp3lame.a */,
+				E89DA94925D0CA76003ED10E /* lame.h */,
+			);
+			path = Lame;
+			sourceTree = "<group>";
+		};
 		E89F388825C6E642001D2E0A /* news */ = {
 			isa = PBXGroup;
 			children = (
@@ -6048,18 +6063,8 @@
 				E8F253A9257904DF00A05A13 /* MNGarageBand.m */,
 				E8F253B72579055100A05A13 /* ExtAudioConverter.h */,
 				E8F253B62579055100A05A13 /* ExtAudioConverter.m */,
-				E8F253B32579055100A05A13 /* lame */,
 			);
 			path = MNGarageBand;
-			sourceTree = "<group>";
-		};
-		E8F253B32579055100A05A13 /* lame */ = {
-			isa = PBXGroup;
-			children = (
-				E8F253B42579055100A05A13 /* libmp3lame.a */,
-				E8F253B52579055100A05A13 /* lame.h */,
-			);
-			path = lame;
 			sourceTree = "<group>";
 		};
 		E8FD033E2430CA0D00841036 /* AMap */ = {
@@ -6510,6 +6515,7 @@
 				E869C9D92570EF680017025E /* CATransition+MNHelper.m in Sources */,
 				E869C9292570EF670017025E /* MNSegmentController.m in Sources */,
 				E869C9902570EF670017025E /* MNImageCropController.m in Sources */,
+				E89DA94D25D0CA8B003ED10E /* MNLame.m in Sources */,
 				E869CA412570EF680017025E /* MJRefreshComponent.m in Sources */,
 				E869C9B52570EF670017025E /* UIImageView+MNHelper.m in Sources */,
 				201DB0A922E8953C0063E88A /* WXCookRecipeHeaderView.m in Sources */,
@@ -7163,7 +7169,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/WeChat/MNKit/units/MNGarageBand/lame",
+					"$(PROJECT_DIR)/WeChat/MNKit/vendor/Lame",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -7201,7 +7207,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/WeChat/MNKit/units/MNGarageBand/lame",
+					"$(PROJECT_DIR)/WeChat/MNKit/vendor/Lame",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";

@@ -11,7 +11,7 @@
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 
 @implementation FFmpegCommand
-+ (BOOL)checkContentsOfFile:(NSString *)inputPath outputPath:(NSString *)outputPath {
++ (BOOL)existsFileAtPath:(NSString *)inputPath outputPath:(NSString *)outputPath {
     [NSFileManager.defaultManager removeItemAtPath:outputPath error:nil];
     return ([NSFileManager.defaultManager fileExistsAtPath:inputPath] && [NSFileManager.defaultManager createDirectoryAtPath:outputPath.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil]);
 }
@@ -33,7 +33,7 @@
 }
 
 + (BOOL)exportAudioTrack:(NSString *)videoPath outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -acodec copy -vn -y %@", videoPath, outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
 }
@@ -48,7 +48,7 @@
 }
 
 + (BOOL)exportVideoTrack:(NSString *)videoPath outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -vcodec copy -an -y %@", videoPath, outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
 }
@@ -63,7 +63,7 @@
 }
 
 + (BOOL)exportGif:(NSString *)videoPath inRange:(NSRange)range outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSString *command = (range.length == 0) ? [NSString stringWithFormat:@"ffmpeg -i %@ -f gif -y %@", videoPath, outputPath] : [NSString stringWithFormat:@"ffmpeg -i %@ -ss %@ -t %@ -f gif -y %@", videoPath, @(range.location), @(range.length), outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
 }
@@ -78,7 +78,7 @@
 }
 
 + (BOOL)convertM4a:(NSString *)m4aPath toWav:(NSString *)wavPath {
-    if (![self checkContentsOfFile:m4aPath outputPath:wavPath]) return NO;
+    if (![self existsFileAtPath:m4aPath outputPath:wavPath]) return NO;
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -acodec pcm_s16le -ac 1 -ar 16000 -y %@", m4aPath, wavPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:wavPath]);
 }
@@ -93,7 +93,7 @@
 }
 
 + (BOOL)convertMp3:(NSString *)mp3Path toWav:(NSString *)wavPath {
-    if (![self checkContentsOfFile:mp3Path outputPath:wavPath]) return NO;
+    if (![self existsFileAtPath:mp3Path outputPath:wavPath]) return NO;
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -acodec pcm_s16le -ac 1 -ar 16000 -y %@", mp3Path, wavPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:wavPath]);
 }
@@ -108,7 +108,7 @@
 }
 
 + (BOOL)cutVideo:(NSString *)videoPath withRange:(NSRange)range outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     //ffmpeg -ss [start] -t [duration] -i [in].mp4  -c:v libx264 -c:a aac -strict experimental -b:a 98k [out].mp4
     NSString *command = [NSString stringWithFormat:@"ffmpeg -ss %@ -t %@ -i %@ -c:v libx264 -c:a aac -strict experimental -b:a 98k -y %@", @(range.location), @(range.length), videoPath, outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
@@ -124,7 +124,7 @@
 }
 
 + (BOOL)cutVideo:(NSString *)videoPath beginTime:(CGFloat)begin duration:(CGFloat)duration outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -ss %@ -t %@ -codec copy -y %@", videoPath, @(begin), @(duration), outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
 }
@@ -139,7 +139,7 @@
 }
 
 + (BOOL)cropVideo:(NSString *)videoPath withFrame:(CGRect)frame outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     //crop=width:height:x:y, 其中width和height 表示裁剪后的尺寸, x:y 表示裁剪区域的左上角坐标
     NSString *command = [NSString stringWithFormat:@"ffmpeg -i %@ -strict -2 -vf crop=%@:%@:%@:%@ -y %@", videoPath, @(frame.size.width), @(frame.size.height), @(frame.origin.x), @(frame.origin.y), outputPath];
     return ([self execute:command] && [NSFileManager.defaultManager fileExistsAtPath:outputPath]);
@@ -155,7 +155,7 @@
 }
 
 + (BOOL)exportThumbnail:(NSString *)videoPath atTime:(CGFloat)time size:(CGSize)size outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSInteger width = size.width;
     NSInteger height = size.height;
     size.width = width;
@@ -178,7 +178,7 @@
 }
 
 + (BOOL)exportWithoutWatermark:(NSString *)videoPath rect:(CGRect)rect outputPath:(NSString *)outputPath {
-    if (![self checkContentsOfFile:videoPath outputPath:outputPath]) return NO;
+    if (![self existsFileAtPath:videoPath outputPath:outputPath]) return NO;
     NSInteger x = floor(rect.origin.x);
     NSInteger y = floor(rect.origin.y);
     NSInteger w = floor(rect.size.width);
