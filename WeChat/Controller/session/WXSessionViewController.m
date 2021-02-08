@@ -221,7 +221,7 @@
     picker.configuration.showEmptyAlbum = YES;
     picker.configuration.allowsPreviewing = YES;
     picker.configuration.allowsEditing = YES;
-    picker.configuration.allowsPickingGif = NO;
+    picker.configuration.allowsPickingGif = YES;
     picker.configuration.allowsPickingVideo = YES;
     picker.configuration.allowsPickingLivePhoto = YES;
     picker.configuration.allowsDisplayFileSize = YES;

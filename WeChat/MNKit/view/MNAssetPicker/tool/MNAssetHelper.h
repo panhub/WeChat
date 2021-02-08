@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)cancelAssetDownload:(MNAsset *)asset;
 
-#pragma mark - Export Video
+#pragma mark - Export
 #if __has_include(<AVFoundation/AVFoundation.h>)
 /**
  导出视频资源
@@ -101,6 +101,27 @@ NS_ASSUME_NONNULL_BEGIN
                   presetName:(NSString *_Nullable)presetName
              progressHandler:(void(^_Nullable)(float progress))progressHandler
            completionHandler:(void(^_Nullable)(NSString *_Nullable filePath))completionHandler;
+#endif
+
+#if __has_include(<Photos/PHLivePhoto.h>)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+/**
+ 获取LivePhoto的本地文件
+ @param livePhoto 动态图
+ @param completion 结束回调
+ */
++ (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable imagePath, NSString *_Nullable videoPath))completion;
+
+/**
+ 获取LivePhoto的本地文件
+ @param livePhoto 动态图
+ @param imagePath 图片保存的路径
+ @param videoPath 视频保存的路径
+ @param completion 结束回调
+ */
++ (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto imagePath:(NSString *)imagePath videoPath:(NSString *)videoPath completion:(void(^_Nullable)(BOOL result))completion;
+#pragma clang diagnostic pop
 #endif
 
 #pragma mark - Write
@@ -126,14 +147,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)writeAssets:(NSArray <id>*)assets toAlbum:(NSString *_Nullable)albumName completion:(void(^_Nullable)(NSArray<NSString *>*_Nullable identifiers, NSError *_Nullable error))completion;
 
-/**
- 删除相册资源
- @param assets 资源内容
- @param completion 完成回调
- */
-+ (void)deleteAssets:(NSArray <MNAsset *>*)assets
-          completion:(void(^_Nullable)(NSError *_Nullable error))completion;
-
 #if __has_include(<Photos/PHLivePhoto.h>)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
@@ -151,24 +164,17 @@ NS_ASSUME_NONNULL_BEGIN
   @param completion 结束回调
  */
 + (void)writeLivePhotoWithImagePath:(id)imagePath videoPath:(id)videoPath completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completion;
-
-/**
- 获取LivePhoto的本地文件
- @param livePhoto 动态图
- @param completion 结束回调
- */
-+ (void)extractLivePhotoResources:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable imagePath, NSString *_Nullable videoPath))completion;
-
-/**
- 获取LivePhoto的本地文件
- @param livePhoto 动态图
- @param imagePath 图片保存的路径
- @param videoPath 视频保存的路径
- @param completion 结束回调
- */
-+ (void)extractLivePhotoResources:(PHLivePhoto *)livePhoto imagePath:(NSString *)imagePath videoPath:(NSString *)videoPath completion:(void(^_Nullable)(BOOL))completion;
 #pragma clang diagnostic pop
 #endif
+
+#pragma mark - Delete
+/**
+ 删除相册资源
+ @param assets 资源内容
+ @param completion 完成回调
+ */
++ (void)deleteAssets:(NSArray <PHAsset *>*)assets completion:(void(^_Nullable)(NSError *_Nullable error))completion;
+
 @end
 NS_ASSUME_NONNULL_END
 #endif

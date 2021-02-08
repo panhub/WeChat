@@ -639,6 +639,74 @@ static MNAssetHelper *_helper;
 }
 #endif
 
+#if __has_include(<Photos/PHLivePhoto.h>)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
++ (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable, NSString *_Nullable))completion {
+    NSString *fileName = [NSString stringWithFormat:@"%@-%@", NSUUID.UUID.UUIDString, @(__COUNTER__)];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    NSString *cachePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *cacheDirectory = [cachePath stringByAppendingPathComponent:@"live-extract"];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpeg", fileName]];
+    NSString *videoPath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", fileName]];
+    [self exportLivePhotoResources:livePhoto imagePath:imagePath videoPath:videoPath completion:^(BOOL result) {
+        if (!result) {
+            [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
+            [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
+        }
+        if (completion) completion((result ? imagePath : nil), (result ? videoPath : nil));
+    }];
+}
+
++ (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto imagePath:(NSString *)imagePath videoPath:(NSString *)videoPath completion:(void(^_Nullable)(BOOL))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if (!livePhoto || imagePath.length <= 0 || videoPath.length <= 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(NO);
+            });
+            return;
+        }
+        NSString *imageDirectory = imagePath.stringByDeletingLastPathComponent;
+        NSString *videoDirectory = imagePath.stringByDeletingLastPathComponent;
+        if ([NSFileManager.defaultManager fileExistsAtPath:imagePath]) [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
+        if ([NSFileManager.defaultManager fileExistsAtPath:videoPath]) [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
+        if ((![NSFileManager.defaultManager fileExistsAtPath:imageDirectory] && ![NSFileManager.defaultManager createDirectoryAtPath:imageDirectory withIntermediateDirectories:YES attributes:nil error:nil]) || (![NSFileManager.defaultManager fileExistsAtPath:videoDirectory] && ![NSFileManager.defaultManager createDirectoryAtPath:videoDirectory withIntermediateDirectories:YES attributes:nil error:nil])) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(NO);
+            });
+            return;
+        }
+        if ([NSFileManager.defaultManager fileExistsAtPath:imagePath]) [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
+        if ([NSFileManager.defaultManager fileExistsAtPath:videoPath]) [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
+        dispatch_group_t group = dispatch_group_create();
+        NSArray <PHAssetResource *>*liveResource = [PHAssetResource assetResourcesForLivePhoto:livePhoto];
+        for (PHAssetResource *resource in liveResource) {
+            dispatch_group_enter(group);
+            NSMutableData *buffer = NSMutableData.data;
+            PHAssetResourceType type = resource.type;
+            PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
+            options.networkAccessAllowed = YES;
+            [PHAssetResourceManager.defaultManager requestDataForAssetResource:resource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
+                [buffer appendData:data];
+            } completionHandler:^(NSError * _Nullable error) {
+                if (!error) {
+                    if (type == PHAssetResourceTypePairedVideo) {
+                        [buffer writeToFile:videoPath options:NSDataWritingAtomic error:nil];
+                    } else {
+                        [buffer writeToFile:imagePath options:NSDataWritingAtomic error:nil];
+                    }
+                }
+                dispatch_group_leave(group);
+            }];
+        }
+        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+            if (completion) completion(([NSFileManager.defaultManager fileExistsAtPath:imagePath] && [NSFileManager.defaultManager fileExistsAtPath:videoPath]));
+        });
+    });
+}
+#pragma clang diagnostic pop
+#endif
+
 #pragma mark - Write
 + (void)writeImageToAlbum:(id)image completionHandler:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler
 {
@@ -772,38 +840,6 @@ static MNAssetHelper *_helper;
     return [PHAssetCollectionChangeRequest  creationRequestForAssetCollectionWithTitle:title];
 }
 
-+ (void)deleteAssets:(NSArray <MNAsset *>*)assets
-          completion:(void(^_Nullable)(NSError *_Nullable error))completion
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSMutableArray <PHAsset *>*array = @[].mutableCopy;
-        [assets enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (obj.asset) [array addObject:obj.asset];
-        }];
-        if (array.count <= 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion([NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"文件不存在"}]);
-            });
-            return;
-        }
-        [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
-            if (!allowed) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (completion) completion([NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
-                });
-                return;
-            }
-            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-                [PHAssetChangeRequest deleteAssets:array];
-            } completionHandler:^(BOOL success, NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (completion) completion(error);
-                });
-            }];
-        }];
-    });
-}
-
 #if __has_include(<Photos/PHLivePhoto.h>)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
@@ -838,70 +874,34 @@ static MNAssetHelper *_helper;
         }
     }];
 }
-
-+ (void)extractLivePhotoResources:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable, NSString *_Nullable))completion {
-    NSString *fileName = [NSString stringWithFormat:@"%@-%@", NSUUID.UUID.UUIDString, @(__COUNTER__)];
-    fileName = [fileName stringByReplacingOccurrencesOfString:@"-" withString:@""];
-    NSString *cachePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *cacheDirectory = [cachePath stringByAppendingPathComponent:@"live-extract"];
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpeg", fileName]];
-    NSString *videoPath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", fileName]];
-    [self extractLivePhotoResources:livePhoto imagePath:imagePath videoPath:videoPath completion:^(BOOL result) {
-        if (!result) {
-            [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
-            [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
-        }
-        if (completion) completion((result ? imagePath : nil), (result ? videoPath : nil));
-    }];
-}
-
-+ (void)extractLivePhotoResources:(PHLivePhoto *)livePhoto imagePath:(NSString *)imagePath videoPath:(NSString *)videoPath completion:(void(^_Nullable)(BOOL))completion {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        if (!livePhoto || imagePath.length <= 0 || videoPath.length <= 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(NO);
-            });
-            return;
-        }
-        NSString *imageDirectory = imagePath.stringByDeletingLastPathComponent;
-        NSString *videoDirectory = imagePath.stringByDeletingLastPathComponent;
-        if ([NSFileManager.defaultManager fileExistsAtPath:imagePath]) [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
-        if ([NSFileManager.defaultManager fileExistsAtPath:videoPath]) [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
-        if ((![NSFileManager.defaultManager fileExistsAtPath:imageDirectory] && ![NSFileManager.defaultManager createDirectoryAtPath:imageDirectory withIntermediateDirectories:YES attributes:nil error:nil]) || (![NSFileManager.defaultManager fileExistsAtPath:videoDirectory] && ![NSFileManager.defaultManager createDirectoryAtPath:videoDirectory withIntermediateDirectories:YES attributes:nil error:nil])) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(NO);
-            });
-            return;
-        }
-        if ([NSFileManager.defaultManager fileExistsAtPath:imagePath]) [NSFileManager.defaultManager removeItemAtPath:imagePath error:nil];
-        if ([NSFileManager.defaultManager fileExistsAtPath:videoPath]) [NSFileManager.defaultManager removeItemAtPath:videoPath error:nil];
-        dispatch_group_t group = dispatch_group_create();
-        NSArray <PHAssetResource *>*liveResource = [PHAssetResource assetResourcesForLivePhoto:livePhoto];
-        for (PHAssetResource *resource in liveResource) {
-            dispatch_group_enter(group);
-            NSMutableData *buffer = NSMutableData.data;
-            PHAssetResourceType type = resource.type;
-            PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
-            options.networkAccessAllowed = YES;
-            [PHAssetResourceManager.defaultManager requestDataForAssetResource:resource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
-                [buffer appendData:data];
-            } completionHandler:^(NSError * _Nullable error) {
-                if (!error) {
-                    if (type == PHAssetResourceTypePairedVideo) {
-                        [buffer writeToFile:videoPath options:NSDataWritingAtomic error:nil];
-                    } else {
-                        [buffer writeToFile:imagePath options:NSDataWritingAtomic error:nil];
-                    }
-                }
-                dispatch_group_leave(group);
-            }];
-        }
-        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-            if (completion) completion(([NSFileManager.defaultManager fileExistsAtPath:imagePath] && [NSFileManager.defaultManager fileExistsAtPath:videoPath]));
-        });
-    });
-}
 #pragma clang diagnostic pop
 #endif
+
+#pragma mark - Delete
++ (void)deleteAssets:(NSArray <PHAsset *>*)assets completion:(void(^)(NSError *))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if (assets.count <= 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion([NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"文件不存在"}]);
+            });
+            return;
+        }
+        [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
+            if (!allowed) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) completion([NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"未获得系统相册权限"}]);
+                });
+                return;
+            }
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                [PHAssetChangeRequest deleteAssets:assets.copy];
+            } completionHandler:^(BOOL success, NSError *error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) completion(error);
+                });
+            }];
+        }];
+    });
+}
 @end
 #endif
