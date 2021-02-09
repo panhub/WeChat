@@ -7,6 +7,8 @@
 //  视频文件写入
 
 #import <Foundation/Foundation.h>
+#import <CoreMedia/CMSampleBuffer.h>
+#import <AVFoundation/AVMediaFormat.h>
 @class MNMovieWriter;
 
 /**
@@ -45,6 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**当前状态*/
 @property (nonatomic, readonly) MNMovieWriteStatus status;
 
+/**当前状态*/
+@property (nonatomic, strong) dispatch_queue_t delegateQueue;
+
 /**事件代理*/
 @property (nonatomic, weak, nullable) id<MNMovieWriteDelegate> delegate;
 
@@ -52,14 +57,17 @@ NS_ASSUME_NONNULL_BEGIN
  视频写入者
  @param URL 视频路径
  @param delegate 事件代理
+ @param queue 代理回调队列
  @return 视频写入实例
  */
-- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate;
+- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**即将开始写入视频*/
 - (void)prepareWriting;
 
 - (void)finishWriting;
+
+- (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer mediaType:(AVMediaType)mediaType;
 
 @end
 

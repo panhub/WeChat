@@ -302,37 +302,17 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    /// 调整摄像头, 停止录制时不写入
-    @synchronized (self) {
-        if (sampleBuffer == NULL || !self.assetWriter || self.status != MNCaptureStatusRecording) return;
-        @autoreleasepool {
-            if (output == self.videoOutput) {
-                if (self.isStarting == NO) {
-                    if ([self.assetWriter startWriting]) {
-                        [self.assetWriter startSessionAtSourceTime:CMSampleBufferGetPresentationTimeStamp(sampleBuffer)];
-                        self.starting = YES;
-                    } else {
-                        [self failRecording];
-                        return;
-                    }
-                }
-                [self appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeVideo];
-            } else if (output == self.audioOutput) {
-                [self appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeAudio];
-            }
-        }
-    }
-}
-
-- (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer mediaType:(AVMediaType)mediaType {
-    if (mediaType == AVMediaTypeVideo && self.videoWriterInput.readyForMoreMediaData) {
-        if (![self.videoWriterInput appendSampleBuffer:sampleBuffer]) {
-            [self failRecording];
-        }
-    } else if (mediaType == AVMediaTypeAudio && self.audioWriterInput.readyForMoreMediaData) {
-        if (![self.audioWriterInput appendSampleBuffer:sampleBuffer]) {
-            [self failRecording];
-        }
+    
+    if (self.status != MNCaptureStatusPreparing && self.status != MNCaptureStatusRecording) return;
+    
+    if (output == self.videoOutput) {
+        
+        [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeVideo];
+        
+    } else if (output == self.audioOutput) {
+        
+        [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeAudio];
+        
     }
 }
 
