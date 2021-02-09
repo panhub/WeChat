@@ -32,17 +32,14 @@ typedef NS_ENUM(NSInteger, MNCapturePosition) {
  - MNCaptureStatusIdle: 未知, 闲置状态
  - MNCaptureStatusPreparing: 即将写入进文件
  - MNCaptureStatusRecording: 正在录制视频
- - MNCaptureStatusWaiting: 即将结束
- - MNCaptureStatusCompleted: 录制完成
+ - MNCaptureStatusFinish: 录制完成
  - MNCaptureStatusFailed: 录制出错
  */
 typedef NS_ENUM(NSInteger, MNCaptureStatus) {
     MNCaptureStatusIdle = 0,
     MNCaptureStatusPreparing,
     MNCaptureStatusRecording,
-    MNCaptureStatusWaiting,
-    MNCaptureStatusCompleted,
-    MNCaptureStatusFailed
+    MNCaptureStatusFinish
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -59,7 +56,7 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 @optional
 - (void)captureSessionDidStartRecording:(MNCaptureSession *)captureSession;
 - (void)captureSessionDidFinishRecording:(MNCaptureSession *)captureSession;
-- (void)captureSessionDidFailureWithError:(MNCaptureSession *)captureSession;
+- (void)captureSession:(MNCaptureSession *)captureSession didFailWithError:(NSError *)error;
 @end
 
 @interface MNCaptureSession : NSObject
@@ -70,7 +67,7 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 /**录制时长时长*/
 @property (nonatomic, readonly) Float64 duration;
 /**视频帧率, 默认30*/
-@property (nonatomic) NSInteger frameRate;
+@property (nonatomic) int frameRate;
 /**文件地址*/
 @property (nonatomic, copy) NSString *outputPath;
 /**图像展示视图*/

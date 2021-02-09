@@ -9,21 +9,6 @@
 #import "MNMovieWriter.h"
 #import <AVFoundation/AVFoundation.h>
 
-/**
- 文件写入状态
- - MNMovieWriteStatusIdle: 闲置状态
- - MNMovieWriteStatusPreparing: 即将写入
- - MNMovieWriteStatusWriting: 正在写入
- - MNMovieWriteStatusFinish: 已结束
- */
-typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
-    MNMovieWriteStatusIdle = 0,
-    MNMovieWriteStatusPreparing,
-    MNMovieWriteStatusWriting,
-    MNMovieWriteStatusFinish,
-    MNMovieWriteStatusFailed
-};
-
 @interface MNMovieWriter ()
 @property (nonatomic) MNMovieWriteStatus status;
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -54,7 +39,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return self;
 }
 
-- (void)prepareToWriting {
+- (void)prepareWriting {
     
     __weak typeof(self) weakself = self;
     dispatch_async(self.queue, ^{
@@ -77,7 +62,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         NSError *error;
         AVAssetWriter *writer = [[AVAssetWriter alloc] initWithURL:self.URL fileType:AVFileTypeQuickTimeMovie error:&error];
         if (error || !writer) {
-            [self setStatus:MNMovieWriteStatusFailed error:error];
+            [self setStatus:MNMovieWriteStatusFinish error:error];
         } else {
             self.writer = writer;
             [self setStatus:MNMovieWriteStatusPreparing error:nil];
@@ -85,24 +70,34 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     });
 }
 
+- (void)finishWriting {
+    
+}
+
 #pragma mark - 修改状态
 - (void)setStatus:(MNMovieWriteStatus)status error:(NSError *)error {
-    _status = status;
-    if (self.delegate && status >= MNMovieWriteStatusWriting) {
-        __weak typeof(self) weakself = self;
-        dispatch_async(self.queue, ^{
-            __strong typeof(self) self = weakself;
-            @autoreleasepool {
-                if (status == MNMovieWriteStatusFailed && [self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
-                    [self.delegate movieWriter:self didFailWithError:error];
-                } else if (status == MNMovieWriteStatusFinish && [self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
-                    [self.delegate movieWriterDidFinishWriting:self];
+    __weak typeof(self) weakself = self;
+    dispatch_async(self.queue, ^{
+        __strong typeof(self) self = weakself;
+        @synchronized (self) {
+            _status = status;
+            if (self.delegate && (status == MNMovieWriteStatusWriting || status == MNMovieWriteStatusFinish)) {
+                if (status == MNMovieWriteStatusFinish) {
+                    if (error) {
+                        if ([self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
+                            [self.delegate movieWriter:self didFailWithError:error];
+                        }
+                    } else {
+                        if ([self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
+                            [self.delegate movieWriterDidFinishWriting:self];
+                        }
+                    }
                 } else if (status == MNMovieWriteStatusWriting && [self.delegate respondsToSelector:@selector(movieWriterDidStartWriting:)]) {
                     [self.delegate movieWriterDidStartWriting:self];
                 }
             }
-        });
-    }
+        }
+    });
 }
 
 @end

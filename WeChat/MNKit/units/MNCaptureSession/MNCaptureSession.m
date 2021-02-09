@@ -18,6 +18,8 @@
 MNCapturePresetName const MNCapturePresetLowQuality = @"com.mn.capture.low";
 MNCapturePresetName const MNCapturePresetMediumQuality = @"com.mn.capture.medium";
 MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
+MNCapturePresetName const MNCapturePreset1280x720 = @"com.mn.capture.preset.1280x720";
+MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.1920x1080";
 
 @interface MNCaptureSession ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
 @property (nonatomic, strong) dispatch_queue_t writeQueue;
@@ -88,12 +90,12 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
             if (!allowed) {
-                [weakself captureFailureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
+                [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
                 return;
             }
             [MNAuthenticator requestMicrophoneAuthorizationStatusWithHandler:^(BOOL allow) {
                 if (!allow) {
-                    [weakself captureFailureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取麦克风权限失败"];
+                    [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取麦克风权限失败"];
                     return;
                 }
                 if ([weakself setupVideo] && [weakself setupAudio] && [weakself setupImage] ) {
@@ -112,12 +114,12 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
             if (!allowed) {
-                [weakself captureFailureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
+                [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
                 return;
             }
             [MNAuthenticator requestMicrophoneAuthorizationStatusWithHandler:^(BOOL allow) {
                 if (!allow) {
-                    [weakself captureFailureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取麦克风权限失败"];
+                    [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取麦克风权限失败"];
                     return;
                 }
                 if ([weakself setupVideo] && [weakself setupAudio]) {
@@ -136,11 +138,11 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
             if (!allowed) {
-                [weakself captureFailureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
+                [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
                 return;
             }
             if (![weakself setSessionActive:YES]) {
-                [weakself captureFailureWithDescription:@"录像设备初始化失败"];
+                [weakself failureWithDescription:@"录像设备初始化失败"];
                 return;
             }
             if ([weakself setupVideo] && [weakself setupImage]) {
@@ -155,19 +157,35 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
 
 #pragma mark - 设置音/视频/图片
 - (BOOL)setupVideo {
+    if (!self.session) {
+        [self failureWithDescription:@"录像会话初始化失败"];
+        return NO;
+    }
     AVCaptureDevice *device = [self deviceWithPosition:self.capturePosition];
     if (!device) {
-        [self captureFailureWithDescription:@"录像设备初始化失败"];
+        [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
+    }
+    NSInteger frameRate = self.frameRate;
+    if (NSProcessInfo.processInfo.processorCount == 1) {
+        frameRate = 15;
+    }
+    CMTime frameDuration = CMTimeMake(1, (int32_t)frameRate);
+    if ([device lockForConfiguration:NULL] ) {
+        device.activeVideoMaxFrameDuration = frameDuration;
+        device.activeVideoMinFrameDuration = frameDuration;
+        [device unlockForConfiguration];
+    } else {
+        NSLog(@"videoDevice lockForConfiguration failed");
     }
     NSError *error;
     AVCaptureDeviceInput *videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:&error];
     if (error) {
-        [self captureFailureWithDescription:@"录像设备初始化失败"];
+        [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
     }
     if (![self.session canAddInput:videoInput]) {
-        [self captureFailureWithDescription:@"录像设备初始化失败"];
+        [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
     }
     AVCaptureVideoDataOutput *videoOutput = [[AVCaptureVideoDataOutput alloc] init];
@@ -175,7 +193,7 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     [videoOutput setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]}];
     [videoOutput setSampleBufferDelegate:self queue:self.outputQueue];
     if (![self.session canAddOutput:videoOutput]) {
-        [self captureFailureWithDescription:@"录像设备初始化失败"];
+        [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
     }
     [self.session addInput:videoInput];
@@ -186,25 +204,29 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
 }
 
 - (BOOL)setupAudio {
+    if (!self.session) {
+        [self failureWithDescription:@"录像会话初始化失败"];
+        return NO;
+    }
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     if (!device) {
-        [self captureFailureWithDescription:@"录音设备初始化失败"];
+        [self failureWithDescription:@"录音设备初始化失败"];
         return NO;
     }
     NSError *error;
     AVCaptureDeviceInput *audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:&error];
     if (error) {
-        [self captureFailureWithDescription:@"录音设备初始化失败"];
+        [self failureWithDescription:@"录音设备初始化失败"];
         return NO;
     }
     if (![self.session canAddInput:audioInput]) {
-        [self captureFailureWithDescription:@"录音设备初始化失败"];
+        [self failureWithDescription:@"录音设备初始化失败"];
         return NO;
     }
     AVCaptureAudioDataOutput *audioOutput = [[AVCaptureAudioDataOutput alloc] init];
     [audioOutput setSampleBufferDelegate:self queue:self.outputQueue];
     if (![self.session canAddOutput:audioOutput]) {
-        [self captureFailureWithDescription:@"录音设备初始化失败"];
+        [self failureWithDescription:@"录音设备初始化失败"];
         return NO;
     }
     [self.session addInput:audioInput];
@@ -215,10 +237,14 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
 }
 
 - (BOOL)setupImage {
+    if (!self.session) {
+        [self failureWithDescription:@"录像会话初始化失败"];
+        return NO;
+    }
     AVCaptureStillImageOutput *imageOutput = [[AVCaptureStillImageOutput alloc] init];
     [imageOutput setOutputSettings:@{AVVideoCodecKey:AVVideoCodecJPEG}];
     if (![self.session canAddOutput:imageOutput]) {
-        [self captureFailureWithDescription:@"录像设备初始化失败"];
+        [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
     }
     [self.session addOutput:imageOutput];
@@ -228,113 +254,45 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
 
 #pragma mark - 开始/停止捕获
 - (void)startRunning {
-    if (_session && !_session.isRunning) [_session startRunning];
+    @synchronized (self) {
+        if (_session && !_session.isRunning) [_session startRunning];
+    }
 }
 
 - (void)stopRunning {
-    if (_session && _session.isRunning) [_session stopRunning];
+    @synchronized (self) {
+        if (_session && _session.isRunning) [_session stopRunning];
+    }
 }
 
 #pragma mark - 开始/停止录像
 - (void)startRecording {
-    if (self.isRecording) return;
-    if (self.outputPath.length <= 0) {
-        [self captureFailureWithDescription:@"文件输出路径错误"];
-        return;
-    }
-    if (!_session || !_session.isRunning) {
-        [self captureFailureWithDescription:@"录像设备初始化错误"];
-        return;
-    }
-    self.error = nil;
-    self.starting = NO;
-    __weak typeof(self)weakself = self;
-    [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
-    [self startWritingWithCompletionHandler:^{
-        if (weakself.error) {
-            [weakself captureFailureWithError:weakself.error];
-        } else {
-            weakself.status = MNCaptureStatusRecording;
-            if ([weakself.delegate respondsToSelector:@selector(captureSessionDidStartRecording:)]) {
-                [weakself.delegate captureSessionDidStartRecording:weakself];
-            }
+    @synchronized (self) {
+        if (self.status == MNCaptureStatusPreparing || self.status == MNCaptureStatusRecording) {
+            //@throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Already recording" userInfo:nil];
+            NSLog(@"Already recording");
+            return;
         }
-    }];
-}
-
-- (void)startWritingWithCompletionHandler:(void (^)(void))completionHandler {
-    NSError *error;
-    AVAssetWriter *assetWriter = [AVAssetWriter assetWriterWithURL:[NSURL fileURLWithPath:self.outputPath] fileType:AVFileTypeMPEG4 error:&error];
-    if (error) {
-        self.error = error;
-        if (completionHandler) completionHandler();
-        return;
+        [self setStatus:MNCaptureStatusPreparing error:nil];
     }
-    AVAssetWriterInput *videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:self.videoSetting];
-    /// 必须设为YES, 需要从 session 实时获取数据
-    videoWriterInput.expectsMediaDataInRealTime = YES;
-    //videoWriterInput.transform = CGAffineTransformMakeRotation(M_PI_2);
-    if ([assetWriter canAddInput:videoWriterInput]) {
-        [assetWriter addInput:videoWriterInput];
-    } else {
-        self.error = [NSError errorWithDomain:AVFoundationErrorDomain
-                                         code:AVErrorExportFailed
-                                     userInfo:@{NSLocalizedDescriptionKey:@"视频写入失败"}];
-        if (completionHandler) completionHandler();
-        return;
-    }
-    /// 音频
-    AVAssetWriterInput *audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:self.audioSetting];
-    audioWriterInput.expectsMediaDataInRealTime = YES;
-    if ([assetWriter canAddInput:audioWriterInput]) {
-        [assetWriter addInput:audioWriterInput];
-    } else {
-        self.error = [NSError errorWithDomain:AVFoundationErrorDomain
-                                         code:AVErrorExportFailed
-                                     userInfo:@{NSLocalizedDescriptionKey:@"音频写入失败"}];
-        if (completionHandler) completionHandler();
-        return;
-    }
-    self.error = nil;
-    self.assetWriter = assetWriter;
-    self.videoWriterInput = videoWriterInput;
-    self.audioWriterInput = audioWriterInput;
-    if (completionHandler) completionHandler();
+    
+    //self.movieWriter.delegate = self;
+    self.movieWriter.URL = self.URL;
+    
+    [self.movieWriter prepareWriting];
 }
 
 - (void)stopRecording {
-    if (!self.isRecording) return;
-    __weak typeof(self)weakself = self;
-    self.status = MNCaptureStatusCompleted;
-    [self.assetWriter finishWritingWithCompletionHandler:^{
-        if (!weakself.error) weakself.error = weakself.assetWriter.error;
-        if (weakself.error) weakself.status = MNCaptureStatusFailed;
-        weakself.assetWriter = nil;
-        weakself.videoWriterInput = nil;
-        weakself.audioWriterInput = nil;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([weakself.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
-                [weakself.delegate captureSessionDidFinishRecording:weakself];
-            }
-        });
-    }];
+    @synchronized (self) {
+        if (self.status != MNCaptureStatusRecording) {
+            NSLog(@"Not recording");
+            return;
+        }
+    }
+    [self.movieWriter finishWriting];
 }
 
 - (void)failRecording {
-    self.assetWriter = nil;
-    self.videoWriterInput = nil;
-    self.audioWriterInput = nil;
-    self.status = MNCaptureStatusFailed;
-    if (!self.error) {
-        self.error = [NSError errorWithDomain:AVFoundationErrorDomain
-                                         code:AVErrorExportFailed
-                                     userInfo:@{NSLocalizedDescriptionKey:@"视频写入失败"}];
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
-            [self.delegate captureSessionDidFinishRecording:self];
-        }
-    });
 }
 
 - (BOOL)deleteRecording {
@@ -495,21 +453,21 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
 }
 
 #pragma mark - 发生错误
-- (void)captureFailureWithDescription:(NSString *)message {
-    [self captureFailureWithCode:AVErrorScreenCaptureFailed description:message];
+- (void)failureWithDescription:(NSString *)message {
+    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
 }
 
-- (void)captureFailureWithCode:(NSUInteger)code description:(NSString *)description{
-    [self captureFailureWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
+- (void)failureWithCode:(NSUInteger)code description:(NSString *)description{
+    [self failureWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
 }
 
-- (void)captureFailureWithError:(NSError *)error {
+- (void)failureWithError:(NSError *)error {
     __weak typeof(self)weakself = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         weakself.error = error;
-        weakself.status = MNCaptureStatusFailed;
-        if ([weakself.delegate respondsToSelector:@selector(captureSessionDidFailureWithError:)]) {
-            [weakself.delegate captureSessionDidFailureWithError:weakself];
+        weakself.status = MNCaptureStatusIdle;
+        if ([weakself.delegate respondsToSelector:@selector(captureSession:didFailWithError:)]) {
+            [weakself.delegate captureSession:weakself didFailWithError:error];
         }
     });
 }
@@ -571,15 +529,38 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     return NO;
 }
 
+- (void)setStatus:(MNCaptureStatus)status error:(NSError *)error {
+    _status = status;
+    if (self.delegate && status > MNCaptureStatusRecording) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == MNCaptureStatusRecording && [self.delegate respondsToSelector:@selector(captureSessionDidStartRecording:)]) {
+                [self.delegate captureSessionDidStartRecording:self];
+            } else if (status == MNCaptureStatusFinish && [self.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
+                [self.delegate captureSessionDidFinishRecording:self];
+            }
+        });
+    }
+}
+
 #pragma mark - Getter
 - (AVCaptureSession *)session {
     if (!_session) {
         AVCaptureSession *session = [AVCaptureSession new];
         session.usesApplicationAudioSession = NO;
-        if ([session canSetSessionPreset:AVCaptureSessionPresetHigh]) {
-            session.sessionPreset = AVCaptureSessionPresetHigh;
+        AVCaptureSessionPreset sessionPreset = [self sessionPresetWithName:self.presetName];
+        if ([session canSetSessionPreset:sessionPreset]) {
+            session.sessionPreset = sessionPreset;
+        } else if ([session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+            session.sessionPreset = AVCaptureSessionPreset1920x1080;
+        } else if ([session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+            session.sessionPreset = AVCaptureSessionPreset1280x720;
+        } else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium]) {
+            session.sessionPreset = AVCaptureSessionPresetMedium;
+        } if (NSProcessInfo.processInfo.processorCount == 1 && [session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+            session.sessionPreset = AVCaptureSessionPreset640x480;
+        } else if ([session canSetSessionPreset:AVCaptureSessionPresetLow]) {
+            session.sessionPreset = AVCaptureSessionPresetLow;
         }
-        session.sessionPreset = [session canSetSessionPreset:AVCaptureSessionPresetHigh] ? AVCaptureSessionPresetHigh : AVCaptureSessionPresetMedium;
         _session = session;
     }
     return _session;
@@ -608,7 +589,7 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
     return CMTimeGetSeconds(asset.duration);
 }
 
-- (NSInteger)frameRate {
+- (int)frameRate {
     return MIN(30, MAX(_frameRate, 15));
 }
 
@@ -691,6 +672,22 @@ MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
         device = result;
     }
     return device;
+}
+
+- (AVCaptureSessionPreset)sessionPresetWithName:(MNCapturePresetName)presetName {
+    AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
+    if ([presetName isEqualToString:MNCapturePresetHighQuality]) {
+        sessionPreset = AVCaptureSessionPresetHigh;
+    } else if ([presetName isEqualToString:MNCapturePresetMediumQuality]) {
+        sessionPreset = AVCaptureSessionPresetMedium;
+    } else if ([presetName isEqualToString:MNCapturePreset1280x720]) {
+        sessionPreset = AVCaptureSessionPreset1280x720;
+    } else if ([presetName isEqualToString:MNCapturePreset1920x1080]) {
+        sessionPreset = AVCaptureSessionPreset1920x1080;
+    } else if ([presetName isEqualToString:MNCapturePresetLowQuality]) {
+        sessionPreset = AVCaptureSessionPresetLow;
+    }
+    return sessionPreset;
 }
 
 #pragma mark - dealloc
