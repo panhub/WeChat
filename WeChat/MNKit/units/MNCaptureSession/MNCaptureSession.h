@@ -8,28 +8,51 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ 视频预览模式
+ */
 typedef NS_ENUM(NSInteger, MNCaptureResizeMode) {
     MNCaptureResizeModeResize = 0,
     MNCaptureResizeModeResizeAspect,
     MNCaptureResizeModeResizeAspectFill
 };
 
+/**
+ 视频输入摄像头
+ - MNCapturePositionBack: 后置摄像头
+ - MNCapturePositionFront: 前置摄像头
+ */
 typedef NS_ENUM(NSInteger, MNCapturePosition) {
     MNCapturePositionBack = 0,
     MNCapturePositionFront
 };
 
-typedef NS_ENUM(NSInteger, MNCaptureSessionStatus) {
-    MNCaptureSessionStatusUnknown = 0,
-    MNCaptureSessionStatusRecording,
-    MNCaptureSessionStatusCompleted,
-    MNCaptureSessionStatusFailed
+/**
+ 录制状态
+ - MNCaptureStatusIdle: 未知, 闲置状态
+ - MNCaptureStatusPreparing: 即将写入进文件
+ - MNCaptureStatusRecording: 正在录制视频
+ - MNCaptureStatusWaiting: 即将结束
+ - MNCaptureStatusCompleted: 录制完成
+ - MNCaptureStatusFailed: 录制出错
+ */
+typedef NS_ENUM(NSInteger, MNCaptureStatus) {
+    MNCaptureStatusIdle = 0,
+    MNCaptureStatusPreparing,
+    MNCaptureStatusRecording,
+    MNCaptureStatusWaiting,
+    MNCaptureStatusCompleted,
+    MNCaptureStatusFailed
 };
+
+NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString * MNCapturePresetName;
 FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetLowQuality;
 FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetMediumQuality;
 FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetHighQuality;
+FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1280x720;
+FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 
 @class MNCaptureSession;
 @protocol MNCaptureSessionDelegate <NSObject>
@@ -57,15 +80,17 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetHighQuality;
 /**捕获质量*/
 @property (nonatomic, copy) MNCapturePresetName presetName;
 /**事件回调*/
-@property (nonatomic, weak) id<MNCaptureSessionDelegate> delegate;
+@property (nonatomic, weak, nullable) id<MNCaptureSessionDelegate> delegate;
 /**状态*/
-@property (nonatomic, readonly) MNCaptureSessionStatus status;
+@property (nonatomic, readonly) MNCaptureStatus status;
 /**是否在录制*/
-@property (nonatomic, readonly, getter=isRecording) BOOL recording;
+@property (nonatomic, readonly) BOOL isRecording;
 /**是否在获取*/
-@property (nonatomic, readonly, getter=isRunning) BOOL running;
+@property (nonatomic, readonly) BOOL isRunning;
+/**视频文件地址*/
+@property (nonatomic, copy) NSURL *URL;
 /**错误信息*/
-@property (nonatomic, readonly, strong) NSError *error;
+@property (nonatomic, strong, readonly, nullable) NSError *error;
 
 /**
  实例化视频捕获者
@@ -75,19 +100,26 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetHighQuality;
 - (instancetype)initWithOutputPath:(NSString *)outputPath;
 
 /**
- 捕获屏幕, 视频/图片
+ 实例化视频录制实例
+ @param URL 视频输出路径
+ @return 视频录制实例
+ */
+- (instancetype)initWithURL:(NSURL *_Nullable)URL;
+
+/**
+ 配置视频录制/图片捕获
  */
 - (void)prepareCapturing;
 
 /**
- 捕获屏幕, 视频
+ 配置视频录制
  */
 - (void)prepareRecording;
 
 /**
- 捕获屏幕, 图片
+ 配置图片捕获
  */
-- (void)prepareStilling;
+- (void)prepareSnapping;
 
 #pragma mark - Instance
 + (instancetype)capturer;
@@ -117,3 +149,4 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePresetHighQuality;
 
 @end
 
+NS_ASSUME_NONNULL_END
