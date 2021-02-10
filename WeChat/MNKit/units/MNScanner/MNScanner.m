@@ -155,8 +155,7 @@
     _scanRect = scanRect;
     if (_metadataOutput && _outputView) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            CGRect rect = [self scanRectOfInterestWithRect:_scanRect];
-            _metadataOutput.rectOfInterest = rect;
+            _metadataOutput.rectOfInterest = [self scanRectOfInterestWithRect:_scanRect];
         });
     }
 }

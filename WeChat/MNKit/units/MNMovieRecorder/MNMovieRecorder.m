@@ -15,7 +15,6 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
-
 /**
  录制状态
  - MNMovieRecordStatusIdle: 未知, 闲置状态
@@ -262,7 +261,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)startRecording {
     @synchronized (self) {
         if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
-            //@throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Already recording" userInfo:nil];
             NSLog(@"Already recording");
             return;
         }

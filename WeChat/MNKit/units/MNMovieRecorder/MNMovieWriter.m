@@ -27,8 +27,8 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 
 @interface MNMovieWriter ()
 @property (nonatomic) MNMovieWriteStatus status;
-@property (nonatomic, strong) dispatch_queue_t writQueue;
 @property (nonatomic, strong) AVAssetWriter *writer;
+@property (nonatomic, strong) dispatch_queue_t writQueue;
 @property (nonatomic, strong) AVAssetWriterInput *videoInput;
 @property (nonatomic, strong) AVAssetWriterInput *audioInput;
 @property (nonatomic) UIDeviceOrientation deviceOrientation;
@@ -38,9 +38,9 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 - (instancetype)init {
     if (self = [super init]) {
         self.movieOrientation = AVCaptureVideoOrientationPortrait;
+        self.deviceOrientation = UIDevice.currentDevice.orientation;
         self.writQueue = dispatch_queue_create("com.mn.movie.write.queue", DISPATCH_QUEUE_SERIAL);
         self.delegateQueue = dispatch_queue_create("com.mn.movie.delegate.queue", DISPATCH_QUEUE_SERIAL);
-        self.deviceOrientation = UIDevice.currentDevice.orientation;
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(deviceOrientationDidChangeNotification)
@@ -61,6 +61,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return self;
 }
 
+#pragma mark - Sample Buffer
 - (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer mediaType:(AVMediaType)mediaType {
     
     // 缓存为空 出错
@@ -118,13 +119,13 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 }
             }
             
+            CFRelease(sampleBuffer);
+            
             if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
                 @synchronized (self) {
                     [self setStatus:MNMovieWriteStatusWriting error:nil];
                 }
             }
-            
-            CFRelease(sampleBuffer);
         }
     });
 }
@@ -241,8 +242,8 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 [self setStatus:MNMovieWriteStatusFinish error:error];
             }
         } else {
+            self.writer = writer;
             @synchronized (self) {
-                self.writer = writer;
                 [self setStatus:MNMovieWriteStatusPreparing error:nil];
             }
         }
@@ -383,6 +384,11 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     if ([NSFileManager.defaultManager createDirectoryAtPath:URL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil]) {
         _URL = URL.copy;
     }
+}
+
+- (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    [UIDevice.currentDevice endGeneratingDeviceOrientationNotifications];
 }
 
 @end
