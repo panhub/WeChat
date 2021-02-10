@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     
     // 缓存为空 出错
     if (sampleBuffer == NULL) {
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"SampleBuffer is NULL!" userInfo:nil];
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL sample buffer" userInfo:nil];
         return;
     }
     
@@ -75,14 +75,14 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     
     dispatch_async(self.writQueue, ^{
         @autoreleasepool {
-            
+        
             @synchronized (self) {
                 if (self.status != MNMovieWriteStatusPreparing && self.status != MNMovieWriteStatusWriting) {
                     CFRelease(sampleBuffer);
                     return;
                 }
             }
-            
+        
             if (mediaType == AVMediaTypeVideo) {
                 if (!self.videoInput) {
                     if (![self addVideoTrackWithSourceFormatDescription:CMSampleBufferGetFormatDescription(sampleBuffer)]) {
@@ -120,11 +120,11 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
             }
             
             CFRelease(sampleBuffer);
-            
-            if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
-                @synchronized (self) {
-                    [self setStatus:MNMovieWriteStatusWriting error:nil];
-                }
+        }
+        
+        if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
+            @synchronized (self) {
+                [self setStatus:MNMovieWriteStatusWriting error:nil];
             }
         }
     });

@@ -10,10 +10,7 @@
 #import "MNAuthenticator.h"
 #import "MNFileManager.h"
 #import "MNMovieWriter.h"
-#import "UIAlertView+MNHelper.h"
 #import <AVFoundation/AVFoundation.h>
-#import <AssetsLibrary/AssetsLibrary.h>
-#import <MobileCoreServices/MobileCoreServices.h>
 
 /**
  录制状态
@@ -299,16 +296,18 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     
-    if (self.status != MNMovieRecordStatusPreparing && self.status != MNMovieRecordStatusRecording) return;
-    
-    if (output == self.videoOutput) {
+    // 判断此时录制状态是否满足视频写入条件
+    if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
         
-        [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeVideo];
-        
-    } else if (output == self.audioOutput) {
-        
-        [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeAudio];
-        
+        if (output == self.videoOutput) {
+
+            [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeVideo];
+            
+        } else if (output == self.audioOutput) {
+            
+            [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeAudio];
+            
+        }
     }
 }
 
@@ -564,7 +563,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
             session.sessionPreset = AVCaptureSessionPreset1280x720;
         } else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium]) {
             session.sessionPreset = AVCaptureSessionPresetMedium;
-        } if (NSProcessInfo.processInfo.processorCount == 1 && [session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+        } else if (NSProcessInfo.processInfo.processorCount == 1 && [session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
             session.sessionPreset = AVCaptureSessionPreset640x480;
         } else if ([session canSetSessionPreset:AVCaptureSessionPresetLow]) {
             session.sessionPreset = AVCaptureSessionPresetLow;
@@ -637,7 +636,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     [self stopRunning];
     [self stopRecording];
     [self renewSessionActive];
-    [_videoLayer removeFromSuperlayer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
