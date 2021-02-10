@@ -73,7 +73,6 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     CFRetain(sampleBuffer);
     
     dispatch_async(self.writQueue, ^{
-        
         @autoreleasepool {
             
             @synchronized (self) {
@@ -121,7 +120,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
             
             if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
                 @synchronized (self) {
-                    [self setStatus:MNMovieWriteStatusWaiting error:nil];
+                    [self setStatus:MNMovieWriteStatusWriting error:nil];
                 }
             }
             
@@ -131,6 +130,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 }
 
 - (BOOL)appendVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer {
+    
     if (self.writer.status == AVAssetWriterStatusUnknown) {
         if ([self.writer startWriting]) {
             [self.writer startSessionAtSourceTime:CMSampleBufferGetPresentationTimeStamp(sampleBuffer)];
@@ -211,6 +211,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         audioInput.expectsMediaDataInRealTime = YES;
         if ([self.writer canAddInput:audioInput]){
             [self.writer addInput:audioInput];
+            self.audioInput = audioInput;
             return YES;
         }
     }
