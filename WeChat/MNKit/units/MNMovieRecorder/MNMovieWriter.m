@@ -78,6 +78,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         
             @synchronized (self) {
                 if (self.status != MNMovieWriteStatusPreparing && self.status != MNMovieWriteStatusWriting) {
+                    NSLog(@"=========");
                     CFRelease(sampleBuffer);
                     return;
                 }
@@ -252,18 +253,13 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 
 - (void)finishWriting {
     @synchronized (self) {
-        if (self.status != MNMovieWriteStatusWriting) {
-            NSLog(@"Not recording");
-            return;
-        }
+        if (self.status != MNMovieWriteStatusWriting) return;
         [self setStatus:MNMovieWriteStatusWaiting error:nil];
     }
     __weak typeof(self) weakself = self;
     dispatch_async(self.writQueue, ^{
-        if (weakself.status != MNMovieWriteStatusWaiting) {
-            // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
-            return;
-        }
+        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
+        if (weakself.status != MNMovieWriteStatusWaiting) return;
         [weakself.writer finishWritingWithCompletionHandler:^{
             NSError *error = weakself.writer.error;
             __strong typeof(self) self = weakself;

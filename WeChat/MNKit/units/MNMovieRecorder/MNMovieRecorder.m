@@ -42,10 +42,12 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
 @property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
+@property (nonatomic, strong) AVCaptureConnection *audioConnection;
+@property (nonatomic, strong) AVCaptureConnection *videoConnection;
 @property (nonatomic, strong) AVCaptureStillImageOutput *imageOutput;
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
 @property (nonatomic, strong) AVCaptureAudioDataOutput *audioOutput;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoLayer;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 @end
 
 @implementation MNMovieRecorder
@@ -189,6 +191,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     [self.session addOutput:videoOutput];
     self.videoInput = videoInput;
     self.videoOutput = videoOutput;
+    self.audioConnection = [videoOutput connectionWithMediaType:AVMediaTypeVideo];
     return YES;
 }
 
@@ -222,6 +225,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     [self.session addOutput:audioOutput];
     self.audioInput = audioInput;
     self.audioOutput = audioOutput;
+    self.audioConnection = [audioOutput connectionWithMediaType:AVMediaTypeAudio];
     return YES;
 }
 
@@ -257,10 +261,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - 开始/停止录像
 - (void)startRecording {
     @synchronized (self) {
-        if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
-            NSLog(@"Already recording");
-            return;
-        }
+        if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) return;
         [self setStatus:MNMovieRecordStatusPreparing error:nil];
     }
     
@@ -280,10 +281,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (void)stopRecording {
     @synchronized (self) {
-        if (self.status != MNMovieRecordStatusRecording) {
-            NSLog(@"Not recording");
-            return;
-        }
+        if (!self.isRecording) return;
     }
     [self.movieWriter finishWriting];
 }
@@ -295,10 +293,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    
     // 判断此时录制状态是否满足视频写入条件
     if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
-        
+
         if (output == self.videoOutput) {
 
             [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeVideo];
@@ -421,8 +418,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 #pragma mark - 对焦
 - (BOOL)setFocusPoint:(CGPoint)point {
-    if (!_videoInput || !_videoLayer || !_session.isRunning) return NO;
-    CGPoint focus = [_videoLayer captureDevicePointOfInterestForPoint:point];
+    if (!_videoInput || !_previewLayer || !_session.isRunning) return NO;
+    CGPoint focus = [_previewLayer captureDevicePointOfInterestForPoint:point];
     __block BOOL succeed = NO;
     [self changeDeviceConfigurationHandler:^(AVCaptureDevice *device) {
         if ([device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
@@ -492,10 +489,10 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (!_session) return;
     AVLayerVideoGravity videoGravity = self.videoLayerGravity;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.videoLayer removeFromSuperlayer];
-        self.videoLayer.frame = outputView.bounds;
-        self.videoLayer.videoGravity = videoGravity;
-        [outputView.layer insertSublayer:self.videoLayer atIndex:0];
+        [self.previewLayer removeFromSuperlayer];
+        self.previewLayer.frame = outputView.bounds;
+        self.previewLayer.videoGravity = videoGravity;
+        [outputView.layer insertSublayer:self.previewLayer atIndex:0];
     });
 }
 
@@ -511,7 +508,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)setResizeMode:(MNMovieResizeMode)resizeMode {
     if (self.isRecording || resizeMode == _resizeMode) return;
     _resizeMode = resizeMode;
-    _videoLayer.videoGravity = [self videoLayerGravity];
+    _previewLayer.videoGravity = [self videoLayerGravity];
 }
 
 - (void)setStatus:(MNMovieRecordStatus)status error:(NSError *)error {
@@ -573,12 +570,12 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return _session;
 }
 
-- (AVCaptureVideoPreviewLayer *)videoLayer {
-    if (!_videoLayer) {
-        AVCaptureVideoPreviewLayer *videoLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
-        _videoLayer = videoLayer;
+- (AVCaptureVideoPreviewLayer *)previewLayer {
+    if (!_previewLayer) {
+        AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
+        _previewLayer = previewLayer;
     }
-    return _videoLayer;
+    return _previewLayer;
 }
 
 - (BOOL)isRunning {
