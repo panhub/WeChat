@@ -23,8 +23,20 @@ typedef NS_ENUM(NSInteger, MNCaptureResizeMode) {
  - MNCapturePositionFront: 前置摄像头
  */
 typedef NS_ENUM(NSInteger, MNCapturePosition) {
-    MNCapturePositionBack = 0,
+    MNCapturePositionBack = 1,
     MNCapturePositionFront
+};
+
+/**
+ 视频播放方向
+ - MNMovieOrientationPortrait: 竖向
+ - MNMovieOrientationLandscape: 横向
+ */
+typedef NS_ENUM(NSInteger, MNMovieOrientation) {
+    MNMovieOrientationPortrait = 1,
+    MNMovieOrientationPortraitUpsideDown = 2,
+    MNMovieOrientationLandscapeRight = 3,
+    MNMovieOrientationLandscapeLeft = 4
 };
 
 /**
@@ -64,6 +76,8 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 @property (nonatomic) MNCaptureResizeMode resizeMode;
 /**摄像头*/
 @property (nonatomic, readonly) MNCapturePosition capturePosition;
+/**视频方向*/
+@property (nonatomic) MNMovieOrientation movieOrientation;
 /**录制时长时长*/
 @property (nonatomic, readonly) Float64 duration;
 /**视频帧率, 默认30*/

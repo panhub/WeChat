@@ -41,8 +41,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MNMovieWriter : NSObject
 
+/**帧率*/
+@property (nonatomic) int frameRate;
+
 /**本地文件路径*/
 @property (nonatomic, copy) NSURL *URL;
+
+/**预期的视频播放方向*/
+@property (nonatomic) AVCaptureVideoOrientation movieOrientation;
+
+/**摄像头*/
+@property (nonatomic) AVCaptureDevicePosition devicePosition;
 
 /**当前状态*/
 @property (nonatomic, readonly) MNMovieWriteStatus status;
@@ -60,13 +69,19 @@ NS_ASSUME_NONNULL_BEGIN
  @param queue 代理回调队列
  @return 视频写入实例
  */
-- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate queue:(dispatch_queue_t _Nullable)queue;
 
-/**即将开始写入视频*/
+/**等待写入视频*/
 - (void)prepareWriting;
 
+/**结束视频写入*/
 - (void)finishWriting;
 
+/**
+ 写入视频
+ @param sampleBuffer 缓存数据
+ @param mediaType 媒体类型
+ */
 - (void)appendSampleBuffer:(CMSampleBufferRef)sampleBuffer mediaType:(AVMediaType)mediaType;
 
 @end

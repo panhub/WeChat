@@ -73,8 +73,10 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     _movieWriter = MNMovieWriter.new;
     _resizeMode = MNCaptureResizeModeResizeAspect;
     _capturePosition = MNCapturePositionBack;
+    _presetName = MNCapturePreset1280x720;
     _writeQueue = dispatch_queue_create("com.mn.capture.write.queue", DISPATCH_QUEUE_SERIAL);
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
+    _movieOrientation = MNMovieOrientationPortrait;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didEnterBackgroundNotification)
                                                  name:UIApplicationDidEnterBackgroundNotification
@@ -166,11 +168,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
         [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
     }
-    NSInteger frameRate = self.frameRate;
-    if (NSProcessInfo.processInfo.processorCount == 1) {
-        frameRate = 15;
-    }
-    CMTime frameDuration = CMTimeMake(1, (int32_t)frameRate);
+    CMTime frameDuration = CMTimeMake(1, (int32_t)self.frameRate);
     if ([device lockForConfiguration:NULL] ) {
         device.activeVideoMaxFrameDuration = frameDuration;
         device.activeVideoMinFrameDuration = frameDuration;
@@ -278,6 +276,9 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     
     //self.movieWriter.delegate = self;
     self.movieWriter.URL = self.URL;
+    self.movieWriter.frameRate = self.frameRate;
+    self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.capturePosition;
+    self.movieWriter.movieOrientation = (AVCaptureVideoOrientation)self.movieOrientation;
     
     [self.movieWriter prepareWriting];
 }
@@ -570,6 +571,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (int)frameRate {
+    if (NSProcessInfo.processInfo.processorCount == 1) return 15;
     return MIN(30, MAX(_frameRate, 15));
 }
 
@@ -678,6 +680,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     [self stopRecording];
     [_videoLayer removeFromSuperlayer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     NSLog(@"===dealloc===%@", NSStringFromClass(self.class));
 }
 
