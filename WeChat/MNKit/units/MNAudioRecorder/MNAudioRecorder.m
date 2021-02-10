@@ -18,7 +18,7 @@
 @property(nonatomic, strong) NSTimer *powerTimer;
 @property(nonatomic, strong) AVAudioRecorder *recorder;
 @property(nonatomic, strong) NSMutableArray <NSNumber *>*powers;
-@property(nonatomic, copy) AVAudioSessionCategory audioSessionCategory;
+@property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
 @property(nonatomic, getter=isPausing) BOOL pausing;
 @end
 
@@ -32,7 +32,7 @@
     self.channel = MNRecordChannelStereo;
     self.quality = MNRecordQualityMedium;
     self.powers = @[].mutableCopy;
-    self.audioSessionCategory = AVAudioSession.sharedInstance.category;
+    self.sessionCategory = AVAudioSession.sharedInstance.category;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     return self;
 }
@@ -175,10 +175,11 @@
     return !error;
 }
 
-- (BOOL)renewAudioSessionActive {
-    if (!self.audioSessionCategory) return NO;
+- (BOOL)renewSessionActive {
+    if (!self.sessionCategory) return NO;
+    if ([AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) return YES;
     NSError *error;
-    [[AVAudioSession sharedInstance] setCategory:self.audioSessionCategory error:&error];
+    [[AVAudioSession sharedInstance] setCategory:self.sessionCategory error:&error];
     if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
     return !error;
 }
@@ -226,7 +227,7 @@
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag {
     self.pausing = NO;
     [self closeTimer];
-    [self renewAudioSessionActive];
+    [self renewSessionActive];
     if (!flag && !self.error) self.error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"录音失败"}];
     if ([_delegate respondsToSelector:@selector(audioRecorderDidFinishRecording:successfully:)]) {
         [_delegate audioRecorderDidFinishRecording:self successfully:flag];
@@ -237,7 +238,7 @@
     self.pausing = NO;
     self.error = error;
     [self closeTimer];
-    [self renewAudioSessionActive];
+    [self renewSessionActive];
     if ([_delegate respondsToSelector:@selector(audioRecorderDidFailRecording:)]) {
         [_delegate audioRecorderDidFailRecording:self];
     }

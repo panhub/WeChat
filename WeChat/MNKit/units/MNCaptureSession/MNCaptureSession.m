@@ -22,18 +22,12 @@ MNCapturePresetName const MNCapturePreset1280x720 = @"com.mn.capture.preset.1280
 MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.1920x1080";
 
 @interface MNCaptureSession ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
+@property (nonatomic) MNCaptureStatus status;
+@property (nonatomic) MNCapturePosition capturePosition;
+@property (nonatomic, strong) NSError *error;
+@property (nonatomic, strong) MNMovieWriter *movieWriter;
 @property (nonatomic, strong) dispatch_queue_t writeQueue;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
-@property (nonatomic) MNCapturePosition capturePosition;
-@property (nonatomic) MNCaptureStatus status;
-@property (nonatomic, getter=isStarting) BOOL starting;
-@property (nonatomic, strong) NSError *error;
-@property (nonatomic, strong) NSDictionary *audioSetting;
-@property (nonatomic, strong) NSDictionary *videoSetting;
-@property (nonatomic, strong) MNMovieWriter *movieWriter;
-@property (nonatomic, strong) AVAssetWriter *assetWriter;
-@property (nonatomic, strong) AVAssetWriterInput *videoWriterInput;
-@property (nonatomic, strong) AVAssetWriterInput *audioWriterInput;
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
 @property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
@@ -41,6 +35,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
 @property (nonatomic, strong) AVCaptureAudioDataOutput *audioOutput;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoLayer;
+@property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
 @end
 
 @implementation MNCaptureSession
@@ -77,6 +72,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     _writeQueue = dispatch_queue_create("com.mn.capture.write.queue", DISPATCH_QUEUE_SERIAL);
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
     _movieOrientation = MNMovieOrientationPortrait;
+    _sessionCategory = AVAudioSession.sharedInstance.category;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didEnterBackgroundNotification)
                                                  name:UIApplicationDidEnterBackgroundNotification
@@ -274,6 +270,11 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
         [self setStatus:MNCaptureStatusPreparing error:nil];
     }
     
+    if (![self makeRecordSessionActive]) {
+        [self failureWithDescription:@"设置录制会话失败"];
+        return;
+    }
+    
     //self.movieWriter.delegate = self;
     self.movieWriter.URL = self.URL;
     self.movieWriter.frameRate = self.frameRate;
@@ -439,18 +440,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (void)failureWithCode:(NSUInteger)code description:(NSString *)description{
-    [self failureWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
-}
-
-- (void)failureWithError:(NSError *)error {
-    __weak typeof(self)weakself = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        weakself.error = error;
-        weakself.status = MNCaptureStatusIdle;
-        if ([weakself.delegate respondsToSelector:@selector(captureSession:didFailWithError:)]) {
-            [weakself.delegate captureSession:weakself didFailWithError:error];
-        }
-    });
+    [self setStatus:MNCaptureStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
 }
 
 #pragma mark - Notification
@@ -462,6 +452,23 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 
 - (void)willEnterForegroundNotification {
     [self startRunning];
+}
+
+#pragma mark - 设置会话
+- (BOOL)makeRecordSessionActive {
+    NSError *error;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:&error];
+    if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
+    return !error;
+}
+
+- (BOOL)renewSessionActive {
+    if (!self.sessionCategory) return NO;
+    if ([AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) return YES;
+    NSError *error;
+    [[AVAudioSession sharedInstance] setCategory:self.sessionCategory error:&error];
+    if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
+    return !error;
 }
 
 #pragma mark - Setter
@@ -511,13 +518,35 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (void)setStatus:(MNCaptureStatus)status error:(NSError *)error {
-    _status = status;
-    if (self.delegate && status > MNCaptureStatusRecording) {
+    
+    BOOL shouldNotifyDelegate = NO;
+    
+    if (status != _status) {
+        if (status == MNCaptureStatusRecording) {
+            shouldNotifyDelegate = YES;
+        } else if (status == MNCaptureStatusFinish) {
+            shouldNotifyDelegate = YES;
+            if (error) self.error = error;
+        }
+        _status = status;
+    }
+    
+    if (shouldNotifyDelegate && self.delegate) {
+        __weak typeof(self) weakself = self;
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (status == MNCaptureStatusRecording && [self.delegate respondsToSelector:@selector(captureSessionDidStartRecording:)]) {
+            __strong typeof(self) self = weakself;
+            if (status == MNCaptureStatusFinish) {
+                if (error) {
+                    if ([self.delegate respondsToSelector:@selector(captureSession:didFailWithError:)]) {
+                        [self.delegate captureSession:self didFailWithError:error];
+                    }
+                } else {
+                    if ([self.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
+                        [self.delegate captureSessionDidFinishRecording:self];
+                    }
+                }
+            } else if (status == MNCaptureStatusRecording && [self.delegate respondsToSelector:@selector(captureSessionDidStartRecording:)]) {
                 [self.delegate captureSessionDidStartRecording:self];
-            } else if (status == MNCaptureStatusFinish && [self.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
-                [self.delegate captureSessionDidFinishRecording:self];
             }
         });
     }
@@ -564,8 +593,8 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (Float64)duration {
-    if (self.isRunning || ![NSFileManager.defaultManager fileExistsAtPath:self.outputPath]) return 0.f;
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:self.outputPath] options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@YES}];
+    if (!self.URL || ![NSFileManager.defaultManager fileExistsAtPath:self.URL.path]) return 0.f;
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.URL options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@YES}];
     if (!asset) return 0.f;
     return CMTimeGetSeconds(asset.duration);
 }
@@ -573,50 +602,6 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 - (int)frameRate {
     if (NSProcessInfo.processInfo.processorCount == 1) return 15;
     return MIN(30, MAX(_frameRate, 15));
-}
-
-- (MNCapturePresetName)presetName {
-    return [_presetName hasPrefix:@"com.mn.capture."] ? _presetName : MNCapturePresetMediumQuality;
-}
-
-- (NSDictionary *)videoSetting {
-    if (!_videoSetting) {
-        //NSDictionary *dc = [self.videoOutput recommendedVideoSettingsForAssetWriterWithOutputFileType:AVFileTypeMPEG4];
-        //NSDictionary *d = [dc objectForKey:AVVideoCompressionPropertiesKey];
-        CGFloat width = self.outputSize.width;
-        CGFloat height = self.outputSize.height;
-        /// 码率和帧率设置
-        NSDictionary *compressionSetting = @{AVVideoAverageBitRateKey:@(width*height*6.f), AVVideoExpectedSourceFrameRateKey:@(self.frameRate), AVVideoProfileLevelKey:self.videoProfileLevel};
-        _videoSetting = @{AVVideoWidthKey:@(width), AVVideoHeightKey:@(height), AVVideoCodecKey:AVVideoCodecH264, AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill, AVVideoCompressionPropertiesKey:compressionSetting};
-    }
-    return _videoSetting;
-}
-
-- (NSDictionary *)audioSetting {
-    if (!_audioSetting) {
-        //_audioSetting = @{AVEncoderBitRatePerChannelKey:@(28000), AVFormatIDKey:@(kAudioFormatMPEG4AAC), AVNumberOfChannelsKey:@(1), AVSampleRateKey:@(22050)};
-        AudioChannelLayout channelLayout = {
-            .mChannelLayoutTag = kAudioChannelLayoutTag_Stereo,
-            .mChannelBitmap = kAudioChannelBit_Left,
-            .mNumberChannelDescriptions = 0
-        };
-        NSData *channelLayoutData = [NSData dataWithBytes:&channelLayout length:offsetof(AudioChannelLayout, mChannelDescriptions)];
-        _audioSetting = @{AVFormatIDKey:@(kAudioFormatMPEG4AAC),
-                                   AVSampleRateKey:@(44100),
-                                   AVNumberOfChannelsKey:@(2),
-                                   AVChannelLayoutKey:channelLayoutData};
-    }
-    return _audioSetting;
-}
-
-- (NSString *)videoProfileLevel {
-    NSString *profileLevel = AVVideoProfileLevelH264HighAutoLevel;
-    if ([self.presetName isEqualToString:MNCapturePresetLowQuality]) {
-        profileLevel = AVVideoProfileLevelH264BaselineAutoLevel;
-    } else if ([self.presetName isEqualToString:MNCapturePresetMediumQuality]) {
-        profileLevel = AVVideoProfileLevelH264MainAutoLevel;
-    }
-    return profileLevel;
 }
 
 - (void)updateOutputSizeIfNeeded {
@@ -675,13 +660,14 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 #pragma mark - dealloc
 - (void)dealloc {
     _delegate = nil;
+    _movieWriter.delegate = nil;
     [self closeLighting];
     [self stopRunning];
     [self stopRecording];
+    [self renewSessionActive];
     [_videoLayer removeFromSuperlayer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-    NSLog(@"===dealloc===%@", NSStringFromClass(self.class));
 }
 
 @end

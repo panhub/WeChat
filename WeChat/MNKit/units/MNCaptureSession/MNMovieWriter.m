@@ -266,7 +266,7 @@
         _status = status;
     }
     
-    if (shouldNotifyDelegate) {
+    if (shouldNotifyDelegate && self.delegate) {
         __weak typeof(self) weakself = self;
         dispatch_async(self.delegateQueue, ^{
             __strong typeof(self) self = weakself;

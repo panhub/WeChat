@@ -538,6 +538,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     [self.URLs addObjectsFromArray:playURLs.copy];
 }
 
+#pragma mark - 设置会话
 - (BOOL)makePlaySessionActive {
     //设置会话类型,关闭其他声音,可后台播放(主要是音频)(注意工程选项卡 Capabilities - Background Modes 需要打开)
     /** 设置会话类型
@@ -555,6 +556,15 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     }
     [[AVAudioSession sharedInstance] setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
     return error == nil;
+}
+
+- (BOOL)renewSessionActive {
+    if (!self.sessionCategory) return NO;
+    if ([AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) return YES;
+    NSError *error;
+    [[AVAudioSession sharedInstance] setCategory:self.sessionCategory error:&error];
+    if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
+    return !error;
 }
 
 #pragma mark - Getter
@@ -639,10 +649,7 @@ static void MNPlaySoundCompleteHandler(SystemSoundID soundID,void *clientData){
     [self removeAllURLs];
     if (_observer) [_player removeTimeObserver:_observer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if (self.sessionCategory && ![AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) {
-        [AVAudioSession.sharedInstance setCategory:self.sessionCategory error:nil];
-        [AVAudioSession.sharedInstance setActive:YES error:nil];
-    }
+    [self renewSessionActive];
 }
 
 @end
