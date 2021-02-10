@@ -4513,7 +4513,7 @@
 				E869C62A2570EF620017025E /* MNLock */,
 				E869C62D2570EF620017025E /* MNOperation */,
 				E869C6302570EF620017025E /* MNQueue */,
-				E869C6332570EF620017025E /* MNCaptureSession */,
+				E869C6332570EF620017025E /* MNMovieRecorder */,
 				E869C6362570EF620017025E /* MNNetworking */,
 				E869C6422570EF620017025E /* MNFileManager */,
 			);
@@ -4794,7 +4794,7 @@
 			path = MNQueue;
 			sourceTree = "<group>";
 		};
-		E869C6332570EF620017025E /* MNCaptureSession */ = {
+		E869C6332570EF620017025E /* MNMovieRecorder */ = {
 			isa = PBXGroup;
 			children = (
 				E869C6342570EF620017025E /* MNMovieRecorder.h */,
@@ -4802,7 +4802,7 @@
 				E80828DE25D26C2800968E8B /* MNMovieWriter.h */,
 				E80828DF25D26C2800968E8B /* MNMovieWriter.m */,
 			);
-			path = MNCaptureSession;
+			path = MNMovieRecorder;
 			sourceTree = "<group>";
 		};
 		E869C6362570EF620017025E /* MNNetworking */ = {
