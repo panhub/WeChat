@@ -17,7 +17,7 @@
 @property (nonatomic, strong) UIControl *cameraControl;
 @property (nonatomic, strong) UIImageView *focusView;
 @property (nonatomic, strong) UIImageView *previewView;
-@property (nonatomic, strong) MNMovieRecorder *capturer;
+@property (nonatomic, strong) MNMovieRecorder *recorder;
 @property (nonatomic, strong) MNPlayView *playView;
 @property (nonatomic, strong) MNCapturingView *capturingView;
 @end
@@ -92,11 +92,11 @@
     player.layer = self.playView.layer;
     self.player = player;
     
-    MNMovieRecorder *capturer = [MNMovieRecorder new];
-    capturer.delegate = self;
-    capturer.outputView = self.displayView;
-    [capturer prepareCapturing];
-    self.capturer = capturer;
+    MNMovieRecorder *recorder = [MNMovieRecorder new];
+    recorder.delegate = self;
+    recorder.outputView = self.displayView;
+    [recorder prepareCapturing];
+    self.recorder = recorder;
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didEnterBackgroundNotification:)
@@ -107,7 +107,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-    if (!self.isFirstAppear && self.playView.alpha == 0.f && self.previewView.alpha == 0.f) [self.capturer startRunning];
+    if (!self.isFirstAppear && self.playView.alpha == 0.f && self.previewView.alpha == 0.f) [self.recorder startRunning];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -125,7 +125,7 @@
 - (void)handTap:(UITapGestureRecognizer *)tap {
     if (!self.focusView.hidden) return;
     CGPoint point = [tap locationInView:self.displayView];
-    [self.capturer setFocusPoint:point];
+    [self.recorder setFocusPoint:point];
     self.focusView.center_mn = point;
     self.focusView.hidden = NO;
     [UIView animateWithDuration:.4f animations:^{
@@ -139,7 +139,7 @@
 
 #pragma mark - Camera Switch
 - (void)cameraSwitchControlClicked:(UIControl *)control {
-    [self.capturer convertCapturePosition];
+    [self.recorder convertCapturePosition];
 }
 
 #pragma mark - MNPlayerDelegate
@@ -154,10 +154,10 @@
 #pragma mark - MNCapturingViewDelegate
 - (void)capturingViewCloseButtonClicked:(MNCapturingView *)capturingView {
     self.player.delegate = nil;
-    self.capturer.delegate = nil;
+    self.recorder.delegate = nil;
     [self.player removeAllURLs];
-    [self.capturer stopRecording];
-    [self.capturer deleteRecording];
+    [self.recorder stopRecording];
+    [self.recorder deleteRecording];
     if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
         [self.delegate cameraControllerDidCancel:self];
     } else if (!self.configuration || self.configuration.isAllowsAutoDismiss) {
@@ -176,12 +176,12 @@
 
 - (void)capturingViewBackButtonClicked:(MNCapturingView *)capturingView {
     [capturingView resetCapturing];
-    [self.capturer startRunning];
+    [self.recorder startRunning];
     [UIView animateWithDuration:.3f animations:^{
         self.previewView.alpha = self.playView.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.player removeAllURLs];
-        [self.capturer deleteRecording];
+        [self.recorder deleteRecording];
     }];
 }
 
@@ -193,7 +193,7 @@
         }
     } else {
         // 判断时长是否符合限制要求
-        NSTimeInterval duration = floor(self.capturer.duration);
+        NSTimeInterval duration = floor(self.recorder.duration);
         if (self.configuration.minExportDuration > 0.f && duration < self.configuration.minExportDuration) {
             [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄大于%@s的视频", @(ceil(self.configuration.minExportDuration))]];
             return;
@@ -204,26 +204,26 @@
         }
         // 回调结果
         if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithVideoAtPath:)]) {
-            [self.delegate cameraController:self didFinishWithVideoAtPath:self.capturer.URL.path];
+            [self.delegate cameraController:self didFinishWithVideoAtPath:self.recorder.URL.path];
         }
     }
     // 回调内容
     if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
-        [self.delegate cameraController:self didFinishWithContents:(self.previewView.alpha ? self.previewView.image : self.capturer.URL.path)];
+        [self.delegate cameraController:self didFinishWithContents:(self.previewView.alpha ? self.previewView.image : self.recorder.URL.path)];
     }
 }
 
 - (void)capturingViewShoudBeginCapturing:(MNCapturingView *)capturingView {
-    self.capturer.URL = [NSURL fileURLWithPath:self.filePath];
-    [self.capturer startRecording];
+    self.recorder.URL = [NSURL fileURLWithPath:self.filePath];
+    [self.recorder startRecording];
 }
 
 - (void)capturingViewDidEndCapturing:(MNCapturingView *)capturingView {
-    [self.capturer stopRecording];
+    [self.recorder stopRecording];
 }
 
 - (void)capturingViewShoudCapturingStillImage:(MNCapturingView *)capturingView {
-    [self.capturer captureStillImageAsynchronously:^(UIImage *image) {
+    [self.recorder captureStillImageAsynchronously:^(UIImage *image) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (image) {
                 [self.capturingView stopCapturing];
@@ -232,7 +232,7 @@
                     self.previewView.alpha = 1.f;
                     self.playView.alpha = 0.f;
                 } completion:^(BOOL finished) {
-                    [self.capturer stopRunning];
+                    [self.recorder stopRunning];
                 }];
             } else {
                 [self.view showInfoDialog:@"获取图像失败"];
@@ -242,41 +242,40 @@
 }
 
 #pragma mark - MNMovieRecordDelegate
-- (void)movieRecorderDidStartRecording:(MNMovieRecorder *)capturer {
+- (void)movieRecorderDidStartRecording:(MNMovieRecorder *)recorder {
     [self.capturingView startCapturing];
 }
 
-- (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)capturer {
-    if (capturer.error) [self.view showInfoDialog:capturer.error.localizedDescription];
+- (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)recorder {
     [self.capturingView stopCapturing];
     [UIView animateWithDuration:.3f animations:^{
         self.playView.alpha = 1.f;
         self.previewView.alpha = 0.f;
     } completion:^(BOOL finished) {
-        [self.capturer stopRunning];
-        [self.player addURL:[NSURL fileURLWithPath:self.capturer.URL.path]];
+        [self.recorder stopRunning];
+        [self.player addURL:self.recorder.URL];
         [self.player play];
     }];
 }
 
-- (void)captureSession:(MNMovieRecorder *)capturer didFailWithError:(NSError *)error {
-    if (capturer.error.code == AVErrorApplicationIsNotAuthorized) {
-        [[MNAlertView alertViewWithTitle:nil message:capturer.error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
+- (void)movieRecorder:(MNMovieRecorder *)recorder didFailWithError:(NSError *)error {
+    if (recorder.error.code == AVErrorApplicationIsNotAuthorized) {
+        [[MNAlertView alertViewWithTitle:nil message:recorder.error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
             if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
                 [self.delegate cameraControllerDidCancel:self];
             }
         } ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:self.view];
     } else {
-        [self.view showInfoDialog:capturer.error.localizedDescription];
+        [self.view showInfoDialog:recorder.error.localizedDescription];
     }
 }
 
 #pragma mark - 后台通知
 - (void)didEnterBackgroundNotification:(NSNotification *)notify {
     self.player.delegate = nil;
-    self.capturer.delegate = nil;
+    self.recorder.delegate = nil;
     [self.player removeAllURLs];
-    [self.capturer stopRunning];
+    [self.recorder stopRunning];
     if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
         [self.delegate cameraControllerDidCancel:self];
     }

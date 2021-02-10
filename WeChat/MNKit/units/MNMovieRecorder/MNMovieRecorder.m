@@ -36,13 +36,12 @@ MNMoviePresetName const MNMoviePresetHighQuality = @"com.mn.movie.preset.high";
 MNMoviePresetName const MNMoviePreset1280x720 = @"com.mn.movie.preset.1280x720";
 MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080";
 
-@interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
+@interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate, MNMovieWriteDelegate>
 @property (nonatomic) MNMovieRecordStatus status;
 @property (nonatomic) MNMovieDevicePosition capturePosition;
 @property (nonatomic, copy) NSError *error;
 @property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
 @property (nonatomic, strong) MNMovieWriter *movieWriter;
-@property (nonatomic, strong) dispatch_queue_t writeQueue;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
@@ -73,8 +72,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     _movieWriter = MNMovieWriter.new;
     _resizeMode = MNMovieResizeModeResizeAspect;
     _devicePosition = MNMovieDevicePositionBack;
-    _presetName = MNMoviePreset1280x720;
-    _writeQueue = dispatch_queue_create("com.mn.capture.write.queue", DISPATCH_QUEUE_SERIAL);
+    _presetName = MNMoviePresetHighQuality;
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
     _movieOrientation = MNMovieOrientationPortrait;
     _sessionCategory = AVAudioSession.sharedInstance.category;
@@ -277,12 +275,11 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     }
     
     self.error = nil;
-    //self.movieWriter.delegate = self;
     self.movieWriter.URL = self.URL;
+    self.movieWriter.delegate = self;
     self.movieWriter.frameRate = self.frameRate;
     self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.devicePosition;
     self.movieWriter.movieOrientation = (AVCaptureVideoOrientation)self.movieOrientation;
-    
     [self.movieWriter prepareWriting];
 }
 
@@ -314,6 +311,36 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         
         [self.movieWriter appendSampleBuffer:sampleBuffer mediaType:AVMediaTypeAudio];
         
+    }
+}
+
+#pragma mark - MNMovieWriteDelegate
+- (void)movieWriterDidStartWriting:(MNMovieWriter *)movieWriter {
+    @synchronized (self) {
+        [self setStatus:MNMovieRecordStatusRecording error:nil];
+    }
+}
+
+- (void)movieWriterDidFinishWriting:(MNMovieWriter *)movieWriter {
+    @synchronized (self) {
+        [self setStatus:MNMovieRecordStatusFinish error:nil];
+    }
+}
+
+- (void)movieWriter:(MNMovieWriter *)movieWriter didFailWithError:(NSError *)error {
+    @synchronized (self) {
+        [self setStatus:MNMovieRecordStatusFinish error:error];
+    }
+}
+
+#pragma mark - Fail
+- (void)failureWithDescription:(NSString *)message {
+    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
+}
+
+- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
+    @synchronized (self) {
+        [self setStatus:MNMovieRecordStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
     }
 }
 
@@ -433,17 +460,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     [device unlockForConfiguration];
 }
 
-#pragma mark - 发生错误
-- (void)failureWithDescription:(NSString *)message {
-    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
-}
-
-- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
-    @synchronized (self) {
-        [self setStatus:MNMovieRecordStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
-    }
-}
-
 #pragma mark - Notification
 - (void)didEnterBackgroundNotification {
     [self stopRecording];
@@ -509,8 +525,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         if (status == MNMovieRecordStatusRecording) {
             shouldNotifyDelegate = YES;
         } else if (status == MNMovieRecordStatusFinish) {
-            shouldNotifyDelegate = YES;
             if (error) self.error = error;
+            shouldNotifyDelegate = YES;
         }
         _status = status;
     }

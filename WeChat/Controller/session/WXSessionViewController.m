@@ -225,6 +225,7 @@
     picker.configuration.allowsPickingVideo = YES;
     picker.configuration.allowsPickingLivePhoto = YES;
     picker.configuration.allowsDisplayFileSize = NO;
+    picker.configuration.maxExportDuration = 60.f;
     picker.configuration.allowsCapturing = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
         NSLog(@"");

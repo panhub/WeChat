@@ -119,6 +119,12 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 }
             }
             
+            if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
+                @synchronized (self) {
+                    [self setStatus:MNMovieWriteStatusWaiting error:nil];
+                }
+            }
+            
             CFRelease(sampleBuffer);
         }
     });
