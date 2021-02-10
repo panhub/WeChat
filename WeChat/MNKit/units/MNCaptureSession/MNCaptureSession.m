@@ -39,19 +39,9 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 @end
 
 @implementation MNCaptureSession
-+ (MNCaptureSession *)capturer {
-    return MNCaptureSession.new;
-}
 - (instancetype)init {
     if (self = [super init]) {
         [self initialized];
-    }
-    return self;
-}
-
-- (instancetype)initWithOutputPath:(NSString *)outputPath {
-    if (self = [self init]) {
-        self.outputPath = outputPath;
     }
     return self;
 }
@@ -137,10 +127,6 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
         [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
             if (!allowed) {
                 [weakself failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
-                return;
-            }
-            if (![weakself setSessionActive:YES]) {
-                [weakself failureWithDescription:@"录像设备初始化失败"];
                 return;
             }
             if ([weakself setupVideo] && [weakself setupImage]) {
@@ -294,12 +280,9 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     [self.movieWriter finishWriting];
 }
 
-- (void)failRecording {
-}
-
 - (BOOL)deleteRecording {
     if (self.isRecording) return NO;
-    return [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+    return [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
@@ -439,8 +422,10 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     [self failureWithCode:AVErrorScreenCaptureFailed description:message];
 }
 
-- (void)failureWithCode:(NSUInteger)code description:(NSString *)description{
-    [self setStatus:MNCaptureStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
+- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
+    @synchronized (self) {
+        [self setStatus:MNCaptureStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
+    }
 }
 
 #pragma mark - Notification
@@ -499,22 +484,6 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     if (self.isRecording || resizeMode == _resizeMode) return;
     _resizeMode = resizeMode;
     _videoLayer.videoGravity = [self videoLayerGravity];
-}
-
-- (void)setOutputPath:(NSString *)outputPath {
-    if (self.isRecording || outputPath.pathExtension.length <= 0) return;
-    [NSFileManager.defaultManager removeItemAtPath:outputPath error:nil];
-    /// 只创建文件夹路径, 文件由数据写入时自行创建<踩坑总结>
-    if ([NSFileManager.defaultManager createDirectoryAtPath:outputPath.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil]) {
-        _outputPath = outputPath.copy;
-    }
-}
-
-- (BOOL)setSessionActive:(BOOL)active {
-    NSError *error;
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:&error];
-    if (!error) return [[AVAudioSession sharedInstance] setActive:active error:&error];
-    return NO;
 }
 
 - (void)setStatus:(MNCaptureStatus)status error:(NSError *)error {

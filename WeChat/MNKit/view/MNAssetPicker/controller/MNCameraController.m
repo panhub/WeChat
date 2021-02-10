@@ -204,17 +204,17 @@
         }
         // 回调结果
         if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithVideoAtPath:)]) {
-            [self.delegate cameraController:self didFinishWithVideoAtPath:self.capturer.outputPath];
+            [self.delegate cameraController:self didFinishWithVideoAtPath:self.capturer.URL.path];
         }
     }
     // 回调内容
     if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
-        [self.delegate cameraController:self didFinishWithContents:(self.previewView.alpha ? self.previewView.image : self.capturer.outputPath)];
+        [self.delegate cameraController:self didFinishWithContents:(self.previewView.alpha ? self.previewView.image : self.capturer.URL.path)];
     }
 }
 
 - (void)capturingViewShoudBeginCapturing:(MNCapturingView *)capturingView {
-    self.capturer.outputPath = self.filePath;
+    self.capturer.URL = [NSURL fileURLWithPath:self.filePath];
     [self.capturer startRecording];
 }
 
@@ -254,16 +254,12 @@
         self.previewView.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.capturer stopRunning];
-        NSString *s = self.capturer.outputPath;
-        if ([NSFileManager.defaultManager fileExistsAtPath:s]) {
-            NSLog(@"");
-        }
-        [self.player addURL:[NSURL fileURLWithPath:self.capturer.outputPath]];
+        [self.player addURL:[NSURL fileURLWithPath:self.capturer.URL.path]];
         [self.player play];
     }];
 }
 
-- (void)captureSessionDidFailureWithError:(MNCaptureSession *)capturer {
+- (void)captureSession:(MNCaptureSession *)capturer didFailWithError:(NSError *)error {
     if (capturer.error.code == AVErrorApplicationIsNotAuthorized) {
         [[MNAlertView alertViewWithTitle:nil message:capturer.error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
             if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {

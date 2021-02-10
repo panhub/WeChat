@@ -82,8 +82,6 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 @property (nonatomic, readonly) Float64 duration;
 /**视频帧率, 默认30*/
 @property (nonatomic) int frameRate;
-/**文件地址*/
-@property (nonatomic, copy) NSString *outputPath;
 /**图像展示视图*/
 @property (nonatomic, weak) UIView *outputView;
 /**图像输出尺寸*/
@@ -102,13 +100,6 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
 @property (nonatomic, copy) NSURL *URL;
 /**错误信息*/
 @property (nonatomic, strong, readonly, nullable) NSError *error;
-
-/**
- 实例化视频捕获者
- @param outputPath 视频输出路径
- @return 视频捕获者
- */
-- (instancetype)initWithOutputPath:(NSString *)outputPath;
 
 /**
  实例化视频录制实例
@@ -131,9 +122,6 @@ FOUNDATION_EXTERN MNCapturePresetName const MNCapturePreset1920x1080;
  配置图片捕获
  */
 - (void)prepareSnapping;
-
-#pragma mark - Instance
-+ (instancetype)capturer;
 
 #pragma mark - 捕获
 - (void)startRunning;

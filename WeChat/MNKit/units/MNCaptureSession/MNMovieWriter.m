@@ -353,5 +353,13 @@
     return orientation;
 }
 
+- (void)setURL:(NSURL *)URL {
+    if (!URL.isFileURL) return;
+    [NSFileManager.defaultManager removeItemAtURL:URL error:nil];
+    /// 只创建文件夹路径, 文件由数据写入时自行创建<踩坑总结>
+    if ([NSFileManager.defaultManager createDirectoryAtPath:URL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil]) {
+        _URL = URL.copy;
+    }
+}
 
 @end
