@@ -8,24 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreMedia/CMSampleBuffer.h>
-#import <AVFoundation/AVMediaFormat.h>
+#import <AVFoundation/AVFoundation.h>
 @class MNMovieWriter;
-
-/**
- 文件写入状态
- - MNMovieWriteStatusIdle: 闲置状态
- - MNMovieWriteStatusPreparing: 即将写入
- - MNMovieWriteStatusWriting: 正在写入
- - MNMovieWriteStatusWaiting: 等待结束
- - MNMovieWriteStatusFinish: 已结束
- */
-typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
-    MNMovieWriteStatusIdle = 0,
-    MNMovieWriteStatusPreparing,
-    MNMovieWriteStatusWriting,
-    MNMovieWriteStatusWaiting,
-    MNMovieWriteStatusFinish
-};
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -52,9 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**摄像头*/
 @property (nonatomic) AVCaptureDevicePosition devicePosition;
-
-/**当前状态*/
-@property (nonatomic, readonly) MNMovieWriteStatus status;
 
 /**当前状态*/
 @property (nonatomic, strong) dispatch_queue_t delegateQueue;

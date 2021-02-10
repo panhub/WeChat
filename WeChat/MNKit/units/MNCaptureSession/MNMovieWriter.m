@@ -9,6 +9,22 @@
 #import "MNMovieWriter.h"
 #import <AVFoundation/AVFoundation.h>
 
+/**
+ 文件写入状态
+ - MNMovieWriteStatusIdle: 闲置状态
+ - MNMovieWriteStatusPreparing: 即将写入
+ - MNMovieWriteStatusWriting: 正在写入
+ - MNMovieWriteStatusWaiting: 等待结束
+ - MNMovieWriteStatusFinish: 已结束
+ */
+typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
+    MNMovieWriteStatusIdle = 0,
+    MNMovieWriteStatusPreparing,
+    MNMovieWriteStatusWriting,
+    MNMovieWriteStatusWaiting,
+    MNMovieWriteStatusFinish
+};
+
 @interface MNMovieWriter ()
 @property (nonatomic) MNMovieWriteStatus status;
 @property (nonatomic, strong) dispatch_queue_t writQueue;

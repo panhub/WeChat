@@ -6,7 +6,7 @@
  *  @brief  视频录制
  */
 
-#import "MNCaptureSession.h"
+#import "MNMovieRecorder.h"
 #import "MNAuthenticator.h"
 #import "MNFileManager.h"
 #import "MNMovieWriter.h"
@@ -15,16 +15,32 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
-MNCapturePresetName const MNCapturePresetLowQuality = @"com.mn.capture.low";
-MNCapturePresetName const MNCapturePresetMediumQuality = @"com.mn.capture.medium";
-MNCapturePresetName const MNCapturePresetHighQuality = @"com.mn.capture.high";
-MNCapturePresetName const MNCapturePreset1280x720 = @"com.mn.capture.preset.1280x720";
-MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.1920x1080";
 
-@interface MNCaptureSession ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
-@property (nonatomic) MNCaptureStatus status;
-@property (nonatomic) MNCapturePosition capturePosition;
-@property (nonatomic, strong) NSError *error;
+/**
+ 录制状态
+ - MNMovieRecordStatusIdle: 未知, 闲置状态
+ - MNMovieRecordStatusPreparing: 即将开始
+ - MNMovieRecordStatusRecording: 正在录制视频
+ - MNMovieRecordStatusFinish: 录制完成
+ */
+typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
+    MNMovieRecordStatusIdle = 0,
+    MNMovieRecordStatusPreparing,
+    MNMovieRecordStatusRecording,
+    MNMovieRecordStatusFinish
+};
+
+MNMoviePresetName const MNMoviePresetLowQuality = @"com.mn.movie.preset.low";
+MNMoviePresetName const MNMoviePresetMediumQuality = @"com.mn.movie.preset.medium";
+MNMoviePresetName const MNMoviePresetHighQuality = @"com.mn.movie.preset.high";
+MNMoviePresetName const MNMoviePreset1280x720 = @"com.mn.movie.preset.1280x720";
+MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080";
+
+@interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
+@property (nonatomic) MNMovieRecordStatus status;
+@property (nonatomic) MNMovieDevicePosition capturePosition;
+@property (nonatomic, copy) NSError *error;
+@property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
 @property (nonatomic, strong) MNMovieWriter *movieWriter;
 @property (nonatomic, strong) dispatch_queue_t writeQueue;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
@@ -35,10 +51,9 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoOutput;
 @property (nonatomic, strong) AVCaptureAudioDataOutput *audioOutput;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoLayer;
-@property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
 @end
 
-@implementation MNCaptureSession
+@implementation MNMovieRecorder
 - (instancetype)init {
     if (self = [super init]) {
         [self initialized];
@@ -56,9 +71,9 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 - (void)initialized {
     _frameRate = 30;
     _movieWriter = MNMovieWriter.new;
-    _resizeMode = MNCaptureResizeModeResizeAspect;
-    _capturePosition = MNCapturePositionBack;
-    _presetName = MNCapturePreset1280x720;
+    _resizeMode = MNMovieResizeModeResizeAspect;
+    _devicePosition = MNMovieDevicePositionBack;
+    _presetName = MNMoviePreset1280x720;
     _writeQueue = dispatch_queue_create("com.mn.capture.write.queue", DISPATCH_QUEUE_SERIAL);
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
     _movieOrientation = MNMovieOrientationPortrait;
@@ -248,12 +263,12 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 #pragma mark - 开始/停止录像
 - (void)startRecording {
     @synchronized (self) {
-        if (self.status == MNCaptureStatusPreparing || self.status == MNCaptureStatusRecording) {
+        if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
             //@throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Already recording" userInfo:nil];
             NSLog(@"Already recording");
             return;
         }
-        [self setStatus:MNCaptureStatusPreparing error:nil];
+        [self setStatus:MNMovieRecordStatusPreparing error:nil];
     }
     
     if (![self makeRecordSessionActive]) {
@@ -261,10 +276,11 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
         return;
     }
     
+    self.error = nil;
     //self.movieWriter.delegate = self;
     self.movieWriter.URL = self.URL;
     self.movieWriter.frameRate = self.frameRate;
-    self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.capturePosition;
+    self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.devicePosition;
     self.movieWriter.movieOrientation = (AVCaptureVideoOrientation)self.movieOrientation;
     
     [self.movieWriter prepareWriting];
@@ -272,7 +288,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 
 - (void)stopRecording {
     @synchronized (self) {
-        if (self.status != MNCaptureStatusRecording) {
+        if (self.status != MNMovieRecordStatusRecording) {
             NSLog(@"Not recording");
             return;
         }
@@ -288,7 +304,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     
-    if (self.status != MNCaptureStatusPreparing && self.status != MNCaptureStatusRecording) return;
+    if (self.status != MNMovieRecordStatusPreparing && self.status != MNMovieRecordStatusRecording) return;
     
     if (output == self.videoOutput) {
         
@@ -330,14 +346,14 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 
 #pragma mark - 切换摄像头
 - (BOOL)convertCapturePosition {
-    return [self setDeviceCapturePosition:(MNCapturePositionFront - self.capturePosition)];
+    return [self setDeviceCapturePosition:(MNMovieDevicePositionFront - self.capturePosition)];
 }
 
-- (BOOL)setDeviceCapturePosition:(MNCapturePosition)capturePosition {
+- (BOOL)setDeviceCapturePosition:(MNMovieDevicePosition)capturePosition {
     if (capturePosition == _capturePosition) return YES;
     if (!_session) return NO;
     /**切换到前置摄像头时, 关闭手电筒*/
-    if (capturePosition == MNCapturePositionFront) {
+    if (capturePosition == MNMovieDevicePositionFront) {
         [self closeLighting];
     }
     /**转换摄像头*/
@@ -424,7 +440,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 
 - (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
     @synchronized (self) {
-        [self setStatus:MNCaptureStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
+        [self setStatus:MNMovieRecordStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
     }
 }
 
@@ -460,7 +476,6 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 - (void)setOutputView:(UIView *)outputView {
     if (!outputView) return;
     _outputView = outputView;
-    [self updateOutputSizeIfNeeded];
     if (!_session) return;
     AVLayerVideoGravity videoGravity = self.videoLayerGravity;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -472,28 +487,28 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (AVLayerVideoGravity)videoLayerGravity {
-    if (_resizeMode == MNCaptureResizeModeResize) {
+    if (_resizeMode == MNMovieResizeModeResize) {
         return AVLayerVideoGravityResize;
-    } else if (_resizeMode == MNCaptureResizeModeResizeAspect) {
+    } else if (_resizeMode == MNMovieResizeModeResizeAspect) {
         return AVLayerVideoGravityResizeAspect;
     }
     return AVLayerVideoGravityResizeAspectFill;
 }
 
-- (void)setResizeMode:(MNCaptureResizeMode)resizeMode {
+- (void)setResizeMode:(MNMovieResizeMode)resizeMode {
     if (self.isRecording || resizeMode == _resizeMode) return;
     _resizeMode = resizeMode;
     _videoLayer.videoGravity = [self videoLayerGravity];
 }
 
-- (void)setStatus:(MNCaptureStatus)status error:(NSError *)error {
+- (void)setStatus:(MNMovieRecordStatus)status error:(NSError *)error {
     
     BOOL shouldNotifyDelegate = NO;
     
     if (status != _status) {
-        if (status == MNCaptureStatusRecording) {
+        if (status == MNMovieRecordStatusRecording) {
             shouldNotifyDelegate = YES;
-        } else if (status == MNCaptureStatusFinish) {
+        } else if (status == MNMovieRecordStatusFinish) {
             shouldNotifyDelegate = YES;
             if (error) self.error = error;
         }
@@ -504,18 +519,18 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
         __weak typeof(self) weakself = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) self = weakself;
-            if (status == MNCaptureStatusFinish) {
+            if (status == MNMovieRecordStatusFinish) {
                 if (error) {
-                    if ([self.delegate respondsToSelector:@selector(captureSession:didFailWithError:)]) {
-                        [self.delegate captureSession:self didFailWithError:error];
+                    if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
+                        [self.delegate movieRecorder:self didFailWithError:error];
                     }
                 } else {
-                    if ([self.delegate respondsToSelector:@selector(captureSessionDidFinishRecording:)]) {
-                        [self.delegate captureSessionDidFinishRecording:self];
+                    if ([self.delegate respondsToSelector:@selector(movieRecorderDidFinishRecording:)]) {
+                        [self.delegate movieRecorderDidFinishRecording:self];
                     }
                 }
-            } else if (status == MNCaptureStatusRecording && [self.delegate respondsToSelector:@selector(captureSessionDidStartRecording:)]) {
-                [self.delegate captureSessionDidStartRecording:self];
+            } else if (status == MNMovieRecordStatusRecording && [self.delegate respondsToSelector:@selector(movieRecorderDidStartRecording:)]) {
+                [self.delegate movieRecorderDidStartRecording:self];
             }
         });
     }
@@ -558,7 +573,7 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
 }
 
 - (BOOL)isRecording {
-    return self.status == MNCaptureStatusRecording;
+    return self.status == MNMovieRecordStatusRecording;
 }
 
 - (Float64)duration {
@@ -573,34 +588,8 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     return MIN(30, MAX(_frameRate, 15));
 }
 
-- (void)updateOutputSizeIfNeeded {
-    if (!self.outputView || !CGSizeEqualToSize(self.outputSize, CGSizeZero)) return;
-    CGFloat width = self.outputView.bounds.size.width;
-    CGFloat height = self.outputView.bounds.size.height;
-    if (fabs(width/height - 720.f/1280.f) <= .01f) {
-        self.outputSize = CGSizeMake(720.f, 1280.f);
-    } else if (fabs(width/height - 1280.f/720.f) <= .01f) {
-        self.outputSize = CGSizeMake(1280.f, 720.f);
-    } else if (fabs(width/height - 640.f/480.f) <= .01f) {
-        self.outputSize = CGSizeMake(640.f, 480.f);
-    } else if (fabs(width/height - 480.f/640.f) <= .01f) {
-        self.outputSize = CGSizeMake(480.f, 640.f);
-    } else {
-        CGFloat scale = UIScreen.mainScreen.scale;
-        width = width*scale;
-        height = height*scale;
-        CGFloat width8 = floor(ceil(width)/8.f)*8.f;
-        CGFloat width16 = floor(ceil(width)/16.f)*16.f;
-        if (width8 != width && width16 != width) width = width16;
-        CGFloat height8 = floor(ceil(height)/8.f)*8.f;
-        CGFloat height16 = floor(ceil(height)/16.f)*16.f;
-        if (height8 != height && height16 != height) height = height16;
-        self.outputSize = CGSizeMake(width, height);
-    }
-}
-
-- (AVCaptureDevice *)deviceWithPosition:(MNCapturePosition)capturePosition {
-    AVCaptureDevicePosition position = capturePosition == MNCapturePositionFront ? AVCaptureDevicePositionFront : AVCaptureDevicePositionBack;
+- (AVCaptureDevice *)deviceWithPosition:(MNMovieDevicePosition)capturePosition {
+    AVCaptureDevicePosition position = capturePosition == MNMovieDevicePositionFront ? AVCaptureDevicePositionFront : AVCaptureDevicePositionBack;
     AVCaptureDevice *device;
     NSArray <AVCaptureDevice *>*devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     for (AVCaptureDevice *result in devices) {
@@ -610,17 +599,17 @@ MNCapturePresetName const MNCapturePreset1920x1080 = @"com.mn.capture.preset.192
     return device;
 }
 
-- (AVCaptureSessionPreset)sessionPresetWithName:(MNCapturePresetName)presetName {
+- (AVCaptureSessionPreset)sessionPresetWithName:(MNMoviePresetName)presetName {
     AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
-    if ([presetName isEqualToString:MNCapturePresetHighQuality]) {
+    if ([presetName isEqualToString:MNMoviePresetHighQuality]) {
         sessionPreset = AVCaptureSessionPresetHigh;
-    } else if ([presetName isEqualToString:MNCapturePresetMediumQuality]) {
+    } else if ([presetName isEqualToString:MNMoviePresetMediumQuality]) {
         sessionPreset = AVCaptureSessionPresetMedium;
-    } else if ([presetName isEqualToString:MNCapturePreset1280x720]) {
+    } else if ([presetName isEqualToString:MNMoviePreset1280x720]) {
         sessionPreset = AVCaptureSessionPreset1280x720;
-    } else if ([presetName isEqualToString:MNCapturePreset1920x1080]) {
+    } else if ([presetName isEqualToString:MNMoviePreset1920x1080]) {
         sessionPreset = AVCaptureSessionPreset1920x1080;
-    } else if ([presetName isEqualToString:MNCapturePresetLowQuality]) {
+    } else if ([presetName isEqualToString:MNMoviePresetLowQuality]) {
         sessionPreset = AVCaptureSessionPresetLow;
     }
     return sessionPreset;

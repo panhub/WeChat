@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, WXChatVoiceInputState) {
 #define WXChatVoiceNormalBackgroundColor     [UIColor whiteColor]
 #define WXChatVoiceHighlightedBackgroundColor     UIColorWithSingleRGB(220.f)
 
-@interface WXChatVoiceInputView () <MNAudioRecorderDelegate, WXChatVoiceRecordViewDelegate>
+@interface WXChatVoiceInputView () <MNAudioRecordDelegate, WXChatVoiceRecordViewDelegate>
 @property (nonatomic) CGPoint previousPoint;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) MNAudioRecorder *recorder;
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSInteger, WXChatVoiceInputState) {
     }
 }
 
-#pragma mark - MNAudioRecorderDelegate
+#pragma mark - MNAudioRecordDelegate
 - (void)audioRecorderDidStartRecording:(MNAudioRecorder *)recorder {
     self.state = WXChatVoiceInputStateRecording;
     [self.recordView show];

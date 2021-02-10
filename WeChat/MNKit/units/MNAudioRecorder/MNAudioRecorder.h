@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MNAudioRecorderDelegate <NSObject>
+@protocol MNAudioRecordDelegate <NSObject>
 @optional
 - (void)audioRecorderDidStartRecording:(MNAudioRecorder *)recorder;
 - (void)audioRecorderDidPauseRecording:(MNAudioRecorder *)recorder;
@@ -49,7 +49,7 @@ typedef NS_ENUM(int, MNRecordBitDepth) {
 /**是否录音中*/
 @property(nonatomic, readonly) BOOL isRecording;
 /**事件回调*/
-@property(nonatomic, weak, nullable) id<MNAudioRecorderDelegate> delegate;
+@property(nonatomic, weak, nullable) id<MNAudioRecordDelegate> delegate;
 /**时长*/
 @property(nonatomic, readonly) NSTimeInterval duration;
 /**声道 默认'MNRecordChannelStereo'*/

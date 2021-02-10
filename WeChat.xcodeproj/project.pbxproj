@@ -533,7 +533,7 @@
 		E869C9142570EF670017025E /* MNLock.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C62B2570EF620017025E /* MNLock.m */; };
 		E869C9152570EF670017025E /* MNOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C62E2570EF620017025E /* MNOperation.m */; };
 		E869C9162570EF670017025E /* MNQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6312570EF620017025E /* MNQueue.m */; };
-		E869C9172570EF670017025E /* MNCaptureSession.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6352570EF620017025E /* MNCaptureSession.m */; };
+		E869C9172570EF670017025E /* MNMovieRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6352570EF620017025E /* MNMovieRecorder.m */; };
 		E869C9182570EF670017025E /* MNURLRequestSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6392570EF620017025E /* MNURLRequestSerializer.m */; };
 		E869C9192570EF670017025E /* MNNetworkReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63B2570EF620017025E /* MNNetworkReachability.m */; };
 		E869C91A2570EF670017025E /* MNSSLPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63D2570EF620017025E /* MNSSLPolicy.m */; };
@@ -1919,8 +1919,8 @@
 		E869C62F2570EF620017025E /* MNOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNOperation.h; sourceTree = "<group>"; };
 		E869C6312570EF620017025E /* MNQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNQueue.m; sourceTree = "<group>"; };
 		E869C6322570EF620017025E /* MNQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNQueue.h; sourceTree = "<group>"; };
-		E869C6342570EF620017025E /* MNCaptureSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNCaptureSession.h; sourceTree = "<group>"; };
-		E869C6352570EF620017025E /* MNCaptureSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNCaptureSession.m; sourceTree = "<group>"; };
+		E869C6342570EF620017025E /* MNMovieRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNMovieRecorder.h; sourceTree = "<group>"; };
+		E869C6352570EF620017025E /* MNMovieRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNMovieRecorder.m; sourceTree = "<group>"; };
 		E869C6372570EF620017025E /* MNURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNURLSession.h; sourceTree = "<group>"; };
 		E869C6382570EF620017025E /* MNSSLPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNSSLPolicy.h; sourceTree = "<group>"; };
 		E869C6392570EF620017025E /* MNURLRequestSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNURLRequestSerializer.m; sourceTree = "<group>"; };
@@ -4797,8 +4797,8 @@
 		E869C6332570EF620017025E /* MNCaptureSession */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6342570EF620017025E /* MNCaptureSession.h */,
-				E869C6352570EF620017025E /* MNCaptureSession.m */,
+				E869C6342570EF620017025E /* MNMovieRecorder.h */,
+				E869C6352570EF620017025E /* MNMovieRecorder.m */,
 				E80828DE25D26C2800968E8B /* MNMovieWriter.h */,
 				E80828DF25D26C2800968E8B /* MNMovieWriter.m */,
 			);
@@ -6902,7 +6902,7 @@
 				E869C9592570EF670017025E /* MNDistanceTransitionAnimator.m in Sources */,
 				2055D8EC22E021A40012E43E /* SDWebImageImageIOCoder.m in Sources */,
 				2055D67122E007180012E43E /* YYSpriteSheetImage.m in Sources */,
-				E869C9172570EF670017025E /* MNCaptureSession.m in Sources */,
+				E869C9172570EF670017025E /* MNMovieRecorder.m in Sources */,
 				BF38B06A23D7430200C1171F /* WXCardMessageViewModel.m in Sources */,
 				BF7B525B23E5CCCD003DA959 /* WXSong.m in Sources */,
 				E869CA3A2570EF680017025E /* MJRefreshNormalHeader.m in Sources */,

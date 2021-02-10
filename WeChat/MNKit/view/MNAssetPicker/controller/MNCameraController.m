@@ -11,13 +11,13 @@
 #import "MNCapturingView.h"
 #import "MNPlayView.h"
 
-@interface MNCameraController () <MNCapturingViewDelegate, MNCaptureSessionDelegate, MNPlayerDelegate>
+@interface MNCameraController () <MNCapturingViewDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UIView *displayView;
 @property (nonatomic, strong) UIControl *cameraControl;
 @property (nonatomic, strong) UIImageView *focusView;
 @property (nonatomic, strong) UIImageView *previewView;
-@property (nonatomic, strong) MNCaptureSession *capturer;
+@property (nonatomic, strong) MNMovieRecorder *capturer;
 @property (nonatomic, strong) MNPlayView *playView;
 @property (nonatomic, strong) MNCapturingView *capturingView;
 @end
@@ -92,7 +92,7 @@
     player.layer = self.playView.layer;
     self.player = player;
     
-    MNCaptureSession *capturer = [MNCaptureSession new];
+    MNMovieRecorder *capturer = [MNMovieRecorder new];
     capturer.delegate = self;
     capturer.outputView = self.displayView;
     [capturer prepareCapturing];
@@ -241,12 +241,12 @@
     }];
 }
 
-#pragma mark - MNCaptureSessionDelegate
-- (void)captureSessionDidStartRecording:(MNCaptureSession *)capturer {
+#pragma mark - MNMovieRecordDelegate
+- (void)movieRecorderDidStartRecording:(MNMovieRecorder *)capturer {
     [self.capturingView startCapturing];
 }
 
-- (void)captureSessionDidFinishRecording:(MNCaptureSession *)capturer {
+- (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)capturer {
     if (capturer.error) [self.view showInfoDialog:capturer.error.localizedDescription];
     [self.capturingView stopCapturing];
     [UIView animateWithDuration:.3f animations:^{
@@ -259,7 +259,7 @@
     }];
 }
 
-- (void)captureSession:(MNCaptureSession *)capturer didFailWithError:(NSError *)error {
+- (void)captureSession:(MNMovieRecorder *)capturer didFailWithError:(NSError *)error {
     if (capturer.error.code == AVErrorApplicationIsNotAuthorized) {
         [[MNAlertView alertViewWithTitle:nil message:capturer.error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
             if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {

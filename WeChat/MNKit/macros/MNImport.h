@@ -112,7 +112,7 @@
 #import "MNWeakProxy.h"
 #import "MNConfiguration.h"
 #import "MNScanner.h"
-#import "MNCaptureSession.h"
+#import "MNMovieRecorder.h"
 #import "MNAssetPicker.h"
 #import "MNEmojiManager.h"
 #import "MNAddressBook.h"
