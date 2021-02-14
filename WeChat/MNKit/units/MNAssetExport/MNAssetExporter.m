@@ -331,7 +331,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     
     // 回调结果
     dispatch_group_notify(group, dispatch_queue_create("com.mn.asset.finish.queue", DISPATCH_QUEUE_SERIAL), ^{
-        [assetReader cancelReading];
+        if (assetReader.status == AVAssetReaderStatusReading) [assetReader cancelReading];
         [assetWriter finishWritingWithCompletionHandler:^{
             if (assetWriter.error) {
                 self.error = assetWriter.error;
@@ -498,7 +498,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     }
     // 获取原视频轨道的帧率与分辨率
     float nominalFrameRate = videoTrack.nominalFrameRate;
-    if (isnan(nominalFrameRate) || nominalFrameRate <= 0.f) nominalFrameRate = 1.f;
+    if (isnan(nominalFrameRate) || nominalFrameRate <= 0.f) nominalFrameRate = self.frameRate;
     CGSize naturalSize = videoTrack.naturalSizeOfVideo;
     // 计算两者比率从而获得所需码率
     return ((width*height*self.frameRate)/(naturalSize.width*naturalSize.height*nominalFrameRate))*estimatedDataRate;

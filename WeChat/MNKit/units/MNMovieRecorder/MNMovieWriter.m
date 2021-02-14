@@ -15,14 +15,16 @@
  - MNMovieWriteStatusPreparing: 即将写入
  - MNMovieWriteStatusWriting: 正在写入
  - MNMovieWriteStatusWaiting: 等待结束
- - MNMovieWriteStatusFinish: 已结束
+ - MNMovieWriteStatusFinish: 结束
+ - MNMovieWriteStatusFailed: 失败
  */
 typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     MNMovieWriteStatusIdle = 0,
     MNMovieWriteStatusPreparing,
     MNMovieWriteStatusWriting,
     MNMovieWriteStatusWaiting,
-    MNMovieWriteStatusFinish
+    MNMovieWriteStatusFinish,
+    MNMovieWriteStatusFailed
 };
 
 @interface MNMovieWriter ()
@@ -40,7 +42,6 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         self.movieOrientation = AVCaptureVideoOrientationPortrait;
         self.deviceOrientation = UIDevice.currentDevice.orientation;
         self.writQueue = dispatch_queue_create("com.mn.movie.write.queue", DISPATCH_QUEUE_SERIAL);
-        self.delegateQueue = dispatch_queue_create("com.mn.movie.delegate.queue", DISPATCH_QUEUE_SERIAL);
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(deviceOrientationDidChangeNotification)
@@ -50,13 +51,12 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return self;
 }
 
-- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate queue:(dispatch_queue_t)queue {
+- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate {
     NSParameterAssert(URL != nil);
     NSParameterAssert(delegate != nil);
     if (self = [self init]) {
         self.URL = URL;
         self.delegate = delegate;
-        if (queue) self.delegateQueue = queue;
     }
     return self;
 }
@@ -88,7 +88,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 if (!self.videoInput) {
                     if (![self addVideoTrackWithSourceFormatDescription:CMSampleBufferGetFormatDescription(sampleBuffer)]) {
                         @synchronized (self) {
-                            [self setStatus:MNMovieWriteStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not add video input"}]];
+                            [self setStatus:MNMovieWriteStatusFailed error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not add video input"}]];
                         }
                     }
                 }
@@ -96,7 +96,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 if (self.audioInput && self.videoInput) {
                     if (![self appendVideoSampleBuffer:sampleBuffer]) {
                         @synchronized (self) {
-                            [self setStatus:MNMovieWriteStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not append video sample buffer"}]];
+                            [self setStatus:MNMovieWriteStatusFailed error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not append video sample buffer"}]];
                         }
                     }
                 }
@@ -106,7 +106,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 if (!self.audioInput) {
                     if (![self addAudioTrackWithSourceFormatDescription:CMSampleBufferGetFormatDescription(sampleBuffer)]) {
                         @synchronized (self) {
-                            [self setStatus:MNMovieWriteStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not add audio input"}]];
+                            [self setStatus:MNMovieWriteStatusFailed error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not add audio input"}]];
                         }
                     }
                 }
@@ -114,14 +114,14 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 if (self.audioInput && self.videoInput) {
                     if (![self appendAudioSampleBuffer:sampleBuffer]) {
                         @synchronized (self) {
-                            [self setStatus:MNMovieWriteStatusFinish error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not append audio sample buffer"}]];
+                            [self setStatus:MNMovieWriteStatusFailed error:[NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"Can not append audio sample buffer"}]];
                         }
                     }
                 }
             }
-            
-            CFRelease(sampleBuffer);
         }
+        
+        CFRelease(sampleBuffer);
         
         if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
             @synchronized (self) {
@@ -220,14 +220,11 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return NO;
 }
 
-- (void)prepareWriting {
+- (void)startWriting {
     __weak typeof(self) weakself = self;
     dispatch_async(self.writQueue, ^{
         __strong typeof(self) self = weakself;
         @synchronized (self) {
-            if (!self.URL) {
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unknow movie path!" userInfo:nil];
-            }
             if (self.status == MNMovieWriteStatusPreparing) {
                 @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Already prepared, cannot prepare again!" userInfo:nil];
             }
@@ -235,12 +232,15 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Moive is writing!" userInfo:nil];
             }
         }
+        if (!self.URL) {
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unknow movie path!" userInfo:nil];
+        }
         [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
         NSError *error;
         AVAssetWriter *writer = [[AVAssetWriter alloc] initWithURL:self.URL fileType:AVFileTypeQuickTimeMovie error:&error];
         if (error || !writer) {
             @synchronized (self) {
-                [self setStatus:MNMovieWriteStatusFinish error:error];
+                [self setStatus:MNMovieWriteStatusFailed error:error];
             }
         } else {
             self.writer = writer;
@@ -276,32 +276,27 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     BOOL shouldNotifyDelegate = NO;
     
     if (status != _status) {
-        if (status == MNMovieWriteStatusWriting) {
-            shouldNotifyDelegate = YES;
-        } else if (status == MNMovieWriteStatusFinish) {
+        if (status == MNMovieWriteStatusWriting || status == MNMovieWriteStatusFinish) {
             shouldNotifyDelegate = YES;
             [self teardownAssetWriterAndInputs];
-            if (error) [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
+        } else if (status == MNMovieWriteStatusFailed) {
+            shouldNotifyDelegate = YES;
+            [self teardownAssetWriterAndInputs];
+            [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
         }
         _status = status;
     }
     
     if (shouldNotifyDelegate && self.delegate) {
         __weak typeof(self) weakself = self;
-        dispatch_async(self.delegateQueue, ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) self = weakself;
-            if (status == MNMovieWriteStatusFinish) {
-                if (error) {
-                    if ([self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
-                        [self.delegate movieWriter:self didFailWithError:error];
-                    }
-                } else {
-                    if ([self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
-                        [self.delegate movieWriterDidFinishWriting:self];
-                    }
-                }
-            } else if (status == MNMovieWriteStatusWriting && [self.delegate respondsToSelector:@selector(movieWriterDidStartWriting:)]) {
+            if (status == MNMovieWriteStatusWriting && [self.delegate respondsToSelector:@selector(movieWriterDidStartWriting:)]) {
                 [self.delegate movieWriterDidStartWriting:self];
+            } else if (status == MNMovieWriteStatusFinish && [self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
+                [self.delegate movieWriterDidFinishWriting:self];
+            } else if (status == MNMovieWriteStatusFailed && [self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
+                [self.delegate movieWriter:self didFailWithError:error];
             }
         });
     }

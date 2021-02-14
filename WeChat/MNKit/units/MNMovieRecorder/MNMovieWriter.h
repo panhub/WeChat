@@ -37,9 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**摄像头*/
 @property (nonatomic) AVCaptureDevicePosition devicePosition;
 
-/**当前状态*/
-@property (nonatomic, strong) dispatch_queue_t delegateQueue;
-
 /**事件代理*/
 @property (nonatomic, weak, nullable) id<MNMovieWriteDelegate> delegate;
 
@@ -47,13 +44,12 @@ NS_ASSUME_NONNULL_BEGIN
  视频写入者
  @param URL 视频路径
  @param delegate 事件代理
- @param queue 代理回调队列
  @return 视频写入实例
  */
-- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate queue:(dispatch_queue_t _Nullable)queue;
+- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MNMovieWriteDelegate>)delegate;
 
 /**等待写入视频*/
-- (void)prepareWriting;
+- (void)startWriting;
 
 /**结束视频写入*/
 - (void)finishWriting;

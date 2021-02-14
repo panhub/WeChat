@@ -14,16 +14,16 @@
 
 /**
  录制状态
- - MNMovieRecordStatusIdle: 未知, 闲置状态
- - MNMovieRecordStatusPreparing: 即将开始
+ - MNMovieRecordStatusIdle: 默认 闲置状态
  - MNMovieRecordStatusRecording: 正在录制视频
- - MNMovieRecordStatusFinish: 录制完成
+ - MNMovieRecordStatusFinish: 录制结束
+ - MNMovieRecordStatusFailed: 录制失败
  */
 typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     MNMovieRecordStatusIdle = 0,
-    MNMovieRecordStatusPreparing,
     MNMovieRecordStatusRecording,
-    MNMovieRecordStatusFinish
+    MNMovieRecordStatusFinish,
+    MNMovieRecordStatusFailed
 };
 
 MNMoviePresetName const MNMoviePresetLowQuality = @"com.mn.movie.preset.low";
@@ -261,8 +261,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - 开始/停止录像
 - (void)startRecording {
     @synchronized (self) {
-        if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) return;
-        [self setStatus:MNMovieRecordStatusPreparing error:nil];
+        if (self.status == MNMovieRecordStatusRecording) return;
+        [self setStatus:MNMovieRecordStatusRecording error:nil];
     }
     
     if (![self makeRecordSessionActive]) {
@@ -276,7 +276,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     self.movieWriter.frameRate = self.frameRate;
     self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.devicePosition;
     self.movieWriter.movieOrientation = (AVCaptureVideoOrientation)self.movieOrientation;
-    [self.movieWriter prepareWriting];
+    [self.movieWriter startWriting];
 }
 
 - (void)stopRecording {
@@ -294,7 +294,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     // 判断此时录制状态是否满足视频写入条件
-    if (self.status == MNMovieRecordStatusPreparing || self.status == MNMovieRecordStatusRecording) {
+    if (self.status == MNMovieRecordStatusRecording) {
 
         if (output == self.videoOutput) {
 
@@ -313,17 +313,26 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     @synchronized (self) {
         [self setStatus:MNMovieRecordStatusRecording error:nil];
     }
+    if ([self.delegate respondsToSelector:@selector(movieRecorderDidStartRecording:)]) {
+        [self.delegate movieRecorderDidStartRecording:self];
+    }
 }
 
 - (void)movieWriterDidFinishWriting:(MNMovieWriter *)movieWriter {
     @synchronized (self) {
         [self setStatus:MNMovieRecordStatusFinish error:nil];
     }
+    if ([self.delegate respondsToSelector:@selector(movieRecorderDidFinishRecording:)]) {
+        [self.delegate movieRecorderDidFinishRecording:self];
+    }
 }
 
 - (void)movieWriter:(MNMovieWriter *)movieWriter didFailWithError:(NSError *)error {
     @synchronized (self) {
         [self setStatus:MNMovieRecordStatusFinish error:error];
+    }
+    if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
+        [self.delegate movieRecorder:self didFailWithError:error];
     }
 }
 
@@ -511,36 +520,18 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     _previewLayer.videoGravity = [self videoLayerGravity];
 }
 
+- (void)setStatus:(MNMovieRecordStatus)status {
+    [self setStatus:status error:nil];
+}
+
 - (void)setStatus:(MNMovieRecordStatus)status error:(NSError *)error {
-    
-    BOOL shouldNotifyDelegate = NO;
-    
-    if (status != _status) {
-        if (status == MNMovieRecordStatusRecording) {
-            shouldNotifyDelegate = YES;
-        } else if (status == MNMovieRecordStatusFinish) {
-            if (error) self.error = error;
-            shouldNotifyDelegate = YES;
-        }
-        _status = status;
-    }
-    
-    if (shouldNotifyDelegate && self.delegate) {
+    _status = status;
+    if (error && self.delegate) {
         __weak typeof(self) weakself = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) self = weakself;
-            if (status == MNMovieRecordStatusFinish) {
-                if (error) {
-                    if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
-                        [self.delegate movieRecorder:self didFailWithError:error];
-                    }
-                } else {
-                    if ([self.delegate respondsToSelector:@selector(movieRecorderDidFinishRecording:)]) {
-                        [self.delegate movieRecorderDidFinishRecording:self];
-                    }
-                }
-            } else if (status == MNMovieRecordStatusRecording && [self.delegate respondsToSelector:@selector(movieRecorderDidStartRecording:)]) {
-                [self.delegate movieRecorderDidStartRecording:self];
+            if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
+                [self.delegate movieRecorder:self didFailWithError:error];
             }
         });
     }
