@@ -1,15 +1,31 @@
 //
-//  MNCapturingView.m
+//  MNCapturingToolBar.m
 //  MNKit
 //
 //  Created by Vincent on 2019/6/13.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "MNCapturingView.h"
+#import "MNCapturingToolBar.h"
 #import "UIColor+MNHelper.h"
+#import "CALayer+MNAnimation.h"
 
-@interface MNCapturingView () <CAAnimationDelegate>
+/**
+ 控制栏状态
+ - MNCapturingToolStateIdle: 正常
+ - MNCapturingToolStateWaiting: 等待下一步指示
+ - MNCapturingToolStateRunning: 捕获数据
+ - MNCapturingToolStateFinished: 播放状态
+ */
+typedef NS_ENUM(NSInteger, MNCapturingToolState) {
+    MNCapturingToolStateIdle = 0,
+    MNCapturingToolStateWaiting,
+    MNCapturingToolStateRunning,
+    MNCapturingToolStateFinished
+};
+
+@interface MNCapturingToolBar () <CAAnimationDelegate>
+@property (nonatomic) MNCapturingToolState state;
 @property (nonatomic, strong) UIView *touchView;
 @property (nonatomic, strong) UIView *trackView;
 @property (nonatomic, strong) UIButton *closeButton;
@@ -23,7 +39,7 @@
 #define MNCapturingViewDoneButtonTag  20
 #define MNCapturingViewCloseButtonTag  30
 
-@implementation MNCapturingView
+@implementation MNCapturingToolBar
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         
@@ -88,18 +104,18 @@
 - (void)didMoveToSuperview {
     [super didMoveToSuperview];
     if (!self.superview) return;
-    if ((self.options & MNCapturingOptionPhoto) != 0) {
+    if (self.options & MNCapturingOptionPhoto) {
         [self.trackView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(handTap:), nil)];
     }
-    if ((self.options & MNCapturingOptionVideo) != 0) {
+    if (self.options & MNCapturingOptionVideo) {
         [self.trackView addGestureRecognizer:UILongPressGestureRecognizerCreate(self, .3f, @selector(handLongPress:), nil)];
     }
 }
 
 #pragma mark - Gesture
 - (void)handTap:(UITapGestureRecognizer *)recognizer {
-    if (self.state == MNCapturingViewStateNormal && [self.delegate respondsToSelector:@selector(capturingViewShoudCapturingStillImage:)]) {
-        [self.delegate capturingViewShoudCapturingStillImage:self];
+    if (self.state == MNCapturingToolStateIdle && [self.delegate respondsToSelector:@selector(capturingToolBarShoudTakeStillImage:)]) {
+        [self.delegate capturingToolBarShoudTakeStillImage:self];
     }
 }
 
@@ -108,18 +124,15 @@
     switch (state) {
         case UIGestureRecognizerStateBegan:
         {
-            if (self.state != MNCapturingViewStateNormal) return;
+            if (self.state != MNCapturingToolStateIdle) return;
             [self beginCapturing];
         } break;
         case UIGestureRecognizerStateEnded:
         {
-            if (self.state != MNCapturingViewStateCapturing) return;
+            if (self.state != MNCapturingToolStateRunning) return;
             [self endCapturing];
         } break;
-        case UIGestureRecognizerStateChanged:
-        {
-            
-        } break;
+        case UIGestureRecognizerStateChanged: break;
         default:
         {
             [UIView animateWithDuration:.3f animations:^{
@@ -130,7 +143,7 @@
                 self.progressLayer.hidden = YES;
                 [self.progressLayer removeAllAnimations];
                 self.progressLayer.strokeEnd = 0.f;
-                self.state = MNCapturingViewStateNormal;
+                self.state = MNCapturingToolStateIdle;
             }];
         } break;
     }
@@ -138,18 +151,18 @@
 
 #pragma mark - 录制/播放
 - (void)beginCapturing {
-    self.state = MNCapturingViewStateWaiting;
+    self.state = MNCapturingToolStateWaiting;
     [self.progressLayer resetAnimation];
-    if ([self.delegate respondsToSelector:@selector(capturingViewShoudBeginCapturing:)]) {
-        [self.delegate capturingViewShoudBeginCapturing:self];
+    if ([self.delegate respondsToSelector:@selector(capturingToolBarShoudBeginCapturing:)]) {
+        [self.delegate capturingToolBarShoudBeginCapturing:self];
     }
 }
 
 - (void)endCapturing {
-    self.state = MNCapturingViewStateWaiting;
+    self.state = MNCapturingToolStateWaiting;
     [self.progressLayer pauseAnimation];
-    if ([self.delegate respondsToSelector:@selector(capturingViewDidEndCapturing:)]) {
-        [self.delegate capturingViewDidEndCapturing:self];
+    if ([self.delegate respondsToSelector:@selector(capturingToolBarDidEndCapturing:)]) {
+        [self.delegate capturingToolBarDidEndCapturing:self];
     }
 }
 
@@ -158,27 +171,27 @@
     switch (button.tag) {
         case MNCapturingViewCloseButtonTag:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingViewCloseButtonClicked:)]) {
-                [self.delegate capturingViewCloseButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(capturingToolBarCloseButtonClicked:)]) {
+                [self.delegate capturingToolBarCloseButtonClicked:self];
             }
         } break;
         case MNCapturingViewBackButtonTag:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingViewBackButtonClicked:)]) {
-                [self.delegate capturingViewBackButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(capturingToolBarBackButtonClicked:)]) {
+                [self.delegate capturingToolBarBackButtonClicked:self];
             }
         } break;
         default:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingViewDoneButtonClicked:)]) {
-                [self.delegate capturingViewDoneButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(capturingToolBarDoneButtonClicked:)]) {
+                [self.delegate capturingToolBarDoneButtonClicked:self];
             }
         } break;
     }
 }
 
 - (void)startCapturing {
-    self.state = MNCapturingViewStateWaiting;
+    self.state = MNCapturingToolStateWaiting;
     [UIView animateWithDuration:.3f animations:^{
         self.closeButton.alpha = 0.f;
         self.touchView.transform = CGAffineTransformMakeScale(.7f, .7f);
@@ -186,12 +199,12 @@
     } completion:^(BOOL finished) {
         self.progressLayer.hidden = NO;
         if (self.timeoutInterval > 0.f) [self.progressLayer addAnimation:self.strokeAnimation forKey:@""];
-        self.state = MNCapturingViewStateCapturing;
+        self.state = MNCapturingToolStateRunning;
     }];
 }
 
 - (void)stopCapturing {
-    self.state = MNCapturingViewStateWaiting;
+    self.state = MNCapturingToolStateWaiting;
     [UIView animateWithDuration:.3f animations:^{
         self.touchView.transform = CGAffineTransformIdentity;
         self.trackView.transform = CGAffineTransformIdentity;
@@ -205,18 +218,18 @@
             self.backButton.left_mn = self.closeButton.left_mn;
             self.doneButton.right_mn = self.width_mn - self.closeButton.left_mn;
         } completion:^(BOOL finished) {
-            self.state = MNCapturingViewStateFinished;
+            self.state = MNCapturingToolStateFinished;
         }];
     }];
 }
 
 - (void)resetCapturing {
-    self.state = MNCapturingViewStateWaiting;
+    self.state = MNCapturingToolStateWaiting;
     [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.closeButton.alpha = self.touchView.alpha = self.trackView.alpha = 1.f;
         self.backButton.center_mn = self.doneButton.center_mn = self.trackView.center_mn;
     } completion:^(BOOL finished) {
-        self.state = MNCapturingViewStateNormal;
+        self.state = MNCapturingToolStateIdle;
     }];
 }
 

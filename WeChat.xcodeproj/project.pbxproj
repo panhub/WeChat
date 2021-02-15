@@ -663,7 +663,7 @@
 		E869C9962570EF670017025E /* MNVideoTailorView.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C77A2570EF640017025E /* MNVideoTailorView.m */; };
 		E869C9972570EF670017025E /* MNAssetSelectControl.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C77B2570EF640017025E /* MNAssetSelectControl.m */; };
 		E869C9982570EF670017025E /* MNAlbumSelectControl.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C77C2570EF640017025E /* MNAlbumSelectControl.m */; };
-		E869C9992570EF670017025E /* MNCapturingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C77F2570EF640017025E /* MNCapturingView.m */; };
+		E869C9992570EF670017025E /* MNCapturingToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C77F2570EF640017025E /* MNCapturingToolBar.m */; };
 		E869C99A2570EF670017025E /* MNAssetCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C7802570EF640017025E /* MNAssetCell.m */; };
 		E869C99B2570EF670017025E /* MNAssetSelectCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C7812570EF640017025E /* MNAssetSelectCell.m */; };
 		E869C99C2570EF670017025E /* MNVideoResizeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C7822570EF640017025E /* MNVideoResizeButton.m */; };
@@ -2198,7 +2198,7 @@
 		E869C77C2570EF640017025E /* MNAlbumSelectControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNAlbumSelectControl.m; sourceTree = "<group>"; };
 		E869C77D2570EF640017025E /* MNTailorTimeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNTailorTimeView.h; sourceTree = "<group>"; };
 		E869C77E2570EF640017025E /* MNAlbumCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNAlbumCell.h; sourceTree = "<group>"; };
-		E869C77F2570EF640017025E /* MNCapturingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNCapturingView.m; sourceTree = "<group>"; };
+		E869C77F2570EF640017025E /* MNCapturingToolBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNCapturingToolBar.m; sourceTree = "<group>"; };
 		E869C7802570EF640017025E /* MNAssetCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNAssetCell.m; sourceTree = "<group>"; };
 		E869C7812570EF640017025E /* MNAssetSelectCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNAssetSelectCell.m; sourceTree = "<group>"; };
 		E869C7822570EF640017025E /* MNVideoResizeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNVideoResizeButton.m; sourceTree = "<group>"; };
@@ -2215,7 +2215,7 @@
 		E869C78D2570EF640017025E /* MNAssetBrowseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNAssetBrowseCell.h; sourceTree = "<group>"; };
 		E869C78E2570EF640017025E /* MNAssetToolBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNAssetToolBar.m; sourceTree = "<group>"; };
 		E869C78F2570EF640017025E /* MNAssetCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNAssetCell.h; sourceTree = "<group>"; };
-		E869C7902570EF640017025E /* MNCapturingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNCapturingView.h; sourceTree = "<group>"; };
+		E869C7902570EF640017025E /* MNCapturingToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNCapturingToolBar.h; sourceTree = "<group>"; };
 		E869C7912570EF640017025E /* MNAlbumCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNAlbumCell.m; sourceTree = "<group>"; };
 		E869C7922570EF640017025E /* MNTailorTimeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNTailorTimeView.m; sourceTree = "<group>"; };
 		E869C7932570EF640017025E /* MNAlbumSelectControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNAlbumSelectControl.h; sourceTree = "<group>"; };
@@ -5517,8 +5517,8 @@
 				E869C7892570EF640017025E /* MNAssetSelectView.m */,
 				E869C7782570EF640017025E /* MNAssetToolBar.h */,
 				E869C78E2570EF640017025E /* MNAssetToolBar.m */,
-				E869C7902570EF640017025E /* MNCapturingView.h */,
-				E869C77F2570EF640017025E /* MNCapturingView.m */,
+				E869C7902570EF640017025E /* MNCapturingToolBar.h */,
+				E869C77F2570EF640017025E /* MNCapturingToolBar.m */,
 				E869C79B2570EF640017025E /* MNTailorHandler.h */,
 				E869C7872570EF640017025E /* MNTailorHandler.m */,
 				E869C77D2570EF640017025E /* MNTailorTimeView.h */,
@@ -6857,7 +6857,7 @@
 				2055D6AB22E007180012E43E /* NSNotificationCenter+YYAdd.m in Sources */,
 				E8F71E1425C5D44B00F67DCE /* WXSelectCoverView.m in Sources */,
 				E869C9C52570EF670017025E /* UICollectionView+MNHelper.m in Sources */,
-				E869C9992570EF670017025E /* MNCapturingView.m in Sources */,
+				E869C9992570EF670017025E /* MNCapturingToolBar.m in Sources */,
 				E869C9102570EF670017025E /* MNURLRequest.m in Sources */,
 				E869C93F2570EF670017025E /* MNEmojiPacket.m in Sources */,
 				201DAEF722E894410063E88A /* WXWalletViewController.m in Sources */,

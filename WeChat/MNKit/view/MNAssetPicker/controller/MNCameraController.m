@@ -8,10 +8,10 @@
 
 #import "MNCameraController.h"
 #import "MNAssetPickConfiguration.h"
-#import "MNCapturingView.h"
+#import "MNCapturingToolBar.h"
 #import "MNPlayView.h"
 
-@interface MNCameraController () <MNCapturingViewDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
+@interface MNCameraController () <MNCapturingToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UIView *displayView;
 @property (nonatomic, strong) UIControl *cameraControl;
@@ -19,7 +19,7 @@
 @property (nonatomic, strong) UIImageView *previewView;
 @property (nonatomic, strong) MNMovieRecorder *recorder;
 @property (nonatomic, strong) MNPlayView *playView;
-@property (nonatomic, strong) MNCapturingView *capturingView;
+@property (nonatomic, strong) MNCapturingToolBar *capturingView;
 @end
 
 #pragma clang diagnostic push
@@ -70,7 +70,7 @@
     [self.contentView addSubview:previewView];
     self.previewView = previewView;
     
-    MNCapturingView *capturingView = [[MNCapturingView alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
+    MNCapturingToolBar *capturingView = [[MNCapturingToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
     capturingView.delegate = self;
     capturingView.bottom_mn = self.contentView.height_mn - MN_TAB_SAFE_HEIGHT - 60.f;
     capturingView.timeoutInterval = MAX(self.configuration.maxCaptureDuration, self.configuration.maxExportDuration);
@@ -125,7 +125,7 @@
 - (void)handTap:(UITapGestureRecognizer *)tap {
     if (!self.focusView.hidden) return;
     CGPoint point = [tap locationInView:self.displayView];
-    [self.recorder setFocusPoint:point];
+    [self.recorder setFocus:point];
     self.focusView.center_mn = point;
     self.focusView.hidden = NO;
     [UIView animateWithDuration:.4f animations:^{
@@ -151,8 +151,8 @@
     [player play];
 }
 
-#pragma mark - MNCapturingViewDelegate
-- (void)capturingViewCloseButtonClicked:(MNCapturingView *)capturingView {
+#pragma mark - MNCapturingToolDelegate
+- (void)capturingToolBarCloseButtonClicked:(MNCapturingToolBar *)toolBar {
     self.player.delegate = nil;
     self.recorder.delegate = nil;
     [self.player removeAllURLs];
@@ -174,8 +174,8 @@
     }
 }
 
-- (void)capturingViewBackButtonClicked:(MNCapturingView *)capturingView {
-    [capturingView resetCapturing];
+- (void)capturingToolBarBackButtonClicked:(MNCapturingToolBar *)toolBar {
+    [toolBar resetCapturing];
     [self.recorder startRunning];
     [UIView animateWithDuration:.3f animations:^{
         self.previewView.alpha = self.playView.alpha = 0.f;
@@ -185,7 +185,7 @@
     }];
 }
 
-- (void)capturingViewDoneButtonClicked:(MNCapturingView *)capturingView {
+- (void)capturingToolBarDoneButtonClicked:(MNCapturingToolBar *)toolBar {
     // 判断资源类型
     if (self.previewView.alpha) {
         if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithStillImage:)]) {
@@ -213,18 +213,20 @@
     }
 }
 
-- (void)capturingViewShoudBeginCapturing:(MNCapturingView *)capturingView {
+- (void)capturingToolBarShoudBeginCapturing:(MNCapturingToolBar *)toolBar {
     self.recorder.URL = [NSURL fileURLWithPath:self.filePath];
     [self.recorder startRecording];
 }
 
-- (void)capturingViewDidEndCapturing:(MNCapturingView *)capturingView {
+- (void)capturingToolBarDidEndCapturing:(MNCapturingToolBar *)toolBar {
     [self.recorder stopRecording];
 }
 
-- (void)capturingViewShoudCapturingStillImage:(MNCapturingView *)capturingView {
-    [self.recorder captureStillImageAsynchronously:^(UIImage *image) {
+- (void)capturingToolBarShoudTakeStillImage:(MNCapturingToolBar *)toolBar {
+    __weak typeof(self) weakself = self;
+    [self.recorder takeStillImageAsynchronously:^(UIImage * _Nullable image) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(self) self = weakself;
             if (image) {
                 [self.capturingView stopCapturing];
                 self.previewView.image = image;

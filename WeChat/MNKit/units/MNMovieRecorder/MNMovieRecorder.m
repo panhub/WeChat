@@ -558,6 +558,18 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return result;
 }
 
+#pragma mark - -缩放
+- (BOOL)setZoomFactor:(CGFloat)factor withRate:(float)rate {
+    __block BOOL result = NO;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (device) {
+            [device rampToVideoZoomFactor:factor withRate:4.0];
+            result = YES;
+        }
+    }];
+    return result;
+}
+
 #pragma mark - 设备信息
 - (void)changeDeviceConfigurationHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
     AVCaptureDevice *device = self.videoInput.device;
@@ -739,12 +751,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)dealloc {
     _delegate = nil;
     _movieWriter.delegate = nil;
-    [self closeFlash];
-    [self closeTorch];
     [self stopRunning];
     [self cancelRecording];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 @end

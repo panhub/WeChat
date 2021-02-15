@@ -7,6 +7,7 @@
 //  视频文件写入
 
 #import <Foundation/Foundation.h>
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import <CoreMedia/CMSampleBuffer.h>
 #import <AVFoundation/AVFoundation.h>
 @class MNMovieWriter;
@@ -69,3 +70,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+#endif

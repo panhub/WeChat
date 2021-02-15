@@ -7,6 +7,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#if __has_include(<AVFoundation/AVFoundation.h>)
 
 /**
  视频预览模式
@@ -73,7 +74,7 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 /**图像展示视图*/
 @property (nonatomic, weak) UIView *outputView;
 /**捕获质量*/
-@property (nonatomic, copy) MNMoviePresetName presetName;
+@property (nonatomic, copy, nullable) MNMoviePresetName presetName;
 /**事件回调*/
 @property (nonatomic, weak, nullable) id<MNMovieRecordDelegate> delegate;
 /**是否在录制*/
@@ -138,6 +139,10 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 #pragma mark - 曝光
 - (BOOL)setExposure:(CGPoint)point;
 
+#pragma mark - -缩放
+- (BOOL)setZoomFactor:(CGFloat)factor withRate:(float)rate;
+
 @end
 
 NS_ASSUME_NONNULL_END
+#endif
