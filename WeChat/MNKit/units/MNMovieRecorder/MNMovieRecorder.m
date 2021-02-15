@@ -36,7 +36,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 @interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate, MNMovieWriteDelegate>
 @property (nonatomic) MNMovieRecordStatus status;
-@property (nonatomic) MNMovieDevicePosition capturePosition;
 @property (nonatomic) BOOL shouldSessionRunning;
 @property (nonatomic, strong) MNMovieWriter *movieWriter;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
@@ -67,9 +66,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)initialized {
     _frameRate = 30;
     _movieWriter = MNMovieWriter.new;
-    _resizeMode = MNMovieResizeModeResizeAspect;
-    _devicePosition = MNMovieDevicePositionBack;
     _presetName = MNMoviePresetHighQuality;
+    _devicePosition = MNMovieDevicePositionBack;
+    _resizeMode = MNMovieResizeModeResizeAspect;
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
     _movieOrientation = MNMovieOrientationPortrait;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:nil];
@@ -163,7 +162,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         [self failureWithDescription:@"录像会话初始化失败"];
         return NO;
     }
-    AVCaptureDevice *device = [self deviceWithPosition:self.capturePosition];
+    AVCaptureDevice *device = [self deviceWithPosition:self.devicePosition];
     if (!device) {
         [self failureWithDescription:@"录像设备初始化失败"];
         return NO;
@@ -465,11 +464,11 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 #pragma mark - 切换摄像头
 - (BOOL)convertCapturePosition {
-    return [self convertCapturePosition:(MNMovieDevicePositionFront + MNMovieDevicePositionBack - self.capturePosition) error:NULL];
+    return [self convertCapturePosition:(MNMovieDevicePositionBack + MNMovieDevicePositionFront - self.devicePosition) error:NULL];
 }
 
 - (BOOL)convertCapturePosition:(MNMovieDevicePosition)capturePosition error:(NSError **)error {
-    if (capturePosition == _capturePosition) return YES;
+    if (capturePosition == self.devicePosition) return YES;
     if (!_session) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"录制会话已结束"}];
@@ -505,16 +504,19 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if ([self.session canAddInput:videoInput]) {
         // 添加动画效果
         if (_previewLayer) {
-            CATransition *animation = [CATransition animation];
-            animation.type = @"oglFlip";
-            animation.subtype = kCATransitionFromLeft;
-            animation.duration = .5f;
-            [self.previewLayer addAnimation:animation forKey:@"flip"];
+            CATransition *transition = [CATransition animation];
+            transition.type = @"oglFlip";
+            transition.subtype = kCATransitionFromLeft;
+            transition.duration = .5f;
+            transition.removedOnCompletion = NO;
+            transition.fillMode = kCAFillModeForwards;
+            [self.previewLayer addAnimation:transition forKey:nil];
         }
         // 转换
         [self.session addInput:videoInput];
         [self.session commitConfiguration];
         self.videoInput = videoInput;
+        self.devicePosition = capturePosition;
     } else {
         if (self.videoInput) [self.session addInput:self.videoInput];
         [self.session commitConfiguration];
@@ -570,7 +572,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return result;
 }
 
-#pragma mark - 设备信息
+#pragma mark - 设备
 - (void)changeDeviceConfigurationHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
     AVCaptureDevice *device = self.videoInput.device;
     if (!device) {

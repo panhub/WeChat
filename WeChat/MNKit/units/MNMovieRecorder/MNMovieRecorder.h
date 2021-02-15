@@ -64,7 +64,7 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 /**视频拉伸方式*/
 @property (nonatomic) MNMovieResizeMode resizeMode;
 /**摄像头方向*/
-@property (nonatomic, readonly) MNMovieDevicePosition devicePosition;
+@property (nonatomic) MNMovieDevicePosition devicePosition;
 /**视频方向*/
 @property (nonatomic) MNMovieOrientation movieOrientation;
 /**录制时长时长*/
