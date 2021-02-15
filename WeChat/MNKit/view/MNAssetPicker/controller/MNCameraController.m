@@ -19,7 +19,7 @@
 @property (nonatomic, strong) UIImageView *previewView;
 @property (nonatomic, strong) MNMovieRecorder *recorder;
 @property (nonatomic, strong) MNPlayView *playView;
-@property (nonatomic, strong) MNCapturingToolBar *capturingView;
+@property (nonatomic, strong) MNCapturingToolBar *toolBar;
 @end
 
 #pragma clang diagnostic push
@@ -43,19 +43,6 @@
     [self.contentView addSubview:displayView];
     self.displayView = displayView;
     
-    UIControl *cameraControl = [[UIControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 40.f, 40.f)];
-    cameraControl.right_mn = self.contentView.width_mn - 20.f;
-    cameraControl.top_mn =  (MN_NAV_BAR_HEIGHT - cameraControl.height_mn)/2.f + MN_STATUS_BAR_HEIGHT;
-    cameraControl.backgroundImage = [MNBundle imageForResource:@"video_record_camera_switch"];
-    [cameraControl addTarget:self action:@selector(cameraSwitchControlClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.contentView addSubview:cameraControl];
-    self.cameraControl = cameraControl;
-    
-    UIImageView *focusView = [UIImageView imageViewWithFrame:CGRectMake(0.f, 0.f, 55.f, 55.f) image:[MNBundle imageForResource:@"video_record_focusing"]];
-    focusView.hidden = YES;
-    [displayView addSubview:focusView];
-    self.focusView = focusView;
-    
     MNPlayView *playView = [[MNPlayView alloc] initWithFrame:self.contentView.bounds];
     playView.alpha = 0.f;
     playView.touchEnabled = NO;
@@ -70,17 +57,30 @@
     [self.contentView addSubview:previewView];
     self.previewView = previewView;
     
-    MNCapturingToolBar *capturingView = [[MNCapturingToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
-    capturingView.delegate = self;
-    capturingView.bottom_mn = self.contentView.height_mn - MN_TAB_SAFE_HEIGHT - 60.f;
-    capturingView.timeoutInterval = MAX(self.configuration.maxCaptureDuration, self.configuration.maxExportDuration);
+    MNCapturingToolBar *toolBar = [[MNCapturingToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
+    toolBar.delegate = self;
+    toolBar.bottom_mn = self.contentView.height_mn - MN_TAB_SAFE_HEIGHT - 60.f;
+    toolBar.timeoutInterval = MAX(self.configuration.maxCaptureDuration, self.configuration.maxExportDuration);
     if (self.configuration.isAllowsPickingPhoto && self.configuration.isAllowsPickingVideo) {
-        capturingView.options = MNCapturingOptionPhoto|MNCapturingOptionVideo;
+        toolBar.options = MNCapturingOptionPhoto|MNCapturingOptionVideo;
     } else if (self.configuration.isAllowsPickingVideo) {
-        capturingView.options = MNCapturingOptionVideo;
+        toolBar.options = MNCapturingOptionVideo;
     }
-    [self.contentView addSubview:capturingView];
-    self.capturingView = capturingView;
+    [self.contentView addSubview:toolBar];
+    self.toolBar = toolBar;
+    
+    UIControl *cameraControl = [[UIControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 40.f, 40.f)];
+    cameraControl.right_mn = self.contentView.width_mn - 20.f;
+    cameraControl.top_mn =  (MN_NAV_BAR_HEIGHT - cameraControl.height_mn)/2.f + MN_STATUS_BAR_HEIGHT;
+    cameraControl.backgroundImage = [MNBundle imageForResource:@"video_record_camera_switch"];
+    [cameraControl addTarget:self action:@selector(cameraSwitchControlClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:cameraControl];
+    self.cameraControl = cameraControl;
+    
+    UIImageView *focusView = [UIImageView imageViewWithFrame:CGRectMake(0.f, 0.f, 55.f, 55.f) image:[MNBundle imageForResource:@"video_record_focusing"]];
+    focusView.hidden = YES;
+    [displayView addSubview:focusView];
+    self.focusView = focusView;
 }
 
 - (void)viewDidLoad {
@@ -131,7 +131,7 @@
     [UIView animateWithDuration:.4f animations:^{
         self.focusView.transform = CGAffineTransformMakeScale(.5f, .5f);
     }];
-    dispatch_after_main(.6f, ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         self.focusView.hidden = YES;
         self.focusView.transform = CGAffineTransformIdentity;
     });
@@ -228,7 +228,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) self = weakself;
             if (image) {
-                [self.capturingView stopCapturing];
+                [self.toolBar stopCapturing];
                 self.previewView.image = image;
                 [UIView animateWithDuration:.3f animations:^{
                     self.previewView.alpha = 1.f;
@@ -245,11 +245,11 @@
 
 #pragma mark - MNMovieRecordDelegate
 - (void)movieRecorderDidStartRecording:(MNMovieRecorder *)recorder {
-    [self.capturingView startCapturing];
+    [self.toolBar startCapturing];
 }
 
 - (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)recorder {
-    [self.capturingView stopCapturing];
+    [self.toolBar stopCapturing];
     [UIView animateWithDuration:.3f animations:^{
         self.playView.alpha = 1.f;
         self.previewView.alpha = 0.f;
