@@ -259,14 +259,14 @@
 }
 
 - (void)movieRecorder:(MNMovieRecorder *)recorder didFailWithError:(NSError *)error {
-    if (recorder.error.code == AVErrorApplicationIsNotAuthorized) {
-        [[MNAlertView alertViewWithTitle:nil message:recorder.error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
+    if (error.code == AVErrorApplicationIsNotAuthorized) {
+        [[MNAlertView alertViewWithTitle:nil message:error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
             if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
                 [self.delegate cameraControllerDidCancel:self];
             }
         } ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:self.view];
     } else {
-        [self.view showInfoDialog:recorder.error.localizedDescription];
+        [self.view showInfoDialog:error.localizedDescription];
     }
 }
 

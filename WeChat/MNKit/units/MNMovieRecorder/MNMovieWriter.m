@@ -296,10 +296,8 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     if (status != _status) {
         if (status == MNMovieWriteStatusWriting || status == MNMovieWriteStatusFinish) {
             shouldNotifyDelegate = YES;
-        } else if (status == MNMovieWriteStatusFailed) {
+        } else if (status == MNMovieWriteStatusFailed || status == MNMovieWriteStatusCancel) {
             shouldNotifyDelegate = YES;
-            [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
-        } else if (status == MNMovieWriteStatusCancel) {
             [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
         }
         _status = status;
@@ -317,6 +315,8 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 [self.delegate movieWriterDidStartWriting:self];
             } else if (status == MNMovieWriteStatusFinish && [self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
                 [self.delegate movieWriterDidFinishWriting:self];
+            } else if (status == MNMovieWriteStatusCancel && [self.delegate respondsToSelector:@selector(movieWriterDidCancelWriting:)]) {
+                [self.delegate movieWriterDidCancelWriting:self];
             } else if (status == MNMovieWriteStatusFailed && [self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
                 [self.delegate movieWriter:self didFailWithError:error];
             }
@@ -338,7 +338,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 #pragma mark - Tool
 - (CGAffineTransform)transformFromMovieOrientationTo:(AVCaptureVideoOrientation)orientation {
     CGFloat orientationAngleOffset = [self angleFromPortraitOrientationTo:orientation];
-    CGFloat videoOrientationAngleOffset = [self angleFromPortraitOrientationTo:self.handMovieOrientation];
+    CGFloat videoOrientationAngleOffset = [self angleFromPortraitOrientationTo:self.videoOrientation];
     CGFloat angleOffset;
     if (self.devicePosition == AVCaptureDevicePositionBack) {
         angleOffset = videoOrientationAngleOffset - orientationAngleOffset + M_PI_2;
@@ -368,7 +368,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return angle;
 }
 
-- (AVCaptureVideoOrientation)handMovieOrientation {
+- (AVCaptureVideoOrientation)videoOrientation {
     AVCaptureVideoOrientation orientation;
     switch (self.movieOrientation) {
         case UIDeviceOrientationPortrait:

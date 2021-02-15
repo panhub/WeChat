@@ -53,6 +53,7 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 @optional
 - (void)movieRecorderDidStartRecording:(MNMovieRecorder *)recorder;
 - (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)recorder;
+- (void)movieRecorderDidCancelRecording:(MNMovieRecorder *)recorder;
 - (void)movieRecorder:(MNMovieRecorder *)recorder didFailWithError:(NSError *)error;
 @end
 
@@ -79,6 +80,10 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 @property (nonatomic, readonly) BOOL isRecording;
 /**是否在获取*/
 @property (nonatomic, readonly) BOOL isRunning;
+/**是否打开了手电筒*/
+@property (nonatomic, readonly) BOOL isOnTorch;
+/**是否打开了闪光灯*/
+@property (nonatomic, readonly) BOOL isOnFlash;
 
 /**
  实例化视频录制实例
@@ -112,19 +117,26 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 - (void)cancelRecording;
 - (BOOL)deleteRecording;
 
-#pragma mark - 手电筒控制
-- (BOOL)openLighting;
-- (BOOL)closeLighting;
+#pragma mark - 拍照
+- (void)takeStillImageAsynchronously:(void(^)(UIImage *_Nullable))completion;
 
-#pragma mark - 转换镜头方向
+#pragma mark - 手电筒
+- (NSError *_Nullable)openTorch;
+- (NSError *_Nullable)closeTorch;
+
+#pragma mark - 闪光灯
+- (NSError *_Nullable)openFlash;
+- (NSError *_Nullable)closeFlash;
+
+#pragma mark - 摄像头
 - (BOOL)convertCapturePosition;
-- (BOOL)setDeviceCapturePosition:(MNMovieDevicePosition)capturePosition;
+- (BOOL)convertCapturePosition:(MNMovieDevicePosition)capturePosition error:(NSError *_Nullable*_Nullable)error;
 
 #pragma mark - 对焦
-- (BOOL)setFocusPoint:(CGPoint)point;
+- (BOOL)setFocus:(CGPoint)point;
 
-#pragma mark - 拍照
-- (void)captureStillImageAsynchronously:(void(^)(UIImage *image))completion;
+#pragma mark - 曝光
+- (BOOL)setExposure:(CGPoint)point;
 
 @end
 

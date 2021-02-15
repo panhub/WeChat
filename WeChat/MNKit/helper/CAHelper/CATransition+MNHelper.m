@@ -18,7 +18,7 @@ CATransitionType const kCATransitionRippleEffect = @"rippleEffect";
 CATransitionType const kCATransitionPageCurl = @"pageCurl";
 /* 下翻页 */
 CATransitionType const kCATransitionPageUnCurl = @"pageUnCurl";
-/* 上下翻转 */
+/* 翻转 */
 CATransitionType const kCATransitionOglFlip = @"oglFlip";
 /* 镜头快门开 */
 CATransitionType const kCATransitionCameraIrisHollowOpen = @"cameraIrisHollowOpen";

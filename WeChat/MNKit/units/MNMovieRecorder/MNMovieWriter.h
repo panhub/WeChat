@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)movieWriterDidStartWriting:(MNMovieWriter *)movieWriter;
 /**视频写入结束*/
 - (void)movieWriterDidFinishWriting:(MNMovieWriter *)movieWriter;
+/**视频写入取消*/
+- (void)movieWriterDidCancelWriting:(MNMovieWriter *)movieWriter;
 /**视频写入出错*/
 - (void)movieWriter:(MNMovieWriter *)movieWriter didFailWithError:(NSError *)error;
 @end

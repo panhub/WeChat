@@ -5718,16 +5718,16 @@
 		E869C8062570EF650017025E /* CAHelper */ = {
 			isa = PBXGroup;
 			children = (
-				E869C8072570EF650017025E /* CALayer+MNLayout.h */,
-				E869C8082570EF650017025E /* CALayer+MNHelper.m */,
-				E869C8092570EF650017025E /* CAAnimation+MNHelper.m */,
-				E869C80A2570EF650017025E /* CATransition+MNHelper.m */,
-				E869C80B2570EF650017025E /* CALayer+MNAnimation.h */,
-				E869C80C2570EF650017025E /* CALayer+MNLayout.m */,
-				E869C80D2570EF650017025E /* CALayer+MNHelper.h */,
 				E869C80E2570EF650017025E /* CAAnimation+MNHelper.h */,
+				E869C8092570EF650017025E /* CAAnimation+MNHelper.m */,
+				E869C80B2570EF650017025E /* CALayer+MNAnimation.h */,
 				E869C80F2570EF650017025E /* CALayer+MNAnimation.m */,
+				E869C80D2570EF650017025E /* CALayer+MNHelper.h */,
+				E869C8082570EF650017025E /* CALayer+MNHelper.m */,
+				E869C8072570EF650017025E /* CALayer+MNLayout.h */,
+				E869C80C2570EF650017025E /* CALayer+MNLayout.m */,
 				E869C8102570EF650017025E /* CATransition+MNHelper.h */,
+				E869C80A2570EF650017025E /* CATransition+MNHelper.m */,
 			);
 			path = CAHelper;
 			sourceTree = "<group>";

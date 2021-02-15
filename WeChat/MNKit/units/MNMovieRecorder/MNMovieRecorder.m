@@ -17,12 +17,14 @@
  - MNMovieRecordStatusIdle: 默认 闲置状态
  - MNMovieRecordStatusRecording: 正在录制视频
  - MNMovieRecordStatusFinish: 录制结束
+ - MNMovieRecordStatusCancel: 录制取消
  - MNMovieRecordStatusFailed: 录制失败
  */
 typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     MNMovieRecordStatusIdle = 0,
     MNMovieRecordStatusRecording,
     MNMovieRecordStatusFinish,
+    MNMovieRecordStatusCancel,
     MNMovieRecordStatusFailed
 };
 
@@ -139,6 +141,22 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     });
 }
 
+#pragma mark - Fail
+- (void)failureWithDescription:(NSString *)message {
+    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
+}
+
+- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
+    @synchronized (self) {
+        self.status = MNMovieRecordStatusFailed;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
+            [self.delegate movieRecorder:self didFailWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
+        }
+    });
+}
+
 #pragma mark - 设置音/视频/图片
 - (BOOL)setupVideo {
     if (!self.session) {
@@ -155,8 +173,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         device.activeVideoMaxFrameDuration = frameDuration;
         device.activeVideoMinFrameDuration = frameDuration;
         [device unlockForConfiguration];
-    } else {
-        NSLog(@"videoDevice lockForConfiguration failed");
     }
     NSError *error;
     AVCaptureDeviceInput *videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:&error];
@@ -233,6 +249,10 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 #pragma mark - 开始/停止捕获
+- (BOOL)isRunning {
+    return (_session && _session.isRunning);
+}
+
 - (void)startRunning {
     @synchronized (self) {
         if (_session && !_session.isRunning) [_session startRunning];
@@ -246,6 +266,12 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 #pragma mark - 开始/停止录像
+- (BOOL)isRecording {
+    @synchronized (self) {
+        return self.status == MNMovieRecordStatusRecording;
+    }
+}
+
 - (void)startRecording {
     @synchronized (self) {
         if (self.status == MNMovieRecordStatusRecording) return;
@@ -263,6 +289,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
+    [self closeFlash];
+    [self closeTorch];
     [self.movieWriter finishWriting];
 }
 
@@ -270,12 +298,32 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
+    [self closeFlash];
+    [self closeTorch];
     [self.movieWriter cancelWriting];
 }
 
 - (BOOL)deleteRecording {
     if (self.isRecording) return NO;
     return [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
+}
+
+#pragma mark - 获取照片
+- (void)takeStillImageAsynchronously:(void(^)(UIImage *))completion {
+    if (!self.imageOutput) {
+        if (completion) completion(nil);
+        return;
+    }
+    AVCaptureConnection *imageConnection = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
+    if (imageConnection.isVideoOrientationSupported) imageConnection.videoOrientation = self.videoOrientation;
+    [self.imageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
+        if (error || imageDataSampleBuffer == NULL) {
+            if (completion) completion(nil);
+            return;
+        }
+        NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+        if (completion) completion([UIImage imageWithData:imageData]);
+    }];
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate AVCaptureAudioDataOutputSampleBufferDelegate
@@ -314,145 +362,216 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     }
 }
 
+- (void)movieWriterDidCancelWriting:(MNMovieWriter *)movieWriter {
+    @synchronized (self) {
+        self.status = MNMovieRecordStatusCancel;
+    }
+    if ([self.delegate respondsToSelector:@selector(movieRecorderDidCancelRecording:)]) {
+        [self.delegate movieRecorderDidCancelRecording:self];
+    }
+}
+
 - (void)movieWriter:(MNMovieWriter *)movieWriter didFailWithError:(NSError *)error {
     @synchronized (self) {
         self.status = MNMovieRecordStatusFailed;
     }
+    [self closeTorch];
     if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
         [self.delegate movieRecorder:self didFailWithError:error];
     }
 }
 
-#pragma mark - Fail
-- (void)failureWithDescription:(NSString *)message {
-    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
+#pragma mark - 手电筒
+- (BOOL)isOnTorch {
+    AVCaptureDevice *device = self.videoInput.device;
+    return (device && device.torchMode >= AVCaptureTorchModeOn);
 }
 
-- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
-    @synchronized (self) {
-        self.status = MNMovieRecordStatusFailed;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
-            [self.delegate movieRecorder:self didFailWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
-        }
-    });
-}
-
-#pragma mark - 手电筒控制
-- (BOOL)openLighting {
-    __block BOOL succeed = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice *device) {
-        if ([device hasTorch] && [device isTorchModeSupported:AVCaptureTorchModeOn]) {
-            if (device.torchMode != AVCaptureTorchModeOn) {
-                [device setTorchMode:AVCaptureTorchModeOn];
+- (NSError *)openTorch {
+    __block NSError *error;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasTorch) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
+        } else if (device.torchMode != AVCaptureTorchModeOn) {
+            if (device.hasFlash && device.flashMode == AVCaptureFlashModeOn) {
+                device.flashMode = AVCaptureFlashModeOff;
             }
-            succeed = YES;
+            if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+                device.torchMode = AVCaptureTorchModeOn;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+            }
         }
     }];
-    return succeed;
+    return error;
 }
 
-- (BOOL)closeLighting {
-    __block BOOL succeed = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice *device) {
-        if ([device hasTorch] && [device isTorchModeSupported:AVCaptureTorchModeOff]) {
-            if (device.torchMode != AVCaptureTorchModeOff) {
-                [device setTorchMode:AVCaptureTorchModeOff];
+- (NSError *)closeTorch {
+    __block NSError *error;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasTorch) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
+        } else if (device.torchMode != AVCaptureTorchModeOff) {
+            if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
+                device.torchMode = AVCaptureTorchModeOff;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
             }
-            succeed = YES;
         }
     }];
-    return succeed;
+    return error;
+}
+
+#pragma mark - 闪光灯
+- (BOOL)isOnFlash {
+    AVCaptureDevice *device = self.videoInput.device;
+    return (device && device.flashMode >= AVCaptureFlashModeOn);
+}
+
+- (NSError *)openFlash {
+    __block NSError *error;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasFlash) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现闪光灯"}];
+        } else if (device.flashMode != AVCaptureFlashModeOn) {
+            if (device.hasFlash && device.torchMode == AVCaptureTorchModeOn) {
+                device.torchMode = AVCaptureTorchModeOff;
+            }
+            if ([device isFlashModeSupported:AVCaptureFlashModeOn]) {
+                device.flashMode = AVCaptureFlashModeOn;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+            }
+        }
+    }];
+    return error;
+}
+
+- (NSError *)closeFlash {
+    __block NSError *error;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasFlash) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现闪光灯"}];
+        } else if (device.flashMode != AVCaptureFlashModeOff) {
+            if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
+                device.flashMode = AVCaptureFlashModeOff;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+            }
+        }
+    }];
+    return error;
 }
 
 #pragma mark - 切换摄像头
 - (BOOL)convertCapturePosition {
-    return [self setDeviceCapturePosition:(MNMovieDevicePositionFront - self.capturePosition)];
+    return [self convertCapturePosition:(MNMovieDevicePositionFront + MNMovieDevicePositionBack - self.capturePosition) error:NULL];
 }
 
-- (BOOL)setDeviceCapturePosition:(MNMovieDevicePosition)capturePosition {
+- (BOOL)convertCapturePosition:(MNMovieDevicePosition)capturePosition error:(NSError **)error {
     if (capturePosition == _capturePosition) return YES;
-    if (!_session) return NO;
-    /**切换到前置摄像头时, 关闭手电筒*/
-    if (capturePosition == MNMovieDevicePositionFront) {
-        [self closeLighting];
-    }
-    /**转换摄像头*/
-    AVCaptureDevice *device = [self deviceWithPosition:capturePosition];
-    if (!device) return NO;
-    NSError *error;
-    AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-    if (error) return NO;
-    [self.session stopRunning];
-    [self.session beginConfiguration];
-    if ([self.session canAddInput:videoInput]) {
-        [self.session removeInput:self.videoInput];
-        [self.session addInput:videoInput];
-        self.videoInput = videoInput;
-    }
-    [self.session commitConfiguration];
-    [self.session startRunning];
-    BOOL success = self.videoInput == videoInput;
-    if (success) _capturePosition = capturePosition;
-    return success;
-}
-
-#pragma mark - 获取照片
-- (void)captureStillImageAsynchronously:(void(^)(UIImage *))completion {
-    if (!self.imageOutput) {
-        if (completion) completion(nil);
-        return;
-    }
-    AVCaptureConnection *captureConnection = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
-    [self.imageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
-        if (error || imageDataSampleBuffer == NULL) {
-            if (completion) completion(nil);
-            return;
+    if (!_session) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"录制会话已结束"}];
         }
-        NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-        UIImage *image = [UIImage imageWithData:data];
-        image = [image resizingOrientation];
-        if (completion) completion(image);
-    }];
+        return NO;
+    }
+    // 新的摄像头
+    AVCaptureDevice *device = [self deviceWithPosition:capturePosition];
+    if (!device) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"获取摄像头失败"}];
+        }
+        return NO;
+    }
+    CMTime frameDuration = CMTimeMake(1, (int32_t)self.frameRate);
+    if ([device lockForConfiguration:NULL] ) {
+        device.activeVideoMaxFrameDuration = frameDuration;
+        device.activeVideoMinFrameDuration = frameDuration;
+        [device unlockForConfiguration];
+    }
+    AVCaptureDeviceInput *videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:NULL];
+    if (!videoInput) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"切换摄像头失败"}];
+        }
+        return NO;
+    }
+    // 关闭手电筒/闪光灯
+    [self closeFlash];
+    [self closeTorch];
+    [self.session beginConfiguration];
+    if (self.videoInput) [self.session removeInput:self.videoInput];
+    if ([self.session canAddInput:videoInput]) {
+        // 添加动画效果
+        if (_previewLayer) {
+            CATransition *animation = [CATransition animation];
+            animation.type = @"oglFlip";
+            animation.subtype = kCATransitionFromLeft;
+            animation.duration = .5f;
+            [self.previewLayer addAnimation:animation forKey:@"flip"];
+        }
+        // 转换
+        [self.session addInput:videoInput];
+        [self.session commitConfiguration];
+        self.videoInput = videoInput;
+    } else {
+        if (self.videoInput) [self.session addInput:self.videoInput];
+        [self.session commitConfiguration];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"切换摄像头失败"}];
+        }
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - 对焦
-- (BOOL)setFocusPoint:(CGPoint)point {
-    if (!_videoInput || !_previewLayer || !_session.isRunning) return NO;
-    CGPoint focus = [_previewLayer captureDevicePointOfInterestForPoint:point];
-    __block BOOL succeed = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice *device) {
-        if ([device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-            [device setFocusMode:AVCaptureFocusModeAutoFocus];
-        }
-        if ([device isFocusPointOfInterestSupported]) {
-            [device setFocusPointOfInterest:focus];
-        }
-        if ([device isExposureModeSupported:AVCaptureExposureModeAutoExpose]) {
-            [device setExposureMode:AVCaptureExposureModeAutoExpose];
-        }
-        if ([device isExposurePointOfInterestSupported]) {
-            [device setExposurePointOfInterest:focus];
+- (BOOL)setFocus:(CGPoint)point {
+    if (!_previewLayer) return NO;
+    point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
+    __block BOOL result = NO;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (device && device.isFocusPointOfInterestSupported &&
+            [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+            device.focusPointOfInterest = point;
+            device.focusMode = AVCaptureFocusModeAutoFocus;
+            result = YES;
         }
     }];
-    return succeed;
+    return result;
 }
 
-#pragma mark - 改变设备设置状态
-- (void)changeDeviceConfigurationHandler:(void(^)(AVCaptureDevice *device))configurationHandler {
-    if (!_session) return;
-    AVCaptureDevice *device = [_videoInput device];
-    if (!device) return;
-    NSError *error;
-    if (![device lockForConfiguration:&error] || error) {
-        NSLog(@"lockForConfiguration error: %@", error);
+#pragma mark - 曝光
+- (BOOL)setExposure:(CGPoint)point {
+    if (!_previewLayer) return NO;
+    point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
+    __block BOOL result = NO;
+    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+        if (device && device.isExposurePointOfInterestSupported &&
+            [device isExposureModeSupported:AVCaptureExposureModeAutoExpose]) {
+            device.exposurePointOfInterest = point;
+            device.exposureMode = AVCaptureExposureModeAutoExpose;
+            result = YES;
+        }
+    }];
+    return result;
+}
+
+#pragma mark - 设备信息
+- (void)changeDeviceConfigurationHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
+    AVCaptureDevice *device = self.videoInput.device;
+    if (!device) {
+        if (resultHandler) resultHandler(nil);
         return;
     }
-    [_session beginConfiguration];
-    if (configurationHandler) configurationHandler(device);
-    [_session commitConfiguration];
-    [device unlockForConfiguration];
+    NSError *error;
+    if (![device lockForConfiguration:&error] || error) {
+        if (resultHandler) resultHandler(nil);
+    } else {
+        if (resultHandler) resultHandler(device);
+        [device unlockForConfiguration];
+    }
 }
 
 #pragma mark - Notification
@@ -497,7 +616,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 #pragma mark - Setter
 - (void)setOutputView:(UIView *)outputView {
-    if (!outputView) return;
     _outputView = outputView;
     if (!_session) return;
     AVLayerVideoGravity videoGravity = self.videoLayerGravity;
@@ -548,20 +666,28 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return _session;
 }
 
+- (AVCaptureSessionPreset)sessionPresetWithName:(MNMoviePresetName)presetName {
+    AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
+    if ([presetName isEqualToString:MNMoviePresetHighQuality]) {
+        sessionPreset = AVCaptureSessionPresetHigh;
+    } else if ([presetName isEqualToString:MNMoviePresetMediumQuality]) {
+        sessionPreset = AVCaptureSessionPresetMedium;
+    } else if ([presetName isEqualToString:MNMoviePreset1280x720]) {
+        sessionPreset = AVCaptureSessionPreset1280x720;
+    } else if ([presetName isEqualToString:MNMoviePreset1920x1080]) {
+        sessionPreset = AVCaptureSessionPreset1920x1080;
+    } else if ([presetName isEqualToString:MNMoviePresetLowQuality]) {
+        sessionPreset = AVCaptureSessionPresetLow;
+    }
+    return sessionPreset;
+}
+
 - (AVCaptureVideoPreviewLayer *)previewLayer {
     if (!_previewLayer) {
         AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
         _previewLayer = previewLayer;
     }
     return _previewLayer;
-}
-
-- (BOOL)isRunning {
-    return (_session && _session.isRunning);
-}
-
-- (BOOL)isRecording {
-    return self.status == MNMovieRecordStatusRecording;
 }
 
 - (Float64)duration {
@@ -587,29 +713,36 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return device;
 }
 
-- (AVCaptureSessionPreset)sessionPresetWithName:(MNMoviePresetName)presetName {
-    AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
-    if ([presetName isEqualToString:MNMoviePresetHighQuality]) {
-        sessionPreset = AVCaptureSessionPresetHigh;
-    } else if ([presetName isEqualToString:MNMoviePresetMediumQuality]) {
-        sessionPreset = AVCaptureSessionPresetMedium;
-    } else if ([presetName isEqualToString:MNMoviePreset1280x720]) {
-        sessionPreset = AVCaptureSessionPreset1280x720;
-    } else if ([presetName isEqualToString:MNMoviePreset1920x1080]) {
-        sessionPreset = AVCaptureSessionPreset1920x1080;
-    } else if ([presetName isEqualToString:MNMoviePresetLowQuality]) {
-        sessionPreset = AVCaptureSessionPresetLow;
+- (AVCaptureVideoOrientation)videoOrientation {
+    AVCaptureVideoOrientation orientation;
+    switch (self.movieOrientation) {
+        case UIDeviceOrientationPortrait:
+            orientation = AVCaptureVideoOrientationPortrait;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            orientation = AVCaptureVideoOrientationLandscapeRight;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            orientation = AVCaptureVideoOrientationLandscapeLeft;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            orientation = AVCaptureVideoOrientationPortraitUpsideDown;
+            break;
+        default:
+            orientation = AVCaptureVideoOrientationPortrait;
+            break;
     }
-    return sessionPreset;
+    return orientation;
 }
 
 #pragma mark - dealloc
 - (void)dealloc {
     _delegate = nil;
     _movieWriter.delegate = nil;
-    [self closeLighting];
+    [self closeFlash];
+    [self closeTorch];
     [self stopRunning];
-    [self stopRecording];
+    [self cancelRecording];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
