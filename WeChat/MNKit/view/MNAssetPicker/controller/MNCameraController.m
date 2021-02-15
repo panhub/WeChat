@@ -193,13 +193,13 @@
         }
     } else {
         // 判断时长是否符合限制要求
-        NSTimeInterval duration = floor(self.recorder.duration);
-        if (self.configuration.minExportDuration > 0.f && duration < self.configuration.minExportDuration) {
-            [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄大于%@s的视频", @(ceil(self.configuration.minExportDuration))]];
+        NSTimeInterval duration = ceil(self.recorder.duration);
+        if (self.configuration.minExportDuration > 0.f && floor(duration) < self.configuration.minExportDuration) {
+            [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄大于%@s的视频", @(floor(self.configuration.minExportDuration))]];
             return;
         }
-        if (self.configuration.maxExportDuration > 0.f && (!self.configuration.isAllowsEditing || self.configuration.maxPickingCount > 1) && duration > self.configuration.maxExportDuration) {
-            [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄小于%@s的视频", @(floor(self.configuration.maxExportDuration))]];
+        if (self.configuration.maxExportDuration > 0.f && (!self.configuration.isAllowsEditing || self.configuration.maxPickingCount > 1) && ceil(duration) > self.configuration.maxExportDuration) {
+            [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄小于%@s的视频", @(ceil(self.configuration.maxExportDuration))]];
             return;
         }
         // 回调结果

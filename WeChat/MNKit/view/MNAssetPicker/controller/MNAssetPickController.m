@@ -469,6 +469,30 @@
 }
 
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)content {
+    if (self.configuration.isAllowsWritToAlbum) {
+        [cameraController.view showActivityDialog:@"请稍后"];
+        __weak typeof(cameraController) vc = cameraController;
+        [MNAssetHelper writeAssets:content toAlbum:self.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+            if (error || identifiers.count <= 0) {
+                [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"无法保存图片" : @"无法保存视频")];
+            } else if ([self insertContents:content]) {
+                [vc.view closeDialogWithCompletionHandler:^{
+                    [vc.navigationController popViewControllerAnimated:YES];
+                }];
+            } else {
+                [vc.view showInfoDialog:@"操作失败"];
+            }
+        }];
+    } else {
+        if ([self insertContents:content]) {
+            [cameraController.navigationController popViewControllerAnimated:YES];
+        } else {
+            [cameraController.view showInfoDialog:@"操作失败"];
+        }
+    }
+}
+
+- (BOOL)insertContents:(id)content {
     if ([content isKindOfClass:UIImage.class] && !self.configuration.isOriginalExporting) {
         UIImage *image = content;
         if (self.configuration.maxExportPixel > 0) {
@@ -480,18 +504,14 @@
         if (image) content = image;
     }
     MNAsset *asset = [MNAsset assetWithContent:content configuration:self.configuration];
-    if (!asset) {
-        [cameraController.view showInfoDialog:@"操作失败"];
-        return;
-    }
+    if (!asset) return NO;
     if (self.configuration.sortAscending) {
         [self.collection addAsset:asset];
     } else {
         [self.collection insertAssetAtFront:asset];
     }
     self.collection = self.collection;
-    if (self.configuration.isAllowsWritToAlbum) [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.localizedTitle completion:nil];
-    [cameraController.navigationController popViewControllerAnimated:YES];
+    return YES;
 }
 
 #pragma mark - MNImageCropDelegate
