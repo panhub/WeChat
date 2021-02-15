@@ -57,6 +57,8 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 @end
 
 @interface MNMovieRecorder : NSObject
+/**视频文件地址*/
+@property (nonatomic, copy) NSURL *URL;
 /**视频拉伸方式*/
 @property (nonatomic) MNMovieResizeMode resizeMode;
 /**摄像头方向*/
@@ -77,10 +79,6 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 @property (nonatomic, readonly) BOOL isRecording;
 /**是否在获取*/
 @property (nonatomic, readonly) BOOL isRunning;
-/**视频文件地址*/
-@property (nonatomic, copy) NSURL *URL;
-/**错误信息*/
-@property (nonatomic, copy, readonly, nullable) NSError *error;
 
 /**
  实例化视频录制实例
@@ -111,6 +109,7 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 #pragma mark - 开始/停止/删除
 - (void)startRecording;
 - (void)stopRecording;
+- (void)cancelRecording;
 - (BOOL)deleteRecording;
 
 #pragma mark - 手电筒控制

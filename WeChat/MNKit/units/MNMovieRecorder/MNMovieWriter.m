@@ -16,6 +16,7 @@
  - MNMovieWriteStatusWriting: 正在写入
  - MNMovieWriteStatusWaiting: 等待结束
  - MNMovieWriteStatusFinish: 结束
+ - MNMovieWriteStatusCancel: 取消
  - MNMovieWriteStatusFailed: 失败
  */
 typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
@@ -24,6 +25,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     MNMovieWriteStatusWriting,
     MNMovieWriteStatusWaiting,
     MNMovieWriteStatusFinish,
+    MNMovieWriteStatusCancel,
     MNMovieWriteStatusFailed
 };
 
@@ -69,21 +71,20 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL sample buffer" userInfo:nil];
         return;
     }
-    
+
     // 强引用缓存数据
     CFRetain(sampleBuffer);
-    
+
     dispatch_async(self.writQueue, ^{
         @autoreleasepool {
-        
+
             @synchronized (self) {
                 if (self.status != MNMovieWriteStatusPreparing && self.status != MNMovieWriteStatusWriting) {
-                    NSLog(@"=========");
                     CFRelease(sampleBuffer);
                     return;
                 }
             }
-        
+
             if (mediaType == AVMediaTypeVideo) {
                 if (!self.videoInput) {
                     if (![self addVideoTrackWithSourceFormatDescription:CMSampleBufferGetFormatDescription(sampleBuffer)]) {
@@ -92,7 +93,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                         }
                     }
                 }
-                
+
                 if (self.audioInput && self.videoInput) {
                     if (![self appendVideoSampleBuffer:sampleBuffer]) {
                         @synchronized (self) {
@@ -100,9 +101,9 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                         }
                     }
                 }
-                
+
             } else if (mediaType == AVMediaTypeAudio) {
-                
+
                 if (!self.audioInput) {
                     if (![self addAudioTrackWithSourceFormatDescription:CMSampleBufferGetFormatDescription(sampleBuffer)]) {
                         @synchronized (self) {
@@ -110,7 +111,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                         }
                     }
                 }
-                
+
                 if (self.audioInput && self.videoInput) {
                     if (![self appendAudioSampleBuffer:sampleBuffer]) {
                         @synchronized (self) {
@@ -119,9 +120,9 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                     }
                 }
             }
+            
+            CFRelease(sampleBuffer);
         }
-        
-        CFRelease(sampleBuffer);
         
         if (self.status == MNMovieWriteStatusPreparing && self.writer.status == AVAssetWriterStatusWriting) {
             @synchronized (self) {
@@ -220,6 +221,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return NO;
 }
 
+#pragma mark - 开始/停止
 - (void)startWriting {
     __weak typeof(self) weakself = self;
     dispatch_async(self.writQueue, ^{
@@ -264,9 +266,25 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
             NSError *error = weakself.writer.error;
             __strong typeof(self) self = weakself;
             @synchronized (self) {
-                [self setStatus:MNMovieWriteStatusFinish error:error];
+                [self setStatus:(error ? MNMovieWriteStatusFailed : MNMovieWriteStatusFinish) error:error];
             }
         }];
+    });
+}
+
+- (void)cancelWriting {
+    @synchronized (self) {
+        if (self.status != MNMovieWriteStatusWriting) return;
+        [self setStatus:MNMovieWriteStatusWaiting error:nil];
+    }
+    __weak typeof(self) weakself = self;
+    dispatch_async(self.writQueue, ^{
+        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
+        if (weakself.status != MNMovieWriteStatusWaiting) return;
+        [weakself.writer cancelWriting];
+        @synchronized (self) {
+            [self setStatus:MNMovieWriteStatusCancel error:nil];
+        }
     });
 }
 
@@ -278,13 +296,17 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     if (status != _status) {
         if (status == MNMovieWriteStatusWriting || status == MNMovieWriteStatusFinish) {
             shouldNotifyDelegate = YES;
-            [self teardownAssetWriterAndInputs];
         } else if (status == MNMovieWriteStatusFailed) {
             shouldNotifyDelegate = YES;
-            [self teardownAssetWriterAndInputs];
+            [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
+        } else if (status == MNMovieWriteStatusCancel) {
             [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
         }
         _status = status;
+    }
+        
+    if (status >= MNMovieWriteStatusFinish) {
+        [self teardownAssetWriterAndInputs];
     }
     
     if (shouldNotifyDelegate && self.delegate) {

@@ -54,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**结束视频写入*/
 - (void)finishWriting;
 
+/**取消视频写入*/
+- (void)cancelWriting;
+
 /**
  写入视频
  @param sampleBuffer 缓存数据
