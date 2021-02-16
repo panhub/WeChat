@@ -472,7 +472,7 @@
     if (self.configuration.isAllowsWritToAlbum) {
         [cameraController.view showActivityDialog:@"请稍后"];
         __weak typeof(cameraController) vc = cameraController;
-        [MNAssetHelper writeAssets:content toAlbum:self.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+        [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
             if (error || identifiers.count <= 0) {
                 [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"无法保存图片" : @"无法保存视频")];
             } else if ([self insertContents:content]) {

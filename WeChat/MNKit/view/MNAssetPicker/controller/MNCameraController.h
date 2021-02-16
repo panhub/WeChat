@@ -15,10 +15,6 @@
 - (void)cameraControllerDidCancel:(MNCameraController *)cameraController;
 /**录像控制器结束拍照*/
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)contents;
-/**录像控制器结束拍照*/
-- (void)cameraController:(MNCameraController *)cameraController didFinishWithStillImage:(UIImage *)image;
-/**录像控制器结束拍摄*/
-- (void)cameraController:(MNCameraController *)cameraController didFinishWithVideoAtPath:(NSString *)filePath;
 @end
 
 @interface MNCameraController : MNBaseViewController

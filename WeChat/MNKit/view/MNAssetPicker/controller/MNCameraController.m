@@ -16,7 +16,7 @@
 @property (nonatomic, strong) UIView *displayView;
 @property (nonatomic, strong) UIControl *cameraControl;
 @property (nonatomic, strong) UIImageView *focusView;
-@property (nonatomic, strong) UIImageView *previewView;
+@property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) MNMovieRecorder *recorder;
 @property (nonatomic, strong) MNPlayView *playView;
 @property (nonatomic, strong) MNCapturingToolBar *toolBar;
@@ -50,12 +50,12 @@
     [self.contentView addSubview:playView];
     self.playView = playView;
     
-    UIImageView *previewView = [UIImageView imageViewWithFrame:self.contentView.bounds image:nil];
-    previewView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    previewView.alpha = 0.f;
-    previewView.backgroundColor = [UIColor blackColor];
-    [self.contentView addSubview:previewView];
-    self.previewView = previewView;
+    UIImageView *imageView = [UIImageView imageViewWithFrame:self.contentView.bounds image:nil];
+    imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    imageView.alpha = 0.f;
+    imageView.backgroundColor = [UIColor blackColor];
+    [self.contentView addSubview:imageView];
+    self.imageView = imageView;
     
     MNCapturingToolBar *toolBar = [[MNCapturingToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
     toolBar.delegate = self;
@@ -107,18 +107,25 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-    if (!self.isFirstAppear && self.playView.alpha == 0.f && self.previewView.alpha == 0.f) [self.recorder startRunning];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.playView.alpha == 1.f && self.player.state > MNPlayerStatePlaying) [self.player play];
+    if (self.playView.alpha == 1.f) {
+        if (self.player.state > MNPlayerStatePlaying) [self.player play];
+    } else if (self.isFirstAppear && self.imageView.alpha == 0.f) {
+        [self.recorder startRunning];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-    if (self.playView.alpha == 1.f && self.player.isPlaying) [self.player pause];
+    if (self.playView.alpha == 1.f) {
+        if (self.player.state == MNPlayerStatePlaying) [self.player pause];
+    } else {
+        [self.recorder stopRunning];
+    }
 }
 
 #pragma mark - Tap
@@ -178,7 +185,7 @@
     [toolBar resetCapturing];
     [self.recorder startRunning];
     [UIView animateWithDuration:.3f animations:^{
-        self.previewView.alpha = self.playView.alpha = 0.f;
+        self.imageView.alpha = self.playView.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.player removeAllURLs];
         [self.recorder deleteRecording];
@@ -187,9 +194,9 @@
 
 - (void)capturingToolBarDoneButtonClicked:(MNCapturingToolBar *)toolBar {
     // 判断资源类型
-    if (self.previewView.alpha) {
-        if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithStillImage:)]) {
-            [self.delegate cameraController:self didFinishWithStillImage:self.previewView.image];
+    if (self.imageView.alpha) {
+        if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
+            [self.delegate cameraController:self didFinishWithContents:self.imageView.image];
         }
     } else {
         // 判断时长是否符合限制要求
@@ -203,13 +210,9 @@
             return;
         }
         // 回调结果
-        if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithVideoAtPath:)]) {
-            [self.delegate cameraController:self didFinishWithVideoAtPath:self.recorder.URL.path];
+        if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
+            [self.delegate cameraController:self didFinishWithContents:self.recorder.URL.path];
         }
-    }
-    // 回调内容
-    if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
-        [self.delegate cameraController:self didFinishWithContents:(self.previewView.alpha ? self.previewView.image : self.recorder.URL.path)];
     }
 }
 
@@ -229,10 +232,10 @@
             __strong typeof(self) self = weakself;
             if (image) {
                 [self.toolBar stopCapturing];
-                self.previewView.image = image;
+                self.imageView.image = image;
                 [UIView animateWithDuration:.3f animations:^{
-                    self.previewView.alpha = 1.f;
                     self.playView.alpha = 0.f;
+                    self.imageView.alpha = 1.f;
                 } completion:^(BOOL finished) {
                     [self.recorder stopRunning];
                 }];
@@ -252,7 +255,7 @@
     [self.toolBar stopCapturing];
     [UIView animateWithDuration:.3f animations:^{
         self.playView.alpha = 1.f;
-        self.previewView.alpha = 0.f;
+        self.imageView.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.recorder stopRunning];
         [self.player addURL:self.recorder.URL];
