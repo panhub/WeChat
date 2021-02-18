@@ -13,7 +13,7 @@
 
 @interface MNCameraController () <MNCapturingToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
 @property (nonatomic, strong) MNPlayer *player;
-@property (nonatomic, strong) UIView *displayView;
+@property (nonatomic, strong) UIView *movieView;
 @property (nonatomic, strong) UIControl *cameraControl;
 @property (nonatomic, strong) UIImageView *focusView;
 @property (nonatomic, strong) UIImageView *imageView;
@@ -35,13 +35,13 @@
 - (void)createView {
     [super createView];
 
-    self.contentView.backgroundColor = [UIColor blackColor];
+    self.contentView.backgroundColor = UIColor.blackColor;
     
-    UIView *displayView = [[UIView alloc] initWithFrame:self.contentView.bounds];
-    displayView.backgroundColor = [UIColor blackColor];
-    [displayView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(handTap:), nil)];
-    [self.contentView addSubview:displayView];
-    self.displayView = displayView;
+    UIView *movieView = [[UIView alloc] initWithFrame:self.contentView.bounds];
+    movieView.backgroundColor = [UIColor blackColor];
+    [movieView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(handTap:), nil)];
+    [self.contentView addSubview:movieView];
+    self.movieView = movieView;
     
     MNPlayView *playView = [[MNPlayView alloc] initWithFrame:self.contentView.bounds];
     playView.alpha = 0.f;
@@ -71,7 +71,7 @@
     
     UIControl *cameraControl = [[UIControl alloc] initWithFrame:CGRectMake(0.f, 0.f, 40.f, 40.f)];
     cameraControl.right_mn = self.contentView.width_mn - 20.f;
-    cameraControl.top_mn =  (MN_NAV_BAR_HEIGHT - cameraControl.height_mn)/2.f + MN_STATUS_BAR_HEIGHT;
+    cameraControl.top_mn =  floor((MN_NAV_BAR_HEIGHT - cameraControl.height_mn)/2.f) + MN_STATUS_BAR_HEIGHT;
     cameraControl.backgroundImage = [MNBundle imageForResource:@"video_record_camera_switch"];
     [cameraControl addTarget:self action:@selector(cameraSwitchControlClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:cameraControl];
@@ -79,7 +79,7 @@
     
     UIImageView *focusView = [UIImageView imageViewWithFrame:CGRectMake(0.f, 0.f, 55.f, 55.f) image:[MNBundle imageForResource:@"video_record_focusing"]];
     focusView.hidden = YES;
-    [displayView addSubview:focusView];
+    [movieView addSubview:focusView];
     self.focusView = focusView;
 }
 
@@ -94,9 +94,25 @@
     
     MNMovieRecorder *recorder = [MNMovieRecorder new];
     recorder.delegate = self;
-    recorder.outputView = self.displayView;
+    recorder.outputView = self.movieView;
     [recorder prepareCapturing];
     self.recorder = recorder;
+    
+    CGSize presetSize = CGSizeMultiplyToWidth((recorder.presetSizeRatio == MNMovieSizeRatio9x16 ? CGSizeMake(3.f, 4.f) : CGSizeMake(9.f, 16.f)), self.contentView.width_mn);
+    presetSize.height = ceil(presetSize.height);
+    if (fabs(presetSize.height - self.contentView.height) > 5.f) {
+        // 屏幕尺寸不合适
+        self.playView.size = self.imageView.size_mn = self.movieView.size_mn = presetSize;
+        CGFloat interval = floor((self.contentView.height_mn - self.cameraControl.bottom_mn - MN_TAB_SAFE_HEIGHT - presetSize.height - self.toolBar.height_mn)/3.f);
+        if (interval > ceil(MNCaptureToolBarMaxHeight - MNCaptureToolBarMinHeight)) {
+            self.playView.top_mn = self.imageView.top_mn = self.movieView.top_mn = self.cameraControl.bottom_mn + interval;
+            self.toolBar.top_mn = self.cameraControl.bottom_mn + presetSize.height + interval*2.f;
+        } else {
+            interval = floor((self.contentView.height_mn - self.cameraControl.bottom_mn - MN_TAB_SAFE_HEIGHT - presetSize.height)/2.f);
+            self.playView.top_mn = self.imageView.top_mn = self.movieView.top_mn = self.cameraControl.bottom_mn + interval;
+            self.toolBar.bottom_mn = self.cameraControl.bottom_mn + interval + presetSize.height - (MNCaptureToolBarMaxHeight - MNCaptureToolBarMinHeight);
+        }
+    }
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didEnterBackgroundNotification:)
@@ -131,7 +147,7 @@
 #pragma mark - Tap
 - (void)handTap:(UITapGestureRecognizer *)tap {
     if (!self.focusView.hidden) return;
-    CGPoint point = [tap locationInView:self.displayView];
+    CGPoint point = [tap locationInView:self.movieView];
     [self.recorder setFocus:point];
     self.focusView.center_mn = point;
     self.focusView.hidden = NO;
@@ -281,6 +297,7 @@
     self.recorder.delegate = nil;
     [self.player removeAllURLs];
     [self.recorder stopRunning];
+    [self.recorder cancelRecording];
     if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
         [self.delegate cameraControllerDidCancel:self];
     }

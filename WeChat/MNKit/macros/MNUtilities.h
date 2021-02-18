@@ -182,7 +182,7 @@ CG_INLINE CGSize CGSizeMultiplyByRatio (CGSize size, CGFloat multiplier) {
  */
 CG_INLINE CGSize CGSizeMultiplyToWidth (CGSize size, CGFloat width) {
     if (width <= 0.f || CGSizeIsEmpty(size)) return CGSizeZero;
-    return CGSizeMake(width, size.height/(size.width/width));
+    return CGSizeMake(width, width/size.width*size.height);
 }
 
 /**
@@ -193,7 +193,7 @@ CG_INLINE CGSize CGSizeMultiplyToWidth (CGSize size, CGFloat width) {
  */
 CG_INLINE CGSize CGSizeMultiplyToHeight (CGSize size, CGFloat height) {
     if (height <= 0.f || CGSizeIsEmpty(size)) return CGSizeZero;
-    return CGSizeMake(size.width/(size.height/height), height);
+    return CGSizeMake(height/size.height*size.width, height);
 }
 
 /**

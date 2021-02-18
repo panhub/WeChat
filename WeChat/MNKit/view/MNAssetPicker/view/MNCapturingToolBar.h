@@ -14,6 +14,9 @@ typedef NS_OPTIONS(NSInteger, MNCapturingOptions) {
     MNCapturingOptionVideo = 1 << 1
 };
 
+UIKIT_EXTERN const CGFloat MNCaptureToolBarMinHeight;
+UIKIT_EXTERN const CGFloat MNCaptureToolBarMaxHeight;
+
 @protocol MNCapturingToolDelegate <NSObject>
 @optional;
 - (void)capturingToolBarCloseButtonClicked:(MNCapturingToolBar *)toolBar;

@@ -34,10 +34,12 @@ typedef NS_ENUM(NSInteger, MNCapturingToolState) {
 @property (nonatomic, strong) CAShapeLayer *progressLayer;
 @end
 
-#define MNCapturingViewMinHeight   75.f
+#define MNCaptureToolButtonTransformScale 1.35f
 #define MNCapturingViewBackButtonTag  10
 #define MNCapturingViewDoneButtonTag  20
 #define MNCapturingViewCloseButtonTag  30
+const CGFloat MNCaptureToolBarMinHeight = 75.f;
+const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToolButtonTransformScale;
 
 @implementation MNCapturingToolBar
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -45,7 +47,7 @@ typedef NS_ENUM(NSInteger, MNCapturingToolState) {
         
         self.options = MNCapturingOptionPhoto;
     
-        UIView *trackView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 75.f, 75.f)];
+        UIView *trackView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, MNCaptureToolBarMinHeight, MNCaptureToolBarMinHeight)];
         trackView.center_mn = self.bounds_center;
         trackView.layer.cornerRadius = trackView.width_mn/2.f;
         trackView.clipsToBounds = YES;
@@ -191,11 +193,12 @@ typedef NS_ENUM(NSInteger, MNCapturingToolState) {
 }
 
 - (void)startCapturing {
+    self.clipsToBounds = NO;
     self.state = MNCapturingToolStateWaiting;
     [UIView animateWithDuration:.3f animations:^{
         self.closeButton.alpha = 0.f;
         self.touchView.transform = CGAffineTransformMakeScale(.7f, .7f);
-        self.trackView.transform = CGAffineTransformMakeScale(1.35f, 1.35f);
+        self.trackView.transform = CGAffineTransformMakeScale(MNCaptureToolButtonTransformScale, MNCaptureToolButtonTransformScale);
     } completion:^(BOOL finished) {
         self.progressLayer.hidden = NO;
         if (self.timeoutInterval > 0.f) [self.progressLayer addAnimation:self.strokeAnimation forKey:@""];
@@ -235,7 +238,7 @@ typedef NS_ENUM(NSInteger, MNCapturingToolState) {
 
 #pragma mark - Setter
 - (void)setFrame:(CGRect)frame {
-    frame.size.height = MAX(MNCapturingViewMinHeight, frame.size.height);
+    frame.size.height = MAX(MNCaptureToolBarMinHeight, frame.size.height);
     [super setFrame:frame];
 }
 

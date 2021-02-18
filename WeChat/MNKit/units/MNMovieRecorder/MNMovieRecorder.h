@@ -19,6 +19,22 @@ typedef NS_ENUM(NSInteger, MNMovieResizeMode) {
 };
 
 /**
+ 视频宽高比率
+ - MNMovieSizeRatioUnknown: 未知
+ - MNMovieSizeRatio9x16: 9/16
+ - MNMovieSizeRatio16x9: 16/9
+ - MNMovieSizeRatio3x4: 3/4
+ - MNMovieSizeRatio4x3: 4/3
+ */
+typedef NS_ENUM(NSInteger, MNMovieSizeRatio) {
+    MNMovieSizeRatioUnknown = 0,
+    MNMovieSizeRatio9x16,
+    MNMovieSizeRatio16x9,
+    MNMovieSizeRatio3x4,
+    MNMovieSizeRatio4x3,
+};
+
+/**
  视频输入摄像头
  - MNMovieDevicePositionBack: 后置摄像头
  - MNMovieDevicePositionFront: 前置摄像头
@@ -75,6 +91,8 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 @property (nonatomic, weak) UIView *outputView;
 /**捕获质量*/
 @property (nonatomic, copy, nullable) MNMoviePresetName presetName;
+/**捕获尺寸比例*/
+@property (nonatomic, readonly) MNMovieSizeRatio presetSizeRatio;
 /**事件回调*/
 @property (nonatomic, weak, nullable) id<MNMovieRecordDelegate> delegate;
 /**是否在录制*/

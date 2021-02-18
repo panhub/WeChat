@@ -35,8 +35,8 @@ MNMoviePresetName const MNMoviePreset1280x720 = @"com.mn.movie.preset.1280x720";
 MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080";
 
 @interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate, MNMovieWriteDelegate>
-@property (nonatomic) MNMovieRecordStatus status;
 @property (nonatomic) BOOL shouldSessionRunning;
+@property (nonatomic) MNMovieRecordStatus status;
 @property (nonatomic, strong) MNMovieWriter *movieWriter;
 @property (nonatomic, strong) dispatch_queue_t outputQueue;
 @property (nonatomic, strong) AVCaptureSession *session;
@@ -68,9 +68,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     _movieWriter = MNMovieWriter.new;
     _presetName = MNMoviePresetHighQuality;
     _devicePosition = MNMovieDevicePositionBack;
+    _movieOrientation = MNMovieOrientationPortrait;
     _resizeMode = MNMovieResizeModeResizeAspect;
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
-    _movieOrientation = MNMovieOrientationPortrait;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionWasInterruptedNotification:) name:AVCaptureSessionWasInterruptedNotification object:nil];
@@ -694,6 +694,24 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         sessionPreset = AVCaptureSessionPresetLow;
     }
     return sessionPreset;
+}
+
+- (MNMovieSizeRatio)presetSizeRatio {
+    if (!_session || !_session.sessionPreset) {
+        return MNMovieSizeRatioUnknown;
+    }
+    AVCaptureSessionPreset presetName = _session.sessionPreset;
+#ifdef __IPHONE_9_0
+    if (@available(iOS 9.0, *)) {
+        if ([presetName isEqualToString:AVCaptureSessionPreset3840x2160]) {
+            return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
+        }
+    }
+#endif
+    if ([presetName isEqualToString:AVCaptureSessionPresetHigh] || [presetName isEqualToString:AVCaptureSessionPreset1920x1080] || [presetName isEqualToString:AVCaptureSessionPreset1280x720] || [presetName isEqualToString:AVCaptureSessionPresetiFrame960x540]) {
+        return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
+    }
+    return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio3x4 : MNMovieSizeRatio4x3;
 }
 
 - (AVCaptureVideoPreviewLayer *)previewLayer {
