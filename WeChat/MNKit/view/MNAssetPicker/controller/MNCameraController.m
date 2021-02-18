@@ -8,10 +8,10 @@
 
 #import "MNCameraController.h"
 #import "MNAssetPickConfiguration.h"
-#import "MNCapturingToolBar.h"
+#import "MNCaptureToolBar.h"
 #import "MNPlayView.h"
 
-@interface MNCameraController () <MNCapturingToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
+@interface MNCameraController () <MNCaptureToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UIView *movieView;
 @property (nonatomic, strong) UIControl *cameraControl;
@@ -19,7 +19,7 @@
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) MNMovieRecorder *recorder;
 @property (nonatomic, strong) MNPlayView *playView;
-@property (nonatomic, strong) MNCapturingToolBar *toolBar;
+@property (nonatomic, strong) MNCaptureToolBar *toolBar;
 @end
 
 #pragma clang diagnostic push
@@ -57,14 +57,14 @@
     [self.contentView addSubview:imageView];
     self.imageView = imageView;
     
-    MNCapturingToolBar *toolBar = [[MNCapturingToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
+    MNCaptureToolBar *toolBar = [[MNCaptureToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.contentView.width_mn, 0.f)];
     toolBar.delegate = self;
     toolBar.bottom_mn = self.contentView.height_mn - MN_TAB_SAFE_HEIGHT - 60.f;
     toolBar.timeoutInterval = MAX(self.configuration.maxCaptureDuration, self.configuration.maxExportDuration);
     if (self.configuration.isAllowsPickingPhoto && self.configuration.isAllowsPickingVideo) {
-        toolBar.options = MNCapturingOptionPhoto|MNCapturingOptionVideo;
+        toolBar.options = MNCaptureOptionPhoto|MNCaptureOptionVideo;
     } else if (self.configuration.isAllowsPickingVideo) {
-        toolBar.options = MNCapturingOptionVideo;
+        toolBar.options = MNCaptureOptionVideo;
     }
     [self.contentView addSubview:toolBar];
     self.toolBar = toolBar;
@@ -174,8 +174,8 @@
     [player play];
 }
 
-#pragma mark - MNCapturingToolDelegate
-- (void)capturingToolBarCloseButtonClicked:(MNCapturingToolBar *)toolBar {
+#pragma mark - MNCaptureToolDelegate
+- (void)captureToolBarCloseButtonClicked:(MNCaptureToolBar *)toolBar {
     self.player.delegate = nil;
     self.recorder.delegate = nil;
     [self.player removeAllURLs];
@@ -197,7 +197,7 @@
     }
 }
 
-- (void)capturingToolBarBackButtonClicked:(MNCapturingToolBar *)toolBar {
+- (void)captureToolBarBackButtonClicked:(MNCaptureToolBar *)toolBar {
     [toolBar resetCapturing];
     [self.recorder startRunning];
     [UIView animateWithDuration:.3f animations:^{
@@ -208,7 +208,7 @@
     }];
 }
 
-- (void)capturingToolBarDoneButtonClicked:(MNCapturingToolBar *)toolBar {
+- (void)captureToolBarDoneButtonClicked:(MNCaptureToolBar *)toolBar {
     // 判断资源类型
     if (self.imageView.alpha) {
         if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
@@ -232,16 +232,16 @@
     }
 }
 
-- (void)capturingToolBarShoudBeginCapturing:(MNCapturingToolBar *)toolBar {
+- (void)captureToolBarShoudBeginCapturing:(MNCaptureToolBar *)toolBar {
     self.recorder.URL = [NSURL fileURLWithPath:self.filePath];
     [self.recorder startRecording];
 }
 
-- (void)capturingToolBarDidEndCapturing:(MNCapturingToolBar *)toolBar {
+- (void)captureToolBarDidEndCapturing:(MNCaptureToolBar *)toolBar {
     [self.recorder stopRecording];
 }
 
-- (void)capturingToolBarShoudTakeStillImage:(MNCapturingToolBar *)toolBar {
+- (void)captureToolBarShoudTakeStillImage:(MNCaptureToolBar *)toolBar {
     __weak typeof(self) weakself = self;
     [self.recorder takeStillImageAsynchronously:^(UIImage * _Nullable image) {
         dispatch_async(dispatch_get_main_queue(), ^{

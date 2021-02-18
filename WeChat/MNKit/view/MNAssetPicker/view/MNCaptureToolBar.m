@@ -1,31 +1,31 @@
 //
-//  MNCapturingToolBar.m
+//  MNCaptureToolBar.m
 //  MNKit
 //
 //  Created by Vincent on 2019/6/13.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
 
-#import "MNCapturingToolBar.h"
+#import "MNCaptureToolBar.h"
 #import "UIColor+MNHelper.h"
 #import "CALayer+MNAnimation.h"
 
 /**
  控制栏状态
- - MNCapturingToolStateIdle: 正常
- - MNCapturingToolStateWaiting: 等待下一步指示
- - MNCapturingToolStateRunning: 捕获数据
- - MNCapturingToolStateFinished: 播放状态
+ - MNCaptureToolStateIdle: 正常
+ - MNCaptureToolStateWaiting: 等待下一步指示
+ - MNCaptureToolStateRunning: 捕获数据
+ - MNCaptureToolStateFinished: 播放状态
  */
-typedef NS_ENUM(NSInteger, MNCapturingToolState) {
-    MNCapturingToolStateIdle = 0,
-    MNCapturingToolStateWaiting,
-    MNCapturingToolStateRunning,
-    MNCapturingToolStateFinished
+typedef NS_ENUM(NSInteger, MNCaptureToolState) {
+    MNCaptureToolStateIdle = 0,
+    MNCaptureToolStateWaiting,
+    MNCaptureToolStateRunning,
+    MNCaptureToolStateFinished
 };
 
-@interface MNCapturingToolBar () <CAAnimationDelegate>
-@property (nonatomic) MNCapturingToolState state;
+@interface MNCaptureToolBar () <CAAnimationDelegate>
+@property (nonatomic) MNCaptureToolState state;
 @property (nonatomic, strong) UIView *touchView;
 @property (nonatomic, strong) UIView *trackView;
 @property (nonatomic, strong) UIButton *closeButton;
@@ -34,18 +34,19 @@ typedef NS_ENUM(NSInteger, MNCapturingToolState) {
 @property (nonatomic, strong) CAShapeLayer *progressLayer;
 @end
 
-#define MNCaptureToolButtonTransformScale 1.35f
-#define MNCapturingViewBackButtonTag  10
-#define MNCapturingViewDoneButtonTag  20
-#define MNCapturingViewCloseButtonTag  30
-const CGFloat MNCaptureToolBarMinHeight = 75.f;
-const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToolButtonTransformScale;
 
-@implementation MNCapturingToolBar
+#define MNCaptureBackButtonTag  10
+#define MNCaptureDoneButtonTag  20
+#define MNCaptureCloseButtonTag  30
+#define MNCaptureButtonTransformScale 1.35f
+const CGFloat MNCaptureToolBarMinHeight = 75.f;
+const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureButtonTransformScale;
+
+@implementation MNCaptureToolBar
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         
-        self.options = MNCapturingOptionPhoto;
+        self.options = MNCaptureOptionPhoto;
     
         UIView *trackView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, MNCaptureToolBarMinHeight, MNCaptureToolBarMinHeight)];
         trackView.center_mn = self.bounds_center;
@@ -83,17 +84,17 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
             [self insertSubview:button belowSubview:trackView];
             if (idx == 0) {
                 self.backButton = button;
-                self.backButton.tag = MNCapturingViewBackButtonTag;
+                self.backButton.tag = MNCaptureBackButtonTag;
                 [self.backButton setBackgroundImage:[MNBundle imageForResource:@"video_record_returnHL"] forState:UIControlStateHighlighted];
             } else {
                 self.doneButton = button;
-                self.doneButton.tag = MNCapturingViewDoneButtonTag;
+                self.doneButton.tag = MNCaptureDoneButtonTag;
             }
         }];
         
         UIButton *closeButton = [UIButton buttonWithFrame:CGRectMake(0.f, 0.f, 40.f, 40.f) image:[MNBundle imageForResource:@"video_record_close"] title:nil titleColor:nil titleFont:nil];
         closeButton.center_mn = CGPointMake(trackView.left_mn/2.f, trackView.centerY_mn);
-        closeButton.tag = MNCapturingViewCloseButtonTag;
+        closeButton.tag = MNCaptureCloseButtonTag;
         [closeButton setBackgroundImage:[MNBundle imageForResource:@"video_record_close"] forState:UIControlStateHighlighted];
         [closeButton addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:closeButton];
@@ -106,18 +107,18 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
 - (void)didMoveToSuperview {
     [super didMoveToSuperview];
     if (!self.superview) return;
-    if (self.options & MNCapturingOptionPhoto) {
+    if (self.options & MNCaptureOptionPhoto) {
         [self.trackView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(handTap:), nil)];
     }
-    if (self.options & MNCapturingOptionVideo) {
+    if (self.options & MNCaptureOptionVideo) {
         [self.trackView addGestureRecognizer:UILongPressGestureRecognizerCreate(self, .3f, @selector(handLongPress:), nil)];
     }
 }
 
 #pragma mark - Gesture
 - (void)handTap:(UITapGestureRecognizer *)recognizer {
-    if (self.state == MNCapturingToolStateIdle && [self.delegate respondsToSelector:@selector(capturingToolBarShoudTakeStillImage:)]) {
-        [self.delegate capturingToolBarShoudTakeStillImage:self];
+    if (self.state == MNCaptureToolStateIdle && [self.delegate respondsToSelector:@selector(captureToolBarShoudTakeStillImage:)]) {
+        [self.delegate captureToolBarShoudTakeStillImage:self];
     }
 }
 
@@ -126,12 +127,12 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
     switch (state) {
         case UIGestureRecognizerStateBegan:
         {
-            if (self.state != MNCapturingToolStateIdle) return;
+            if (self.state != MNCaptureToolStateIdle) return;
             [self beginCapturing];
         } break;
         case UIGestureRecognizerStateEnded:
         {
-            if (self.state != MNCapturingToolStateRunning) return;
+            if (self.state != MNCaptureToolStateRunning) return;
             [self endCapturing];
         } break;
         case UIGestureRecognizerStateChanged: break;
@@ -145,7 +146,7 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
                 self.progressLayer.hidden = YES;
                 [self.progressLayer removeAllAnimations];
                 self.progressLayer.strokeEnd = 0.f;
-                self.state = MNCapturingToolStateIdle;
+                self.state = MNCaptureToolStateIdle;
             }];
         } break;
     }
@@ -153,40 +154,40 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
 
 #pragma mark - 录制/播放
 - (void)beginCapturing {
-    self.state = MNCapturingToolStateWaiting;
+    self.state = MNCaptureToolStateWaiting;
     [self.progressLayer resetAnimation];
-    if ([self.delegate respondsToSelector:@selector(capturingToolBarShoudBeginCapturing:)]) {
-        [self.delegate capturingToolBarShoudBeginCapturing:self];
+    if ([self.delegate respondsToSelector:@selector(captureToolBarShoudBeginCapturing:)]) {
+        [self.delegate captureToolBarShoudBeginCapturing:self];
     }
 }
 
 - (void)endCapturing {
-    self.state = MNCapturingToolStateWaiting;
+    self.state = MNCaptureToolStateWaiting;
     [self.progressLayer pauseAnimation];
-    if ([self.delegate respondsToSelector:@selector(capturingToolBarDidEndCapturing:)]) {
-        [self.delegate capturingToolBarDidEndCapturing:self];
+    if ([self.delegate respondsToSelector:@selector(captureToolBarDidEndCapturing:)]) {
+        [self.delegate captureToolBarDidEndCapturing:self];
     }
 }
 
 #pragma mark - Event
 - (void)buttonClicked:(UIButton *)button {
     switch (button.tag) {
-        case MNCapturingViewCloseButtonTag:
+        case MNCaptureCloseButtonTag:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingToolBarCloseButtonClicked:)]) {
-                [self.delegate capturingToolBarCloseButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(captureToolBarCloseButtonClicked:)]) {
+                [self.delegate captureToolBarCloseButtonClicked:self];
             }
         } break;
-        case MNCapturingViewBackButtonTag:
+        case MNCaptureBackButtonTag:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingToolBarBackButtonClicked:)]) {
-                [self.delegate capturingToolBarBackButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(captureToolBarBackButtonClicked:)]) {
+                [self.delegate captureToolBarBackButtonClicked:self];
             }
         } break;
         default:
         {
-            if ([self.delegate respondsToSelector:@selector(capturingToolBarDoneButtonClicked:)]) {
-                [self.delegate capturingToolBarDoneButtonClicked:self];
+            if ([self.delegate respondsToSelector:@selector(captureToolBarDoneButtonClicked:)]) {
+                [self.delegate captureToolBarDoneButtonClicked:self];
             }
         } break;
     }
@@ -194,20 +195,20 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
 
 - (void)startCapturing {
     self.clipsToBounds = NO;
-    self.state = MNCapturingToolStateWaiting;
+    self.state = MNCaptureToolStateWaiting;
     [UIView animateWithDuration:.3f animations:^{
         self.closeButton.alpha = 0.f;
         self.touchView.transform = CGAffineTransformMakeScale(.7f, .7f);
-        self.trackView.transform = CGAffineTransformMakeScale(MNCaptureToolButtonTransformScale, MNCaptureToolButtonTransformScale);
+        self.trackView.transform = CGAffineTransformMakeScale(MNCaptureButtonTransformScale, MNCaptureButtonTransformScale);
     } completion:^(BOOL finished) {
         self.progressLayer.hidden = NO;
         if (self.timeoutInterval > 0.f) [self.progressLayer addAnimation:self.strokeAnimation forKey:@""];
-        self.state = MNCapturingToolStateRunning;
+        self.state = MNCaptureToolStateRunning;
     }];
 }
 
 - (void)stopCapturing {
-    self.state = MNCapturingToolStateWaiting;
+    self.state = MNCaptureToolStateWaiting;
     [UIView animateWithDuration:.3f animations:^{
         self.touchView.transform = CGAffineTransformIdentity;
         self.trackView.transform = CGAffineTransformIdentity;
@@ -221,18 +222,18 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureToo
             self.backButton.left_mn = self.closeButton.left_mn;
             self.doneButton.right_mn = self.width_mn - self.closeButton.left_mn;
         } completion:^(BOOL finished) {
-            self.state = MNCapturingToolStateFinished;
+            self.state = MNCaptureToolStateFinished;
         }];
     }];
 }
 
 - (void)resetCapturing {
-    self.state = MNCapturingToolStateWaiting;
+    self.state = MNCaptureToolStateWaiting;
     [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.closeButton.alpha = self.touchView.alpha = self.trackView.alpha = 1.f;
         self.backButton.center_mn = self.doneButton.center_mn = self.trackView.center_mn;
     } completion:^(BOOL finished) {
-        self.state = MNCapturingToolStateIdle;
+        self.state = MNCaptureToolStateIdle;
     }];
 }
 
