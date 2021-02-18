@@ -71,7 +71,18 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     _resizeMode = MNMovieResizeModeResizeAspect;
     _outputQueue = dispatch_queue_create("com.mn.capture.output.queue", DISPATCH_QUEUE_SERIAL);
     _movieOrientation = MNMovieOrientationPortrait;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:nil];
+#ifdef __IPHONE_9_0
+    if (@available(iOS 9.0, *)) {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionWasInterruptedNotification:) name:AVCaptureSessionWasInterruptedNotification object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionInterruptionEndedNotification:) name:AVCaptureSessionInterruptionEndedNotification object:nil];
+    } else {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    }
+#else
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+#endif
 }
 
 - (void)prepareCapturing {
@@ -251,13 +262,19 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (void)startRunning {
     @synchronized (self) {
-        if (_session && !_session.isRunning) [_session startRunning];
+        if (_session && !_session.isRunning) {
+            [_session startRunning];
+            _shouldSessionRunning = YES;
+        }
     }
 }
 
 - (void)stopRunning {
     @synchronized (self) {
-        if (_session && _session.isRunning) [_session stopRunning];
+        if (_session && _session.isRunning) {
+            [_session stopRunning];
+            _shouldSessionRunning = NO;
+        }
     }
 }
 
@@ -573,45 +590,22 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 #pragma mark - Notification
-- (void)captureSessionNotification:(NSNotification *)notify {
-    NSNotificationName name = notify.name;
-    if ([name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
-        // 后台
-        self.shouldSessionRunning = self.isRunning;
-        [self stopRunning];
-        [self cancelRecording];
-    } else if ([name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
-        // 前台
-        if (self.shouldSessionRunning) {
-            [self startRunning];
-            self.shouldSessionRunning = NO;
-        }
-    } else if ([name isEqualToString:AVCaptureSessionWasInterruptedNotification]) {
-        // 录制被打断
-        [self stopRunning];
-        [self cancelRecording];
-    } else if ([name isEqualToString:AVCaptureSessionRuntimeErrorNotification]) {
-        // 出错
-        [self cancelRecording];
-#ifdef __IPHONE_9_0
-        if (@available(iOS 9.0, *)) {
-            if ([notify.userInfo[AVCaptureSessionInterruptionReasonKey] integerValue] == AVCaptureSessionInterruptionReasonVideoDeviceNotAvailableInBackground) {
-                [self stopRunning];
-                self.shouldSessionRunning = YES;
-                return;
-            }
-        }
-#endif
-        NSError *error = notify.userInfo[AVCaptureSessionErrorKey];
-        if (error.code == AVErrorMediaServicesWereReset) {
-            if (self.isRunning) [self.session startRunning];
-        } else if (error.code == AVErrorDeviceIsNotAvailableInBackground) {
-            [self stopRunning];
-            self.shouldSessionRunning = YES;
-        } else {
-            [self stopRunning];
-        }
-    }
+// 前台
+- (void)willEnterForegroundNotification:(NSNotification *)notify {
+    if (self.shouldSessionRunning) [self startRunning];
+}
+// 后台
+- (void)didEnterBackgroundNotification:(NSNotification *)notify {
+    if (self.shouldSessionRunning) [_session stopRunning];
+    [self cancelRecording];
+}
+// 中断
+- (void)sessionWasInterruptedNotification:(NSNotification *)notify {
+    [self cancelRecording];
+}
+// 中断结束
+- (void)sessionInterruptionEndedNotification:(NSNotification *)notify {
+    NSLog(@"中断结束");
 }
 
 #pragma mark - Setter

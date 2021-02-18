@@ -12,9 +12,13 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface MNScanner ()<AVCaptureMetadataOutputObjectsDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
+// 保证后台时关闭, 前台时开启
 @property (nonatomic) BOOL shouldSessionRunning;
+// 摄像设备
 @property (nonatomic, strong) AVCaptureDevice *device;
+// 捕捉会话
 @property (nonatomic, strong) AVCaptureSession *session;
+// 捕捉输出
 @property (nonatomic, strong) AVCaptureDeviceInput *deviceInput;
 @property (nonatomic, strong) AVCaptureMetadataOutput *metadataOutput;
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoDataOutput;
@@ -25,10 +29,18 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(captureSessionNotification:)
-                                                   name:nil
-                                                 object:nil];
+    #ifdef __IPHONE_9_0
+        if (@available(iOS 9.0, *)) {
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionWasInterruptedNotification:) name:AVCaptureSessionWasInterruptedNotification object:nil];
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionInterruptionEndedNotification:) name:AVCaptureSessionInterruptionEndedNotification object:nil];
+        } else {
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        }
+    #else
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(willEnterForegroundNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    #endif
     }
     return self;
 }
@@ -172,6 +184,7 @@
     @synchronized (self) {
         if (_session && !_session.isRunning) {
             [_session startRunning];
+            _shouldSessionRunning = YES;
             shouldNotifyDelegate = YES;
         }
     }
@@ -188,6 +201,7 @@
     @synchronized (self) {
         if (_session && _session.isRunning) {
             [_session stopRunning];
+            _shouldSessionRunning = NO;
             shouldNotifyDelegate = YES;
         }
     }
@@ -351,42 +365,36 @@
 }
 
 #pragma mark - Notification
-- (void)captureSessionNotification:(NSNotification *)notify {
-    NSNotificationName name = notify.name;
-    if ([name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
-        // 后台
-        self.shouldSessionRunning = self.isRunning;
-        [self stopRunning];
-    } else if ([name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
-        // 前台
-        if (self.shouldSessionRunning) {
-            [self startRunning];
-            self.shouldSessionRunning = NO;
-        }
-    } else if ([name isEqualToString:AVCaptureSessionWasInterruptedNotification]) {
-        // 录制被打断
-        [self stopRunning];
-    } else if ([name isEqualToString:AVCaptureSessionRuntimeErrorNotification]) {
-        // 出错
-#ifdef __IPHONE_9_0
-        if (@available(iOS 9.0, *)) {
-            if ([notify.userInfo[AVCaptureSessionInterruptionReasonKey] integerValue] == AVCaptureSessionInterruptionReasonVideoDeviceNotAvailableInBackground) {
-                [self stopRunning];
-                self.shouldSessionRunning = YES;
-                return;
+// 前台
+- (void)willEnterForegroundNotification:(NSNotification *)notify {
+    if (self.shouldSessionRunning) [self startRunning];
+}
+// 后台
+- (void)didEnterBackgroundNotification:(NSNotification *)notify {
+    if (self.shouldSessionRunning) {
+        [self.session stopRunning];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
+                [self.delegate scannerDidStopRunning:self];
             }
-        }
-#endif
-        NSError *error = notify.userInfo[AVCaptureSessionErrorKey];
-        if (error.code == AVErrorMediaServicesWereReset) {
-            if (self.isRunning) [self.session startRunning];
-        } else if (error.code == AVErrorDeviceIsNotAvailableInBackground) {
-            [self stopRunning];
-            self.shouldSessionRunning = YES;
-        } else {
-            [self stopRunning];
-        }
+        });
     }
+}
+// 中断
+- (void)sessionWasInterruptedNotification:(NSNotification *)notify {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
+            [self.delegate scannerDidStopRunning:self];
+        }
+    });
+}
+// 中断结束
+- (void)sessionInterruptionEndedNotification:(NSNotification *)notify {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(scannerDidStartRunning:)]) {
+            [self.delegate scannerDidStartRunning:self];
+        }
+    });
 }
 
 #pragma mark - dealloc
