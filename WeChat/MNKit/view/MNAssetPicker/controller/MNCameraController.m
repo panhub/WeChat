@@ -290,6 +290,7 @@
         } ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:self.view];
     } else {
         [self.view showInfoDialog:error.localizedDescription];
+        [self.toolBar resetCapturing];
     }
 }
 

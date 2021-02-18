@@ -230,18 +230,32 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
 }
 
 - (void)resetCapturing {
-    self.state = MNCaptureToolStateWaiting;
-    self.trackView.centerX_mn = self.touchView.centerX_mn = self.doneButton.centerX_mn;
-    [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.closeButton.alpha = 1.f;
-        self.doneButton.alpha = 0.f;
-        self.trackView.alpha = self.touchView.alpha = 1.f;
-        self.backButton.centerX_mn = self.doneButton.centerX_mn = self.trackView.centerX_mn = self.touchView.centerX_mn = self.width_mn/2.f;
-    } completion:^(BOOL finished) {
-        self.backButton.alpha = 0.f;
-        self.state = MNCaptureToolStateIdle;
-        NSLog(@"");
-    }];
+    if (self.state <= MNCaptureToolStateWaiting) return;
+    if (self.state == MNCaptureToolStateRunning) {
+        self.state = MNCaptureToolStateWaiting;
+        [UIView animateWithDuration:.3f animations:^{
+            self.touchView.transform = CGAffineTransformIdentity;
+            self.trackView.transform = CGAffineTransformIdentity;
+        } completion:^(BOOL finished) {
+            self.progressLayer.hidden = YES;
+            [self.progressLayer resetAnimation];
+            [self.progressLayer removeAllAnimations];
+            self.progressLayer.strokeEnd = 0.f;
+            self.state = MNCaptureToolStateIdle;
+        }];
+    } else {
+        self.state = MNCaptureToolStateWaiting;
+        self.trackView.centerX_mn = self.touchView.centerX_mn = self.doneButton.centerX_mn;
+        [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.closeButton.alpha = 1.f;
+            self.doneButton.alpha = 0.f;
+            self.trackView.alpha = self.touchView.alpha = 1.f;
+            self.backButton.centerX_mn = self.doneButton.centerX_mn = self.trackView.centerX_mn = self.touchView.centerX_mn = self.width_mn/2.f;
+        } completion:^(BOOL finished) {
+            self.backButton.alpha = 0.f;
+            self.state = MNCaptureToolStateIdle;
+        }];
+    }
 }
 
 - (void)setState:(MNCaptureToolState)state {
