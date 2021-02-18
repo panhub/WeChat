@@ -17,14 +17,14 @@
  - MNMovieRecordStatusIdle: 默认 闲置状态
  - MNMovieRecordStatusRecording: 正在录制视频
  - MNMovieRecordStatusFinish: 录制结束
- - MNMovieRecordStatusCancel: 录制取消
+ - MNMovieRecordStatusCancelled: 录制取消
  - MNMovieRecordStatusFailed: 录制失败
  */
 typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     MNMovieRecordStatusIdle = 0,
     MNMovieRecordStatusRecording,
     MNMovieRecordStatusFinish,
-    MNMovieRecordStatusCancel,
+    MNMovieRecordStatusCancelled,
     MNMovieRecordStatusFailed
 };
 
@@ -147,13 +147,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
     @synchronized (self) {
-        self.status = MNMovieRecordStatusFailed;
+        [self setStatus:MNMovieRecordStatusFailed error:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
-            [self.delegate movieRecorder:self didFailWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
-        }
-    });
 }
 
 #pragma mark - 设置音/视频/图片
@@ -264,7 +259,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     }
 }
 
-#pragma mark - 开始/停止录像
+#pragma mark - 录像
 - (BOOL)isRecording {
     @synchronized (self) {
         return self.status == MNMovieRecordStatusRecording;
@@ -288,7 +283,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
-    [self closeFlash];
     [self closeTorch];
     [self.movieWriter finishWriting];
 }
@@ -297,7 +291,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
-    [self closeFlash];
     [self closeTorch];
     [self.movieWriter cancelWriting];
 }
@@ -307,7 +300,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
 }
 
-#pragma mark - 获取照片
+#pragma mark - 照片
 - (void)takeStillImageAsynchronously:(void(^)(UIImage *))completion {
     if (!self.imageOutput) {
         if (completion) completion(nil);
@@ -345,38 +338,25 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - MNMovieWriteDelegate
 - (void)movieWriterDidStartWriting:(MNMovieWriter *)movieWriter {
     @synchronized (self) {
-        self.status = MNMovieRecordStatusRecording;
-    }
-    if ([self.delegate respondsToSelector:@selector(movieRecorderDidStartRecording:)]) {
-        [self.delegate movieRecorderDidStartRecording:self];
+        [self setStatus:MNMovieRecordStatusRecording error:nil];
     }
 }
 
 - (void)movieWriterDidFinishWriting:(MNMovieWriter *)movieWriter {
     @synchronized (self) {
-        self.status = MNMovieRecordStatusFinish;
-    }
-    if ([self.delegate respondsToSelector:@selector(movieRecorderDidFinishRecording:)]) {
-        [self.delegate movieRecorderDidFinishRecording:self];
+        [self setStatus:MNMovieRecordStatusFinish error:nil];
     }
 }
 
 - (void)movieWriterDidCancelWriting:(MNMovieWriter *)movieWriter {
     @synchronized (self) {
-        self.status = MNMovieRecordStatusCancel;
-    }
-    if ([self.delegate respondsToSelector:@selector(movieRecorderDidCancelRecording:)]) {
-        [self.delegate movieRecorderDidCancelRecording:self];
+        [self setStatus:MNMovieRecordStatusCancelled error:nil];
     }
 }
 
 - (void)movieWriter:(MNMovieWriter *)movieWriter didFailWithError:(NSError *)error {
     @synchronized (self) {
-        self.status = MNMovieRecordStatusFailed;
-    }
-    [self closeTorch];
-    if ([self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
-        [self.delegate movieRecorder:self didFailWithError:error];
+        [self setStatus:MNMovieRecordStatusFailed error:error];
     }
 }
 
@@ -388,7 +368,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (NSError *)openTorch {
     __block NSError *error;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (!device || !device.hasTorch) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
         } else if (device.torchMode != AVCaptureTorchModeOn) {
@@ -407,7 +387,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (NSError *)closeTorch {
     __block NSError *error;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (!device || !device.hasTorch) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
         } else if (device.torchMode != AVCaptureTorchModeOff) {
@@ -429,7 +409,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (NSError *)openFlash {
     __block NSError *error;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (!device || !device.hasFlash) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现闪光灯"}];
         } else if (device.flashMode != AVCaptureFlashModeOn) {
@@ -448,7 +428,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (NSError *)closeFlash {
     __block NSError *error;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (!device || !device.hasFlash) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现闪光灯"}];
         } else if (device.flashMode != AVCaptureFlashModeOff) {
@@ -462,7 +442,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     return error;
 }
 
-#pragma mark - 切换摄像头
+#pragma mark - 摄像头
 - (BOOL)convertCapturePosition {
     return [self convertCapturePosition:(MNMovieDevicePositionBack + MNMovieDevicePositionFront - self.devicePosition) error:NULL];
 }
@@ -533,7 +513,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (!_previewLayer) return NO;
     point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
     __block BOOL result = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (device && device.isFocusPointOfInterestSupported &&
             [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
             device.focusPointOfInterest = point;
@@ -549,7 +529,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (!_previewLayer) return NO;
     point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
     __block BOOL result = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (device && device.isExposurePointOfInterestSupported &&
             [device isExposureModeSupported:AVCaptureExposureModeAutoExpose]) {
             device.exposurePointOfInterest = point;
@@ -563,7 +543,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - -缩放
 - (BOOL)setZoomFactor:(CGFloat)factor withRate:(float)rate {
     __block BOOL result = NO;
-    [self changeDeviceConfigurationHandler:^(AVCaptureDevice * _Nullable device) {
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
         if (device) {
             [device rampToVideoZoomFactor:factor withRate:4.0];
             result = YES;
@@ -573,7 +553,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 #pragma mark - 设备
-- (void)changeDeviceConfigurationHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
+- (void)performDeviceChangeHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
     AVCaptureDevice *device = self.videoInput.device;
     if (!device) {
         if (resultHandler) resultHandler(nil);
@@ -654,6 +634,35 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (self.isRecording || resizeMode == _resizeMode) return;
     _resizeMode = resizeMode;
     _previewLayer.videoGravity = [self videoLayerGravity];
+}
+
+- (void)setStatus:(MNMovieRecordStatus)status error:(NSError *)error {
+    
+    _status = status;
+    
+    BOOL shouldNotifyDelegate = NO;
+    
+    if (status >= MNMovieRecordStatusRecording) {
+        shouldNotifyDelegate = YES;
+        if (status >= MNMovieRecordStatusFinish) {
+            _movieWriter = nil;
+            [self closeTorch];
+        }
+    }
+    
+    if (shouldNotifyDelegate && self.delegate) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == MNMovieRecordStatusRecording && [self.delegate respondsToSelector:@selector(movieRecorderDidStartRecording:)]) {
+                [self.delegate movieRecorderDidStartRecording:self];
+            } else if (status == MNMovieRecordStatusFinish && [self.delegate respondsToSelector:@selector(movieRecorderDidFinishRecording:)]) {
+                [self.delegate movieRecorderDidFinishRecording:self];
+            } else if (status == MNMovieRecordStatusCancelled && [self.delegate respondsToSelector:@selector(movieRecorderDidCancelRecording:)]) {
+                [self.delegate movieRecorderDidCancelRecording:self];
+            } else if (status == MNMovieRecordStatusFinish && [self.delegate respondsToSelector:@selector(movieRecorder:didFailWithError:)]) {
+                [self.delegate movieRecorder:self didFailWithError:error];
+            }
+        });
+    }
 }
 
 #pragma mark - Getter

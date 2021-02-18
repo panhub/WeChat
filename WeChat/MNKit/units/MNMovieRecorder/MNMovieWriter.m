@@ -13,19 +13,19 @@
  文件写入状态
  - MNMovieWriteStatusIdle: 闲置状态
  - MNMovieWriteStatusPreparing: 即将写入
- - MNMovieWriteStatusWriting: 正在写入
  - MNMovieWriteStatusWaiting: 等待结束
+ - MNMovieWriteStatusWriting: 正在写入
  - MNMovieWriteStatusFinish: 结束
- - MNMovieWriteStatusCancel: 取消
+ - MNMovieWriteStatusCancelled: 取消
  - MNMovieWriteStatusFailed: 失败
  */
 typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     MNMovieWriteStatusIdle = 0,
     MNMovieWriteStatusPreparing,
-    MNMovieWriteStatusWriting,
     MNMovieWriteStatusWaiting,
+    MNMovieWriteStatusWriting,
     MNMovieWriteStatusFinish,
-    MNMovieWriteStatusCancel,
+    MNMovieWriteStatusCancelled,
     MNMovieWriteStatusFailed
 };
 
@@ -61,6 +61,76 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         self.delegate = delegate;
     }
     return self;
+}
+
+#pragma mark - 开始/停止
+- (void)startWriting {
+    __weak typeof(self) weakself = self;
+    dispatch_async(self.writQueue, ^{
+        __strong typeof(self) self = weakself;
+        @synchronized (self) {
+            if (self.status == MNMovieWriteStatusPreparing) {
+                NSLog(@"⚠️⚠️⚠️Already prepared, cannot prepare again!⚠️⚠️⚠️");
+                return;
+            }
+            if (self.status == MNMovieWriteStatusWriting) {
+                NSLog(@"⚠️⚠️⚠️Moive is writing!⚠️⚠️⚠️");
+                return;
+            }
+        }
+        if (!self.URL || !self.URL.isFileURL) {
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Movie path is error!" userInfo:nil];
+        }
+        [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
+        [NSFileManager.defaultManager createDirectoryAtPath:self.URL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:NULL];
+        NSError *error;
+        AVAssetWriter *writer = [[AVAssetWriter alloc] initWithURL:self.URL fileType:AVFileTypeQuickTimeMovie error:&error];
+        if (error || !writer) {
+            @synchronized (self) {
+                [self setStatus:MNMovieWriteStatusFailed error:error];
+            }
+        } else {
+            self.writer = writer;
+            @synchronized (self) {
+                [self setStatus:MNMovieWriteStatusPreparing error:nil];
+            }
+        }
+    });
+}
+
+- (void)finishWriting {
+    @synchronized (self) {
+        if (self.status != MNMovieWriteStatusWriting) return;
+        [self setStatus:MNMovieWriteStatusWaiting error:nil];
+    }
+    __weak typeof(self) weakself = self;
+    dispatch_async(self.writQueue, ^{
+        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
+        if (weakself.status != MNMovieWriteStatusWaiting) return;
+        [weakself.writer finishWritingWithCompletionHandler:^{
+            NSError *error = weakself.writer.error;
+            __strong typeof(self) self = weakself;
+            @synchronized (self) {
+                [self setStatus:(error ? MNMovieWriteStatusFailed : MNMovieWriteStatusFinish) error:error];
+            }
+        }];
+    });
+}
+
+- (void)cancelWriting {
+    @synchronized (self) {
+        if (self.status != MNMovieWriteStatusWriting) return;
+        [self setStatus:MNMovieWriteStatusWaiting error:nil];
+    }
+    __weak typeof(self) weakself = self;
+    dispatch_async(self.writQueue, ^{
+        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
+        if (weakself.status != MNMovieWriteStatusWaiting) return;
+        [weakself.writer cancelWriting];
+        @synchronized (self) {
+            [self setStatus:MNMovieWriteStatusCancelled error:nil];
+        }
+    });
 }
 
 #pragma mark - Sample Buffer
@@ -221,90 +291,22 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return NO;
 }
 
-#pragma mark - 开始/停止
-- (void)startWriting {
-    __weak typeof(self) weakself = self;
-    dispatch_async(self.writQueue, ^{
-        __strong typeof(self) self = weakself;
-        @synchronized (self) {
-            if (self.status == MNMovieWriteStatusPreparing) {
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Already prepared, cannot prepare again!" userInfo:nil];
-            }
-            if (self.status == MNMovieWriteStatusWriting) {
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Moive is writing!" userInfo:nil];
-            }
-        }
-        if (!self.URL) {
-            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Unknow movie path!" userInfo:nil];
-        }
-        [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
-        NSError *error;
-        AVAssetWriter *writer = [[AVAssetWriter alloc] initWithURL:self.URL fileType:AVFileTypeQuickTimeMovie error:&error];
-        if (error || !writer) {
-            @synchronized (self) {
-                [self setStatus:MNMovieWriteStatusFailed error:error];
-            }
-        } else {
-            self.writer = writer;
-            @synchronized (self) {
-                [self setStatus:MNMovieWriteStatusPreparing error:nil];
-            }
-        }
-    });
-}
-
-- (void)finishWriting {
-    @synchronized (self) {
-        if (self.status != MNMovieWriteStatusWriting) return;
-        [self setStatus:MNMovieWriteStatusWaiting error:nil];
-    }
-    __weak typeof(self) weakself = self;
-    dispatch_async(self.writQueue, ^{
-        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
-        if (weakself.status != MNMovieWriteStatusWaiting) return;
-        [weakself.writer finishWritingWithCompletionHandler:^{
-            NSError *error = weakself.writer.error;
-            __strong typeof(self) self = weakself;
-            @synchronized (self) {
-                [self setStatus:(error ? MNMovieWriteStatusFailed : MNMovieWriteStatusFinish) error:error];
-            }
-        }];
-    });
-}
-
-- (void)cancelWriting {
-    @synchronized (self) {
-        if (self.status != MNMovieWriteStatusWriting) return;
-        [self setStatus:MNMovieWriteStatusWaiting error:nil];
-    }
-    __weak typeof(self) weakself = self;
-    dispatch_async(self.writQueue, ^{
-        // 有可能是在写入视频时发生了错误, 改变了状态, 这里就不再操作
-        if (weakself.status != MNMovieWriteStatusWaiting) return;
-        [weakself.writer cancelWriting];
-        @synchronized (self) {
-            [self setStatus:MNMovieWriteStatusCancel error:nil];
-        }
-    });
-}
-
 #pragma mark - 修改状态
 - (void)setStatus:(MNMovieWriteStatus)status error:(NSError *)error {
     
     BOOL shouldNotifyDelegate = NO;
-    
+
     if (status != _status) {
-        if (status == MNMovieWriteStatusWriting || status == MNMovieWriteStatusFinish) {
-            shouldNotifyDelegate = YES;
-        } else if (status == MNMovieWriteStatusFailed || status == MNMovieWriteStatusCancel) {
-            shouldNotifyDelegate = YES;
-            [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
-        }
         _status = status;
-    }
-        
-    if (status >= MNMovieWriteStatusFinish) {
-        [self teardownAssetWriterAndInputs];
+        if (status >= MNMovieWriteStatusWriting) {
+            shouldNotifyDelegate = YES;
+            if (status >= MNMovieWriteStatusFinish) {
+                [self teardownAssetWriterAndInputs];
+                if (status >= MNMovieWriteStatusCancelled) {
+                    if (self.URL) [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
+                }
+            }
+        }
     }
     
     if (shouldNotifyDelegate && self.delegate) {
@@ -315,7 +317,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
                 [self.delegate movieWriterDidStartWriting:self];
             } else if (status == MNMovieWriteStatusFinish && [self.delegate respondsToSelector:@selector(movieWriterDidFinishWriting:)]) {
                 [self.delegate movieWriterDidFinishWriting:self];
-            } else if (status == MNMovieWriteStatusCancel && [self.delegate respondsToSelector:@selector(movieWriterDidCancelWriting:)]) {
+            } else if (status == MNMovieWriteStatusCancelled && [self.delegate respondsToSelector:@selector(movieWriterDidCancelWriting:)]) {
                 [self.delegate movieWriterDidCancelWriting:self];
             } else if (status == MNMovieWriteStatusFailed && [self.delegate respondsToSelector:@selector(movieWriter:didFailWithError:)]) {
                 [self.delegate movieWriter:self didFailWithError:error];
@@ -328,6 +330,13 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     _writer = nil;
     _videoInput = nil;
     _audioInput = nil;
+}
+
+#pragma mark - Getter
+- (BOOL)isWriting {
+    @synchronized (self) {
+        return self.status == MNMovieWriteStatusWriting;
+    }
 }
 
 #pragma mark - Notification

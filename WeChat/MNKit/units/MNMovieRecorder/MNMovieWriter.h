@@ -43,6 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**事件代理*/
 @property (nonatomic, weak, nullable) id<MNMovieWriteDelegate> delegate;
 
+/**是否在写入视频*/
+@property (nonatomic, readonly) BOOL isWriting;
+
 /**
  视频写入者
  @param URL 视频路径
