@@ -61,7 +61,7 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
         touchView.layer.cornerRadius = touchView.width_mn/2.f;
         touchView.clipsToBounds = YES;
         touchView.userInteractionEnabled = NO;
-        touchView.backgroundColor = [UIColor whiteColor];
+        touchView.backgroundColor = UIColor.whiteColor;
         [self addSubview:touchView];
         self.touchView = touchView;
         
@@ -75,7 +75,7 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
         [trackView.layer addSublayer:progressLayer];
         self.progressLayer = progressLayer;
         
-        NSArray <NSString *>*imgs = @[@"video_record_return", @"video_record_done"];
+        NSArray <NSString *>*imgs = @[@"video_record_returnHL", @"video_record_done"];
         [imgs enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             UIButton *button = [UIButton buttonWithFrame:CGRectMake(0.f, 0.f, 70.f, 70.f) image:[MNBundle imageForResource:obj] title:nil titleColor:nil titleFont:nil];
             button.center_mn = trackView.center_mn;
@@ -85,7 +85,6 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
             if (idx == 0) {
                 self.backButton = button;
                 self.backButton.tag = MNCaptureBackButtonTag;
-                [self.backButton setBackgroundImage:[MNBundle imageForResource:@"video_record_returnHL"] forState:UIControlStateHighlighted];
             } else {
                 self.doneButton = button;
                 self.doneButton.tag = MNCaptureDoneButtonTag;
@@ -217,8 +216,11 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
         [self.progressLayer resetAnimation];
         [self.progressLayer removeAllAnimations];
         self.progressLayer.strokeEnd = 0.f;
+        self.trackView.alpha = self.touchView.alpha = 0.f;
+        self.doneButton.alpha = self.backButton.alpha = 1.f;
+        self.doneButton.centerX_mn = self.trackView.centerX_mn;
         [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            self.closeButton.alpha = self.trackView.alpha = self.touchView.alpha = 0.f;
+            self.closeButton.alpha = 0.f;
             self.backButton.left_mn = self.closeButton.left_mn;
             self.doneButton.right_mn = self.width_mn - self.closeButton.left_mn;
         } completion:^(BOOL finished) {
@@ -229,12 +231,21 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
 
 - (void)resetCapturing {
     self.state = MNCaptureToolStateWaiting;
+    self.trackView.centerX_mn = self.touchView.centerX_mn = self.doneButton.centerX_mn;
     [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.closeButton.alpha = self.touchView.alpha = self.trackView.alpha = 1.f;
-        self.backButton.center_mn = self.doneButton.center_mn = self.trackView.center_mn;
+        self.closeButton.alpha = 1.f;
+        self.doneButton.alpha = 0.f;
+        self.trackView.alpha = self.touchView.alpha = 1.f;
+        self.backButton.centerX_mn = self.doneButton.centerX_mn = self.trackView.centerX_mn = self.touchView.centerX_mn = self.width_mn/2.f;
     } completion:^(BOOL finished) {
+        self.backButton.alpha = 0.f;
         self.state = MNCaptureToolStateIdle;
+        NSLog(@"");
     }];
+}
+
+- (void)setState:(MNCaptureToolState)state {
+    _state = state;
 }
 
 #pragma mark - Setter

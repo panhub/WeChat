@@ -636,7 +636,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (status >= MNMovieRecordStatusRecording) {
         shouldNotifyDelegate = YES;
         if (status >= MNMovieRecordStatusFinish) {
-            _movieWriter = nil;
             [self closeTorch];
         }
     }
@@ -660,7 +659,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (AVCaptureSession *)session {
     if (!_session) {
         AVCaptureSession *session = [AVCaptureSession new];
-        session.usesApplicationAudioSession = NO;
+        session.usesApplicationAudioSession = YES;
         AVCaptureSessionPreset sessionPreset = [self sessionPresetWithName:self.presetName];
         if ([session canSetSessionPreset:sessionPreset]) {
             session.sessionPreset = sessionPreset;
@@ -697,10 +696,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 - (MNMovieSizeRatio)presetSizeRatio {
-    if (!_session || !_session.sessionPreset) {
-        return MNMovieSizeRatioUnknown;
-    }
-    AVCaptureSessionPreset presetName = _session.sessionPreset;
+    AVCaptureSessionPreset presetName = self.session.sessionPreset;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {
         if ([presetName isEqualToString:AVCaptureSessionPreset3840x2160]) {

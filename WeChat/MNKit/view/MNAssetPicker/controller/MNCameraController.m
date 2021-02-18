@@ -95,7 +95,6 @@
     MNMovieRecorder *recorder = [MNMovieRecorder new];
     recorder.delegate = self;
     recorder.outputView = self.movieView;
-    [recorder prepareCapturing];
     self.recorder = recorder;
     
     CGSize presetSize = CGSizeMultiplyToWidth((recorder.presetSizeRatio == MNMovieSizeRatio9x16 ? CGSizeMake(9.f, 16.f) : CGSizeMake(3.f, 4.f)), self.contentView.width_mn);
@@ -113,6 +112,8 @@
             self.toolBar.bottom_mn = self.cameraControl.bottom_mn + interval + presetSize.height - (MNCaptureToolBarMaxHeight - MNCaptureToolBarMinHeight);
         }
     }
+    
+    [self.recorder prepareCapturing];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didEnterBackgroundNotification:)
@@ -201,6 +202,7 @@
     [toolBar resetCapturing];
     [self.recorder startRunning];
     [UIView animateWithDuration:.3f animations:^{
+        self.cameraControl.alpha = 1.f;
         self.imageView.alpha = self.playView.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.player removeAllURLs];
@@ -250,8 +252,8 @@
                 [self.toolBar stopCapturing];
                 self.imageView.image = image;
                 [UIView animateWithDuration:.3f animations:^{
-                    self.playView.alpha = 0.f;
                     self.imageView.alpha = 1.f;
+                    self.playView.alpha = self.cameraControl.alpha = 0.f;
                 } completion:^(BOOL finished) {
                     [self.recorder stopRunning];
                 }];
@@ -271,7 +273,7 @@
     [self.toolBar stopCapturing];
     [UIView animateWithDuration:.3f animations:^{
         self.playView.alpha = 1.f;
-        self.imageView.alpha = 0.f;
+        self.imageView.alpha = self.cameraControl.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.recorder stopRunning];
         [self.player addURL:self.recorder.URL];
