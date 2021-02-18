@@ -59,9 +59,9 @@ typedef NS_ENUM(NSInteger, MNMovieOrientation) {
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString * MNMoviePresetName;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetLowQuality;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetMediumQuality;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetHighQuality;
+FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityLow;
+FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityMedium;
+FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityHigh;
 FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1280x720;
 FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 

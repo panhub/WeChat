@@ -98,9 +98,9 @@
     [recorder prepareCapturing];
     self.recorder = recorder;
     
-    CGSize presetSize = CGSizeMultiplyToWidth((recorder.presetSizeRatio == MNMovieSizeRatio9x16 ? CGSizeMake(3.f, 4.f) : CGSizeMake(9.f, 16.f)), self.contentView.width_mn);
+    CGSize presetSize = CGSizeMultiplyToWidth((recorder.presetSizeRatio == MNMovieSizeRatio9x16 ? CGSizeMake(9.f, 16.f) : CGSizeMake(3.f, 4.f)), self.contentView.width_mn);
     presetSize.height = ceil(presetSize.height);
-    if (fabs(presetSize.height - self.contentView.height) > 5.f) {
+    if (self.contentView.height - presetSize.height > 3.f) {
         // 屏幕尺寸不合适
         self.playView.size = self.imageView.size_mn = self.movieView.size_mn = presetSize;
         CGFloat interval = floor((self.contentView.height_mn - self.cameraControl.bottom_mn - MN_TAB_SAFE_HEIGHT - presetSize.height - self.toolBar.height_mn)/3.f);

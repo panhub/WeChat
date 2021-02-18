@@ -28,9 +28,9 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     MNMovieRecordStatusFailed
 };
 
-MNMoviePresetName const MNMoviePresetLowQuality = @"com.mn.movie.preset.low";
-MNMoviePresetName const MNMoviePresetMediumQuality = @"com.mn.movie.preset.medium";
-MNMoviePresetName const MNMoviePresetHighQuality = @"com.mn.movie.preset.high";
+MNMoviePresetName const MNMoviePresetQualityLow = @"com.mn.movie.preset.low";
+MNMoviePresetName const MNMoviePresetQualityMedium = @"com.mn.movie.preset.medium";
+MNMoviePresetName const MNMoviePresetQualityHigh = @"com.mn.movie.preset.high";
 MNMoviePresetName const MNMoviePreset1280x720 = @"com.mn.movie.preset.1280x720";
 MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080";
 
@@ -66,7 +66,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)initialized {
     _frameRate = 30;
     _movieWriter = MNMovieWriter.new;
-    _presetName = MNMoviePresetHighQuality;
+    _presetName = MNMoviePresetQualityHigh;
     _devicePosition = MNMovieDevicePositionBack;
     _movieOrientation = MNMovieOrientationPortrait;
     _resizeMode = MNMovieResizeModeResizeAspect;
@@ -682,15 +682,15 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 - (AVCaptureSessionPreset)sessionPresetWithName:(MNMoviePresetName)presetName {
     AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
-    if ([presetName isEqualToString:MNMoviePresetHighQuality]) {
+    if ([presetName isEqualToString:MNMoviePresetQualityHigh]) {
         sessionPreset = AVCaptureSessionPresetHigh;
-    } else if ([presetName isEqualToString:MNMoviePresetMediumQuality]) {
+    } else if ([presetName isEqualToString:MNMoviePresetQualityMedium]) {
         sessionPreset = AVCaptureSessionPresetMedium;
     } else if ([presetName isEqualToString:MNMoviePreset1280x720]) {
         sessionPreset = AVCaptureSessionPreset1280x720;
     } else if ([presetName isEqualToString:MNMoviePreset1920x1080]) {
         sessionPreset = AVCaptureSessionPreset1920x1080;
-    } else if ([presetName isEqualToString:MNMoviePresetLowQuality]) {
+    } else if ([presetName isEqualToString:MNMoviePresetQualityLow]) {
         sessionPreset = AVCaptureSessionPresetLow;
     }
     return sessionPreset;
