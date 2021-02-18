@@ -244,7 +244,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 
 #pragma mark - 开始/停止捕获
 - (BOOL)isRunning {
-    return (_session && _session.isRunning);
+    @synchronized (self) {
+        return (_session && _session.isRunning);
+    }
 }
 
 - (void)startRunning {
@@ -372,6 +374,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         if (!device || !device.hasTorch) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
         } else if (device.torchMode != AVCaptureTorchModeOn) {
+            // 打开手电筒前 关闭闪光灯
             if (device.hasFlash && device.flashMode == AVCaptureFlashModeOn) {
                 device.flashMode = AVCaptureFlashModeOff;
             }
@@ -413,7 +416,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         if (!device || !device.hasFlash) {
             error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现闪光灯"}];
         } else if (device.flashMode != AVCaptureFlashModeOn) {
-            if (device.hasFlash && device.torchMode == AVCaptureTorchModeOn) {
+            // 打开闪光灯前关闭手电筒
+            if (device.hasTorch && device.torchMode == AVCaptureTorchModeOn) {
                 device.torchMode = AVCaptureTorchModeOff;
             }
             if ([device isFlashModeSupported:AVCaptureFlashModeOn]) {
@@ -604,6 +608,8 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         } else if (error.code == AVErrorDeviceIsNotAvailableInBackground) {
             [self stopRunning];
             self.shouldSessionRunning = YES;
+        } else {
+            [self stopRunning];
         }
     }
 }
@@ -619,15 +625,6 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
         self.previewLayer.videoGravity = videoGravity;
         [outputView.layer insertSublayer:self.previewLayer atIndex:0];
     });
-}
-
-- (AVLayerVideoGravity)videoLayerGravity {
-    if (_resizeMode == MNMovieResizeModeResize) {
-        return AVLayerVideoGravityResize;
-    } else if (_resizeMode == MNMovieResizeModeResizeAspect) {
-        return AVLayerVideoGravityResizeAspect;
-    }
-    return AVLayerVideoGravityResizeAspectFill;
 }
 
 - (void)setResizeMode:(MNMovieResizeMode)resizeMode {
@@ -708,9 +705,19 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (AVCaptureVideoPreviewLayer *)previewLayer {
     if (!_previewLayer) {
         AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
+        previewLayer.contentsScale = UIScreen.mainScreen.scale;
         _previewLayer = previewLayer;
     }
     return _previewLayer;
+}
+
+- (AVLayerVideoGravity)videoLayerGravity {
+    if (_resizeMode == MNMovieResizeModeResize) {
+        return AVLayerVideoGravityResize;
+    } else if (_resizeMode == MNMovieResizeModeResizeAspect) {
+        return AVLayerVideoGravityResizeAspect;
+    }
+    return AVLayerVideoGravityResizeAspectFill;
 }
 
 - (Float64)duration {

@@ -12,6 +12,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface MNScanner ()<AVCaptureMetadataOutputObjectsDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
+@property (nonatomic) BOOL shouldSessionRunning;
 @property (nonatomic, strong) AVCaptureDevice *device;
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDeviceInput *deviceInput;
@@ -21,6 +22,17 @@
 @end
 
 @implementation MNScanner
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(captureSessionNotification:)
+                                                   name:nil
+                                                 object:nil];
+    }
+    return self;
+}
+
 - (void)prepareRunning {
 #if !TARGET_IPHONE_SIMULATOR
     [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
@@ -29,7 +41,6 @@
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            
             // 扫描会话
             AVCaptureSession *session = [AVCaptureSession new];
             session.usesApplicationAudioSession = NO;
@@ -126,7 +137,9 @@
             self.scanRect = self.scanRect;
             
             // 开启扫描
-            [self startRunning];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self startRunning];
+            });
         });
     }];
 #endif
@@ -153,19 +166,33 @@
 }
 
 - (void)startRunning {
+    
+    BOOL shouldNotifyDelegate = NO;
+    
     @synchronized (self) {
-        if (_session && !_session.isRunning) [_session startRunning];
+        if (_session && !_session.isRunning) {
+            [_session startRunning];
+            shouldNotifyDelegate = YES;
+        }
     }
-    if (_session && _session.isRunning && [self.delegate respondsToSelector:@selector(scannerDidStartRunning:)]) {
+    
+    if (shouldNotifyDelegate && [self.delegate respondsToSelector:@selector(scannerDidStartRunning:)]) {
         [self.delegate scannerDidStartRunning:self];
     }
 }
 
 - (void)stopRunning {
+    
+    BOOL shouldNotifyDelegate = NO;
+    
     @synchronized (self) {
-        if (_session && _session.isRunning) [_session stopRunning];
+        if (_session && _session.isRunning) {
+            [_session stopRunning];
+            shouldNotifyDelegate = YES;
+        }
     }
-    if (_session && !_session.isRunning && [self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
+    
+    if (shouldNotifyDelegate && [self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
         [self.delegate scannerDidStopRunning:self];
     }
 }
@@ -205,45 +232,40 @@
     }
 }
 
-- (NSError *)openTorch {
-    __block NSError *error;
+- (BOOL)openTorch {
+    __block BOOL result = NO;
+    __block BOOL shouldNotifyDelegate = NO;
     [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
-        if (!device || !device.hasTorch) {
-            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
-        } else if (device.torchMode != AVCaptureTorchModeOn) {
-            if (device.hasFlash && device.flashMode == AVCaptureFlashModeOn) {
-                device.flashMode = AVCaptureFlashModeOff;
-            }
-            if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+        if (device && device.hasTorch && [device isTorchModeSupported:AVCaptureTorchModeOn]) {
+            result = YES;
+            if (device.torchMode != AVCaptureTorchModeOn) {
                 device.torchMode = AVCaptureTorchModeOn;
-            } else {
-                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+                shouldNotifyDelegate = YES;
             }
         }
     }];
-    if (!error && [self.delegate respondsToSelector:@selector(scannerDidOpenTorch:)]) {
+    if (shouldNotifyDelegate && [self.delegate respondsToSelector:@selector(scannerDidOpenTorch:)]) {
         [self.delegate scannerDidOpenTorch:self];
     }
-    return error;
+    return result;
 }
 
-- (NSError *)closeTorch {
-    __block NSError *error;
+- (BOOL)closeTorch {
+    __block BOOL result = NO;
+    __block BOOL shouldNotifyDelegate = NO;
     [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
-        if (!device || !device.hasTorch) {
-            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
-        } else if (device.torchMode != AVCaptureTorchModeOff) {
-            if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
+        if (device && device.hasTorch && [device isTorchModeSupported:AVCaptureTorchModeOff]) {
+            result = YES;
+            if (device.torchMode != AVCaptureTorchModeOff) {
                 device.torchMode = AVCaptureTorchModeOff;
-            } else {
-                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+                shouldNotifyDelegate = YES;
             }
         }
     }];
-    if (!error && [self.delegate respondsToSelector:@selector(scannerDidCloseTorch:)]) {
+    if (shouldNotifyDelegate && [self.delegate respondsToSelector:@selector(scannerDidCloseTorch:)]) {
         [self.delegate scannerDidCloseTorch:self];
     }
-    return error;
+    return result;
 }
 
 #pragma mark - 对焦
@@ -278,7 +300,7 @@
     }
 }
 
-#pragma mark - - - AVCaptureMetadataOutputObjectsDelegate
+#pragma mark - AVCaptureMetadataOutputObjectsDelegate
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
     if (metadataObjects.count <= 0) return;
     AVMetadataMachineReadableCodeObject *obj = [metadataObjects firstObject];
@@ -290,7 +312,7 @@
     });
 }
 
-#pragma mark - - - AVCaptureVideoDataOutputSampleBufferDelegate
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
     NSDictionary *dic = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary*)metadata];
@@ -298,8 +320,8 @@
     NSDictionary *exifMetadata = [[dic objectForKey:(NSString *)kCGImagePropertyExifDictionary] mutableCopy];
     float brightnessValue = [[exifMetadata objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(scannerUpdateCurrentSampleBrightnessValue:)]) {
-            [self.delegate scannerUpdateCurrentSampleBrightnessValue:brightnessValue];
+        if ([self.delegate respondsToSelector:@selector(scannerUpdateCurrentSampleBrightness:)]) {
+            [self.delegate scannerUpdateCurrentSampleBrightness:brightnessValue];
         }
     });
 }
@@ -328,11 +350,51 @@
     });
 }
 
+#pragma mark - Notification
+- (void)captureSessionNotification:(NSNotification *)notify {
+    NSNotificationName name = notify.name;
+    if ([name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
+        // 后台
+        self.shouldSessionRunning = self.isRunning;
+        [self stopRunning];
+    } else if ([name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
+        // 前台
+        if (self.shouldSessionRunning) {
+            [self startRunning];
+            self.shouldSessionRunning = NO;
+        }
+    } else if ([name isEqualToString:AVCaptureSessionWasInterruptedNotification]) {
+        // 录制被打断
+        [self stopRunning];
+    } else if ([name isEqualToString:AVCaptureSessionRuntimeErrorNotification]) {
+        // 出错
+#ifdef __IPHONE_9_0
+        if (@available(iOS 9.0, *)) {
+            if ([notify.userInfo[AVCaptureSessionInterruptionReasonKey] integerValue] == AVCaptureSessionInterruptionReasonVideoDeviceNotAvailableInBackground) {
+                [self stopRunning];
+                self.shouldSessionRunning = YES;
+                return;
+            }
+        }
+#endif
+        NSError *error = notify.userInfo[AVCaptureSessionErrorKey];
+        if (error.code == AVErrorMediaServicesWereReset) {
+            if (self.isRunning) [self.session startRunning];
+        } else if (error.code == AVErrorDeviceIsNotAvailableInBackground) {
+            [self stopRunning];
+            self.shouldSessionRunning = YES;
+        } else {
+            [self stopRunning];
+        }
+    }
+}
+
 #pragma mark - dealloc
 - (void)dealloc {
     _delegate = nil;
     [self closeTorch];
     [self stopRunning];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 @end

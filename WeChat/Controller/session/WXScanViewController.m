@@ -98,13 +98,9 @@
     self.scanner = scanner;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self.scanner startRunning];
-}
-
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self.scanner startRunning];
     self.navigationController.interactiveTransitionEnabled = NO;
 }
 
@@ -140,7 +136,7 @@
     self.lightLabel.hidden = self.lightButton.hidden = YES;
 }
 
-- (void)scannerUpdateCurrentSampleBrightnessValue:(CGFloat)brightnessValue {
+- (void)scannerUpdateCurrentSampleBrightness:(CGFloat)brightnessValue {
     if (self.scanner.isOnTorch) return;
     self.lightLabel.hidden = self.lightButton.hidden = (brightnessValue > 1.f);
 }

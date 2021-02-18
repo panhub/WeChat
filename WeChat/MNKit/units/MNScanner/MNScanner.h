@@ -11,7 +11,7 @@
 @class MNScanner;
 
 NS_ASSUME_NONNULL_BEGIN
-//
+
 @protocol MNScannerDelegate <NSObject>
 @required
 - (void)scannerDidReadMetadataWithResult:(NSString *)result;
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)scannerDidStopRunning:(MNScanner *)scanner;
 - (void)scannerDidOpenTorch:(MNScanner *)scanner;
 - (void)scannerDidCloseTorch:(MNScanner *)scanner;
-- (void)scannerUpdateCurrentSampleBrightnessValue:(CGFloat)brightnessValue;
+- (void)scannerUpdateCurrentSampleBrightness:(CGFloat)brightnessValue;
 - (void)scanner:(MNScanner *)scanner didFailWithError:(NSError *)error;
 @end
 
@@ -44,8 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopRunning;
 
 #pragma mark - 手电筒
-- (NSError *_Nullable)openTorch;
-- (NSError *_Nullable)closeTorch;
+- (BOOL)openTorch;
+- (BOOL)closeTorch;
 
 #pragma mark - 对焦
 - (BOOL)setFocusPoint:(CGPoint)focusPoint;

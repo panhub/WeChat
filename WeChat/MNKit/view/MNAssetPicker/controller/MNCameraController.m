@@ -113,7 +113,7 @@
     [super viewDidAppear:animated];
     if (self.playView.alpha == 1.f) {
         if (self.player.state > MNPlayerStatePlaying) [self.player play];
-    } else if (self.isFirstAppear && self.imageView.alpha == 0.f) {
+    } else if (self.imageView.alpha == 0.f) {
         [self.recorder startRunning];
     }
 }
@@ -122,8 +122,8 @@
     [super viewWillDisappear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     if (self.playView.alpha == 1.f) {
-        if (self.player.state == MNPlayerStatePlaying) [self.player pause];
-    } else {
+        if (self.player.isPlaying) [self.player pause];
+    } else if (self.imageView.alpha == 0.f) {
         [self.recorder stopRunning];
     }
 }
