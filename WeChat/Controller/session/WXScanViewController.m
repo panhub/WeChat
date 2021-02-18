@@ -90,10 +90,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    MNScanner *scanner = [MNScanner scanner];
+    MNScanner *scanner = [[MNScanner alloc] init];
+    scanner.delegate = self;
     scanner.outputView = self.contentView;
     scanner.scanRect = self.scanView.scanRect;
-    scanner.delegate = self;
+    [scanner prepareRunning];
     self.scanner = scanner;
 }
 
@@ -109,12 +110,16 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.scanner closeTorch];
     [self.scanner stopRunning];
-    [self.scanner closeLighting];
     self.navigationController.interactiveTransitionEnabled = YES;
 }
 
 #pragma mark - MNScannerDelegate
+- (void)scanner:(MNScanner *)scanner didFailWithError:(NSError *)error {
+    [[MNAlertView alertViewWithTitle:nil message:error.localizedDescription handler:nil ensureButtonTitle:nil otherButtonTitles:@"确定", nil] showInView:self.view];
+}
+
 - (void)scannerDidStartRunning:(MNScanner *)scanner {
     [self.scanView startScanning];
 }
@@ -123,27 +128,27 @@
     [self.scanView stopScanning];
 }
 
-- (void)scannerDidOpenLighting:(MNScanner *)scanner {
+- (void)scannerDidOpenTorch:(MNScanner *)scanner {
     self.lightButton.selected = YES;
     self.lightLabel.text = @"轻触关闭";
     self.lightLabel.hidden = self.lightButton.hidden = NO;
 }
 
-- (void)scannerDidCloseLighting:(MNScanner *)scanner {
+- (void)scannerDidCloseTorch:(MNScanner *)scanner {
     self.lightButton.selected = NO;
     self.lightLabel.text = @"轻触点亮";
     self.lightLabel.hidden = self.lightButton.hidden = YES;
 }
 
-- (void)scannerDidSampleCurrentBrightnessValue:(CGFloat)brightnessValue {
-    if (self.scanner.isLighting) return;
+- (void)scannerUpdateCurrentSampleBrightnessValue:(CGFloat)brightnessValue {
+    if (self.scanner.isOnTorch) return;
     self.lightLabel.hidden = self.lightButton.hidden = (brightnessValue > 1.f);
 }
 
 - (void)scannerDidReadMetadataWithResult:(NSString *)result {
     if (result.length <= 0) return;
+    [self.scanner closeTorch];
     [self.scanner stopRunning];
-    [self.scanner closeLighting];
     [MNPlayer playSoundWithFilePath:[WeChatBundle pathForResource:@"qrcode_found" ofType:@"caf" inDirectory:@"sound"] shake:NO];
     if ([result hasPrefix:WXQRCodeMetadataPrefix]) {
         /// 这是自己的二维码
@@ -175,7 +180,7 @@
 #pragma mark - MNScanViewDelegate
 - (void)scanView:(MNScanView *)scanView didClickAtPoint:(CGPoint)point {
     if (!self.focusView.hidden) return;
-    [self.scanner setFocusPoint:point completion:nil];
+    [self.scanner setFocusPoint:point];
     self.focusView.center_mn = point;
     self.focusView.hidden = NO;
     [UIView animateWithDuration:.4f animations:^{
@@ -189,10 +194,10 @@
 
 #pragma mark - 手电筒响应方法
 - (void)lightButtonClicked {
-    if (self.scanner.isLighting) {
-        [self.scanner closeLighting];
+    if (self.scanner.isOnTorch) {
+        [self.scanner closeTorch];
     } else {
-        [self.scanner openLighting];
+        [self.scanner openTorch];
     }
 }
 

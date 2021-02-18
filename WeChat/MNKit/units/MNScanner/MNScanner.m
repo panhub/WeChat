@@ -7,6 +7,7 @@
 //
 
 #import "MNScanner.h"
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import "MNAuthenticator.h"
 #import <AVFoundation/AVFoundation.h>
 
@@ -15,299 +16,324 @@
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDeviceInput *deviceInput;
 @property (nonatomic, strong) AVCaptureMetadataOutput *metadataOutput;
-@property (nonatomic, weak) AVCaptureVideoDataOutput *videoDataOutput;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
+@property (nonatomic, strong) AVCaptureVideoDataOutput *videoDataOutput;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 @end
 
 @implementation MNScanner
-+ (instancetype)scanner {
-    return [MNScanner new];
-}
-
-- (instancetype)init {
-    self = [super init];
-    if (!self) return nil;
-    [self initialized];
-    #if TARGET_IPHONE_SIMULATOR
-    return self;
-    #endif
-    [self startCapture];
-    return self;
-}
-
-- (void)initialized {
-    self.scanRect = CGRectZero;
-    self.sessionPreset = AVCaptureSessionPresetHigh;
-}
-
-- (void)startCapture {
+- (void)prepareRunning {
+#if !TARGET_IPHONE_SIMULATOR
     [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL allowed) {
         if (!allowed) {
-            [UIAlertView showMessage:@"请允许应用访问您的摄像头!"];
+            [self failureWithCode:AVErrorApplicationIsNotAuthorized description:@"获取摄像权限失败"];
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            
+            // 扫描会话
+            AVCaptureSession *session = [AVCaptureSession new];
+            session.usesApplicationAudioSession = NO;
+            session.sessionPreset = AVCaptureSessionPresetHigh;
+            if ([session canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+                session.sessionPreset = AVCaptureSessionPresetHigh;
+            } else if ([session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+                session.sessionPreset = AVCaptureSessionPreset1920x1080;
+            } else if ([session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+                session.sessionPreset = AVCaptureSessionPreset1280x720;
+            } else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium]) {
+                session.sessionPreset = AVCaptureSessionPresetMedium;
+            } else if (NSProcessInfo.processInfo.processorCount == 1 && [session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+                session.sessionPreset = AVCaptureSessionPreset640x480;
+            } else if ([session canSetSessionPreset:AVCaptureSessionPresetLow]) {
+                session.sessionPreset = AVCaptureSessionPresetLow;
+            } else {
+                [self failureWithDescription:@"获取会话失败"];
+                return;
+            }
+        
             //获取摄像设备
-            AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-            _device = device;
+            AVCaptureDevice *device;
+            NSArray <AVCaptureDevice *>*devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+            if (devices.count) device = devices.firstObject;
+            
+            if (!device) {
+                [self failureWithDescription:@"获取摄像头失败"];
+                return;
+            }
             
             //创建摄像设备输入流
-            AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:nil];
-            _deviceInput = deviceInput;
+            CMTime frameDuration = CMTimeMake(1, NSProcessInfo.processInfo.processorCount == 1 ? 15 : 30);
+            if ([device lockForConfiguration:NULL] ) {
+                device.activeVideoMaxFrameDuration = frameDuration;
+                device.activeVideoMinFrameDuration = frameDuration;
+                [device unlockForConfiguration];
+            }
+            NSError *error;
+            AVCaptureDeviceInput *deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:&error];
+            if (error) {
+                [self failureWithDescription:@"扫描设备初始化失败"];
+                return;
+            }
             
-            //创建元数据输出流
-            AVCaptureMetadataOutput *metadataOutput = [[AVCaptureMetadataOutput alloc] init];
-            [metadataOutput setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
-            _metadataOutput = metadataOutput;
+            if (![session canAddInput:deviceInput]) {
+                [self failureWithDescription:@"扫描设备初始化失败"];
+                return;
+            }
+            
+            [session addInput:deviceInput];
             
             //创建摄像数据输出流
             AVCaptureVideoDataOutput *videoDataOutput = [AVCaptureVideoDataOutput new];
-            [videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
-            _videoDataOutput = videoDataOutput;
+            [videoDataOutput setSampleBufferDelegate:self queue:dispatch_queue_create("com.mn.scanner.data.output", DISPATCH_QUEUE_SERIAL)];
+            if (![session canAddOutput:videoDataOutput]) {
+                [self failureWithDescription:@"扫描设备初始化失败"];
+                return;
+            }
             
-            //创建会话对象
-            AVCaptureSession *session = [[AVCaptureSession alloc] init];
-            // 会话采集率: AVCaptureSessionPresetHigh
-            session.sessionPreset = AVCaptureSessionPresetHigh;
-            //添加摄像设备输入流到会话对象
-            if ([session canAddInput:deviceInput]) {
-                [session addInput:deviceInput];
-            }
-            //添加摄像输出流到会话对象,构成识了别光线强弱
-            if ([session canAddOutput:videoDataOutput]) {
-                [session addOutput:videoDataOutput];
-            }
-            if ([session canAddOutput:metadataOutput]) {
-                [session addOutput:metadataOutput];
-                //设置数据输出类型,需要将数据输出添加到会话后再指定元数据类型,否则会报错
-                //设置扫码支持的编码格式(如下设置条形码和二维码兼容)
-                metadataOutput.metadataObjectTypes = @[AVMetadataObjectTypeQRCode,
-                                                       AVMetadataObjectTypeEAN8Code,
-                                                       AVMetadataObjectTypeEAN13Code,
-                                                       AVMetadataObjectTypeCode128Code];
-            }
-            _session = session;
+            [session addOutput:videoDataOutput];
             
-            //判断处理图像数据流边界
-            self.scanRect = _scanRect;
+            //创建元数据输出流
+            AVCaptureMetadataOutput *metadataOutput = [[AVCaptureMetadataOutput alloc] init];
+            [metadataOutput setMetadataObjectsDelegate:self queue:dispatch_queue_create("com.mn.scanner.metadata.output", DISPATCH_QUEUE_SERIAL)];
+            if (![session canAddOutput:metadataOutput]) {
+                [self failureWithDescription:@"扫描设备初始化失败"];
+                return;
+            }
+            
+            //设置数据输出类型,需要将数据输出添加到会话后再指定元数据类型,否则会报错
+            [session addOutput:metadataOutput];
+            
+            //设置扫码支持的编码格式(如下设置条形码和二维码兼容)
+            metadataOutput.metadataObjectTypes = @[AVMetadataObjectTypeQRCode,
+                                                   AVMetadataObjectTypeEAN8Code,
+                                                   AVMetadataObjectTypeEAN13Code,
+                                                   AVMetadataObjectTypeCode128Code];
             
             //预览图层,传递session是为了告诉图层将来显示什么内容
-            AVCaptureVideoPreviewLayer *videoPreviewLayer = [AVCaptureVideoPreviewLayer layerWithSession:session];
-            videoPreviewLayer.contentsScale = [[UIScreen mainScreen] scale];
-            videoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-            _videoPreviewLayer = videoPreviewLayer;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (_outputView) {
-                    videoPreviewLayer.frame = _outputView.bounds;
-                    [_outputView.layer insertSublayer:videoPreviewLayer atIndex:0];
-                }
-                [self startRunning];
-            });
+            AVCaptureVideoPreviewLayer *previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:session];
+            previewLayer.contentsScale = UIScreen.mainScreen.scale;
+            previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+            _previewLayer = previewLayer;
+            
+            _device = device;
+            _session = session;
+            _deviceInput = deviceInput;
+            _videoDataOutput = videoDataOutput;
+            _metadataOutput = metadataOutput;
+            
+            self.outputView = self.outputView;
+            
+            self.scanRect = self.scanRect;
+            
+            // 开启扫描
+            [self startRunning];
         });
     }];
+#endif
 }
 
-- (CALayer *)previewLayer {
-    return _videoPreviewLayer;
+#pragma mark - Fail
+- (void)failureWithDescription:(NSString *)message {
+    [self failureWithCode:AVErrorScreenCaptureFailed description:message];
 }
 
-- (BOOL)isRunning {
-    return (_session && _session.isRunning);
-}
-
-- (BOOL)isLighting {
-    return (_device && _device.torchMode == AVCaptureTorchModeOn);
-}
-
-#pragma mark - 设置输出视图层
-- (void)setOutputView:(UIView *)outputView {
-    if (_videoPreviewLayer) {
-        [_videoPreviewLayer removeFromSuperlayer];
-        _videoPreviewLayer.frame = outputView.bounds;
-        [outputView.layer insertSublayer:_videoPreviewLayer atIndex:0];
-    }
-    _outputView = outputView;
-    [self setScanRect:_scanRect];
-}
-
-#pragma mark - 设置采集质量
-- (void)setSessionPreset:(NSString *)sessionPreset {
-    if ([sessionPreset isEqualToString:_sessionPreset]) return;
-    if (!_session) return;
-    _sessionPreset = sessionPreset;
-    BOOL running = _session.isRunning;
-    [self stopRunning];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [_session beginConfiguration];
-        _session.sessionPreset = sessionPreset;
-        [_session commitConfiguration];
-        if (running) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self startRunning];
-            });
+- (void)failureWithCode:(NSUInteger)code description:(NSString *)description {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(scanner:didFailWithError:)]) {
+            [self.delegate scanner:self didFailWithError:[NSError errorWithDomain:AVFoundationErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey:description}]];
         }
     });
-}
-
-#pragma mark - 设置扫描区域
-- (void)setScanRect:(CGRect)scanRect {
-    if (CGRectEqualToRect(scanRect, CGRectZero)) return;
-    _scanRect = scanRect;
-    if (_metadataOutput && _outputView) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            _metadataOutput.rectOfInterest = [self scanRectOfInterestWithRect:_scanRect];
-        });
-    }
-}
-
-#pragma mark - 扫描区域转换坐标
-- (CGRect)scanRectOfInterestWithRect:(CGRect)rect {
-    if (_outputView) {
-        CGFloat x = (_outputView.height_mn - CGRectGetHeight(rect))/2.f/_outputView.height_mn;
-        CGFloat y = (_outputView.width_mn - CGRectGetWidth(rect))/2.f/_outputView.width_mn;
-        CGFloat w = CGRectGetHeight(rect)/_outputView.height_mn;
-        CGFloat h = CGRectGetWidth(rect)/_outputView.width_mn;
-        return CGRectMake(x, y, w, h);
-    }
-    return CGRectMake(0.f, 0.f, 1.f, 1.f);
-}
-
-#pragma mark - 对焦
-- (void)setFocusPoint:(CGPoint)focusPoint completion:(void(^)(BOOL succeed))completion {
-    if (!_outputView || !_device || !_session) {
-        if (completion) completion(NO);
-        return;
-    }
-    if (![_device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-        if (completion) completion(NO);
-        return;
-    }
-    CGSize size = _outputView.size_mn;
-    if (size.width <= 0 || size.height <= 0) {
-        if (completion) completion(NO);
-        return;
-    }
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        CGPoint point = CGPointMake(focusPoint.y/size.height ,1.f - focusPoint.x/size.width );
-        @synchronized (self) {
-            [_session beginConfiguration];
-            [_device lockForConfiguration:nil];
-            [_device setFocusPointOfInterest:point];
-            [_device setFocusMode:AVCaptureFocusModeAutoFocus];
-            [_device unlockForConfiguration];
-            [_session commitConfiguration];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(YES);
-            });
-        }
-    });
-}
-
-#pragma mark - 开启/关闭手电筒
-- (BOOL)openLighting {
-    if (!_session || !_device) return NO;
-    if (![_device hasTorch] || ![_device isTorchModeSupported:AVCaptureTorchModeOn]) return NO;
-    if (_device.torchMode == AVCaptureTorchModeOn) return YES;
-    @synchronized (self) {
-        [_session beginConfiguration];
-        [_device lockForConfiguration:nil];
-        [_device setTorchMode:AVCaptureTorchModeOn];
-        //[_device setFlashMode:AVCaptureFlashModeOn];
-        [_device unlockForConfiguration];
-        [_session commitConfiguration];
-    }
-    if ([_delegate respondsToSelector:@selector(scannerDidOpenLighting:)]) {
-        [_delegate scannerDidOpenLighting:self];
-    }
-    return YES;
-}
-
-- (BOOL)closeLighting {
-    if (!_device || !_session) return NO;
-    if (![_device hasTorch] || ![_device isTorchModeSupported:AVCaptureTorchModeOff]) return NO;
-    if (_device.torchMode == AVCaptureTorchModeOff) return YES;
-    @synchronized (self) {
-        [_session beginConfiguration];
-        [_device lockForConfiguration:nil];
-        [_device setTorchMode:AVCaptureTorchModeOff];
-        //[_device setFlashMode:AVCaptureFlashModeOff];
-        [_device unlockForConfiguration];
-        [_session commitConfiguration];
-    }
-    if ([_delegate respondsToSelector:@selector(scannerDidCloseLighting:)]) {
-        [_delegate scannerDidCloseLighting:self];
-    }
-    return YES;
 }
 
 #pragma mark - 开启/关闭扫描
+- (BOOL)isRunning {
+    @synchronized (self) {
+        return (_session && _session.isRunning);
+    }
+}
+
 - (void)startRunning {
-    if (_session && !_session.isRunning) {
-        [_session startRunning];
-        if ([_delegate respondsToSelector:@selector(scannerDidStartRunning:)]) {
-            [_delegate scannerDidStartRunning:self];
-        }
+    @synchronized (self) {
+        if (_session && !_session.isRunning) [_session startRunning];
+    }
+    if (_session && _session.isRunning && [self.delegate respondsToSelector:@selector(scannerDidStartRunning:)]) {
+        [self.delegate scannerDidStartRunning:self];
     }
 }
 
 - (void)stopRunning {
-    if (_session && _session.isRunning) {
-        [_session stopRunning];
-        if ([_delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
-            [_delegate scannerDidStopRunning:self];
+    @synchronized (self) {
+        if (_session && _session.isRunning) [_session stopRunning];
+    }
+    if (_session && !_session.isRunning && [self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
+        [self.delegate scannerDidStopRunning:self];
+    }
+}
+
+#pragma mark - Setter
+- (void)setOutputView:(UIView *)outputView {
+    if (!outputView) return;
+    _outputView = outputView;
+    if (_previewLayer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_previewLayer removeFromSuperlayer];
+            _previewLayer.frame = outputView.bounds;
+            [outputView.layer insertSublayer:_previewLayer atIndex:0];
+        });
+    }
+    self.scanRect = self.scanRect;
+}
+
+- (void)setScanRect:(CGRect)scanRect {
+    if (CGRectEqualToRect(scanRect, CGRectZero)) return;
+    _scanRect = scanRect;
+    if (_outputView && _metadataOutput) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CGFloat x = (_outputView.height_mn - CGRectGetHeight(scanRect))/2.f/_outputView.height_mn;
+            CGFloat y = (_outputView.width_mn - CGRectGetWidth(scanRect))/2.f/_outputView.width_mn;
+            CGFloat w = CGRectGetHeight(scanRect)/_outputView.height_mn;
+            CGFloat h = CGRectGetWidth(scanRect)/_outputView.width_mn;
+            _metadataOutput.rectOfInterest = CGRectMake(x, y, w, h);
+        });
+    }
+}
+
+#pragma mark - 手电筒
+- (BOOL)isOnTorch {
+    @synchronized (self) {
+        return (_device && _device.torchMode == AVCaptureTorchModeOn);
+    }
+}
+
+- (NSError *)openTorch {
+    __block NSError *error;
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasTorch) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
+        } else if (device.torchMode != AVCaptureTorchModeOn) {
+            if (device.hasFlash && device.flashMode == AVCaptureFlashModeOn) {
+                device.flashMode = AVCaptureFlashModeOff;
+            }
+            if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+                device.torchMode = AVCaptureTorchModeOn;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+            }
         }
+    }];
+    if (!error && [self.delegate respondsToSelector:@selector(scannerDidOpenTorch:)]) {
+        [self.delegate scannerDidOpenTorch:self];
+    }
+    return error;
+}
+
+- (NSError *)closeTorch {
+    __block NSError *error;
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
+        if (!device || !device.hasTorch) {
+            error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"未发现手电筒"}];
+        } else if (device.torchMode != AVCaptureTorchModeOff) {
+            if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
+                device.torchMode = AVCaptureTorchModeOff;
+            } else {
+                error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorTorchLevelUnavailable userInfo:@{NSLocalizedDescriptionKey:@"设备不支持此操作"}];
+            }
+        }
+    }];
+    if (!error && [self.delegate respondsToSelector:@selector(scannerDidCloseTorch:)]) {
+        [self.delegate scannerDidCloseTorch:self];
+    }
+    return error;
+}
+
+#pragma mark - 对焦
+- (BOOL)setFocusPoint:(CGPoint)point {
+    if (!_previewLayer) return NO;
+    point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
+    __block BOOL result = NO;
+    [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
+        if (device && device.isFocusPointOfInterestSupported &&
+            [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+            device.focusPointOfInterest = point;
+            device.focusMode = AVCaptureFocusModeAutoFocus;
+            result = YES;
+        }
+    }];
+    return result;
+}
+
+#pragma mark - 设备
+- (void)performDeviceChangeHandler:(void(^)(AVCaptureDevice *_Nullable))resultHandler {
+    AVCaptureDevice *device = self.deviceInput.device;
+    if (!device) {
+        if (resultHandler) resultHandler(nil);
+        return;
+    }
+    NSError *error;
+    if (![device lockForConfiguration:&error] || error) {
+        if (resultHandler) resultHandler(nil);
+    } else {
+        if (resultHandler) resultHandler(device);
+        [device unlockForConfiguration];
     }
 }
 
 #pragma mark - - - AVCaptureMetadataOutputObjectsDelegate
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection {
     if (metadataObjects.count <= 0) return;
-    if ([_delegate respondsToSelector:@selector(scannerDidReadMetadataWithResult:)]) {
-        AVMetadataMachineReadableCodeObject *obj = [metadataObjects firstObject];
-        NSString *result = [obj stringValue];
-        if (result.length > 0) [_delegate scannerDidReadMetadataWithResult:result];
-    }
+    AVMetadataMachineReadableCodeObject *obj = [metadataObjects firstObject];
+    NSString *result = [obj stringValue];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (result.length && [self.delegate respondsToSelector:@selector(scannerDidReadMetadataWithResult:)]) {
+            [self.delegate scannerDidReadMetadataWithResult:result];
+        }
+    });
 }
 
 #pragma mark - - - AVCaptureVideoDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    if ([_delegate respondsToSelector:@selector(scannerDidSampleCurrentBrightnessValue:)]) {
-        CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL,sampleBuffer, kCMAttachmentMode_ShouldPropagate);
-        NSDictionary *dic = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary*)metadata];
-        CFRelease(metadata);
-        NSDictionary *exifMetadata = [[dic objectForKey:(NSString *)kCGImagePropertyExifDictionary] mutableCopy];
-        float brightnessValue = [[exifMetadata objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
-        [_delegate scannerDidSampleCurrentBrightnessValue:brightnessValue];
-    }
+    CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
+    NSDictionary *dic = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary*)metadata];
+    CFRelease(metadata);
+    NSDictionary *exifMetadata = [[dic objectForKey:(NSString *)kCGImagePropertyExifDictionary] mutableCopy];
+    float brightnessValue = [[exifMetadata objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(scannerUpdateCurrentSampleBrightnessValue:)]) {
+            [self.delegate scannerUpdateCurrentSampleBrightnessValue:brightnessValue];
+        }
+    });
 }
 
 #pragma mark - 解析图片二维码信息
 + (void)readImageMetadata:(UIImage *)image completion:(void(^)(NSString *result))completion {
     if (!image) {
-        if (completion) {
-            completion(nil);
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(nil);
+        });
         return;
     }
-    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode
-                                              context:nil
-                                              options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
-    NSArray <CIFeature *>*features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
-    NSString *result;
-    if (features.count > 0) {
-        CIQRCodeFeature *feature = (CIQRCodeFeature *)[features lastObject];
-        result = feature.messageString;
-    }
-    if (completion) {
-        completion(result);
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode
+                                                  context:nil
+                                                  options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
+        NSArray <CIFeature *>*features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
+        NSString *result;
+        if (features.count > 0) {
+            CIQRCodeFeature *feature = (CIQRCodeFeature *)[features lastObject];
+            result = feature.messageString;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(result);
+        });
+    });
 }
 
+#pragma mark - dealloc
 - (void)dealloc {
-    self.delegate = nil;
-    [self closeLighting];
+    _delegate = nil;
+    [self closeTorch];
     [self stopRunning];
-    MNDeallocLog;
 }
 
 @end
+#endif

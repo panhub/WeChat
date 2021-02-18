@@ -7,8 +7,8 @@
  */
 
 #import "MNMovieRecorder.h"
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import "MNAuthenticator.h"
-#import "MNFileManager.h"
 #import "MNMovieWriter.h"
 #import <AVFoundation/AVFoundation.h>
 
@@ -363,7 +363,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - 手电筒
 - (BOOL)isOnTorch {
     AVCaptureDevice *device = self.videoInput.device;
-    return (device && device.torchMode >= AVCaptureTorchModeOn);
+    return (device && device.torchMode == AVCaptureTorchModeOn);
 }
 
 - (NSError *)openTorch {
@@ -404,7 +404,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 #pragma mark - 闪光灯
 - (BOOL)isOnFlash {
     AVCaptureDevice *device = self.videoInput.device;
-    return (device && device.flashMode >= AVCaptureFlashModeOn);
+    return (device && device.flashMode == AVCaptureFlashModeOn);
 }
 
 - (NSError *)openFlash {
@@ -768,3 +768,4 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 @end
+#endif

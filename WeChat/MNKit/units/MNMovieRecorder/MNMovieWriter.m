@@ -7,6 +7,7 @@
 //
 
 #import "MNMovieWriter.h"
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import <AVFoundation/AVFoundation.h>
 
 /**
@@ -414,3 +415,4 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 }
 
 @end
+#endif

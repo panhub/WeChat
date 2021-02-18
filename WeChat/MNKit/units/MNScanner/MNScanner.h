@@ -7,17 +7,21 @@
 //  扫描器
 
 #import <Foundation/Foundation.h>
+#if __has_include(<AVFoundation/AVFoundation.h>)
 @class MNScanner;
 
+NS_ASSUME_NONNULL_BEGIN
+//
 @protocol MNScannerDelegate <NSObject>
 @required
 - (void)scannerDidReadMetadataWithResult:(NSString *)result;
 @optional
 - (void)scannerDidStartRunning:(MNScanner *)scanner;
 - (void)scannerDidStopRunning:(MNScanner *)scanner;
-- (void)scannerDidOpenLighting:(MNScanner *)scanner;
-- (void)scannerDidCloseLighting:(MNScanner *)scanner;
-- (void)scannerDidSampleCurrentBrightnessValue:(CGFloat)brightnessValue;
+- (void)scannerDidOpenTorch:(MNScanner *)scanner;
+- (void)scannerDidCloseTorch:(MNScanner *)scanner;
+- (void)scannerUpdateCurrentSampleBrightnessValue:(CGFloat)brightnessValue;
+- (void)scanner:(MNScanner *)scanner didFailWithError:(NSError *)error;
 @end
 
 @interface MNScanner : NSObject
@@ -25,32 +29,31 @@
 @property (nonatomic) CGRect scanRect;
 /**图像输出*/
 @property (nonatomic, weak) UIView *outputView;
-/**预览层*/
-@property (nonatomic, weak, readonly) CALayer *previewLayer;
 /**是否在扫描*/
-@property (nonatomic, readonly, getter=isRunning) BOOL running;
+@property (nonatomic, readonly) BOOL isRunning;
 /**是否开着手电筒*/
-@property (nonatomic, readonly, getter=isLighting) BOOL lighting;
+@property (nonatomic, readonly) BOOL isOnTorch;
 /**回调代理*/
-@property (nonatomic, weak) id<MNScannerDelegate> delegate;
-/**扫码格式*/
-@property (nonatomic, copy, readonly) NSString *sessionPreset;
+@property (nonatomic, weak, nullable) id<MNScannerDelegate> delegate;
 
-#pragma mark - 快速实例化
-+ (instancetype)scanner;
+/**开启扫描配置*/
+- (void)prepareRunning;
 
-#pragma mark - 手电筒控制
-- (BOOL)openLighting;
-- (BOOL)closeLighting;
-
-#pragma mark - 开启/关闭扫描
+#pragma mark - 扫描
 - (void)startRunning;
 - (void)stopRunning;
 
+#pragma mark - 手电筒
+- (NSError *_Nullable)openTorch;
+- (NSError *_Nullable)closeTorch;
+
 #pragma mark - 对焦
-- (void)setFocusPoint:(CGPoint)focusPoint completion:(void(^)(BOOL succeed))completion;
+- (BOOL)setFocusPoint:(CGPoint)focusPoint;
 
 #pragma mark - 读取图片信息
-+ (void)readImageMetadata:(UIImage *)image completion:(void(^)(NSString *result))completion;
++ (void)readImageMetadata:(UIImage *)image completion:(void(^_Nullable)(NSString *_Nullable))completion;
 
 @end
+
+NS_ASSUME_NONNULL_END
+#endif
