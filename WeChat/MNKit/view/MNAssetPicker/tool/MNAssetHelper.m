@@ -80,18 +80,15 @@ static MNAssetHelper *_helper;
         } else {
             options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %ld || mediaType == %ld", PHAssetMediaTypeImage, PHAssetMediaTypeVideo];
         }
-        options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:configuration.sortAscending]];
+        options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:configuration.isSortAscending]];
         NSMutableArray <MNAssetCollection *>*collections = [NSMutableArray arrayWithCapacity:1];
         /// 获取全部相册数据
         PHFetchResult<PHAssetCollection *> *smartResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
         [smartResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if (![obj isKindOfClass:PHAssetCollection.class] || obj.estimatedAssetCount <= 0) return;
             if ([MNAssetHelper isCameraCollection:obj]) {
-                MNAssetCollection *collection = [MNAssetCollection new];
+                MNAssetCollection *collection = [MNAssetHelper fetchAssetsInCollection:obj options:options configuration:configuration];
                 collection.title = @"相机胶卷";
-                collection.localizedTitle = obj.localizedTitle;
-                collection.identifier = obj.localIdentifier;
-                collection.assets = [MNAssetHelper fetchAssetsInAssetCollection:obj options:options configuration:configuration];
                 [collections addObject:collection];
                 *stop = YES;
             }
@@ -105,13 +102,8 @@ static MNAssetHelper *_helper;
         PHFetchResult<PHAssetCollection *>*fetchResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
         [fetchResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger i, BOOL * _Nonnull s) {
             if (![obj isKindOfClass:PHAssetCollection.class]) return;
-            NSArray <MNAsset *>*dataArray = [MNAssetHelper fetchAssetsInAssetCollection:obj options:options configuration:configuration];
-            if (dataArray.count <= 0 && !configuration.showEmptyAlbum) return;
-            MNAssetCollection *collection = [MNAssetCollection new];
-            collection.identifier = obj.localIdentifier;
-            collection.assets = dataArray;
-            collection.localizedTitle = obj.localizedTitle;
-            collection.title = obj.localizedTitle ? : @"未知相簿";
+            MNAssetCollection *collection = [MNAssetHelper fetchAssetsInCollection:obj options:options configuration:configuration];
+            if (collection.assets.count <= 0 && !configuration.isShowEmptyAlbum) return;
             [collections addObject:collection];
         }];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -126,25 +118,31 @@ static MNAssetHelper *_helper;
 }
 
 #pragma mark - Get Asset
-+ (NSMutableArray <MNAsset *>*)fetchAssetsInAssetCollection:(PHAssetCollection *)collection options:(PHFetchOptions *)options configuration:(MNAssetPickConfiguration *)configuration {
++ (MNAssetCollection *)fetchAssetsInCollection:(PHAssetCollection *)collection options:(PHFetchOptions *)options configuration:(MNAssetPickConfiguration *)configuration {
     NSMutableArray <MNAsset *>*assets = [NSMutableArray arrayWithCapacity:0];
     PHFetchResult<PHAsset *>*result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
     [assets addObjectsFromArray:[self assetsWithFetchResult:result configuration:configuration]];
 #if !TARGET_IPHONE_SIMULATOR
     /// 判断是否需要添加拍照模型<仅全部照片需要添加>
-    if ([self isCameraCollection:collection] && configuration.isAllowsCapturing && (configuration.isAllowsPickingPhoto || configuration.isAllowsPickingVideo)) {
-        MNAsset *model = [MNAsset capturingModel];
+    if ([self isCameraCollection:collection] && configuration.isAllowsTakeAsset && (configuration.isAllowsPickingPhoto || configuration.isAllowsPickingVideo)) {
+        MNAsset *model = [MNAsset takeModel];
         if (configuration.isAllowsPickingVideo && !configuration.isAllowsPickingPhoto) {
             model.thumbnail = [MNBundle imageForResource:@"icon_takevideoHL"];
         }
-        if (configuration.sortAscending) {
+        if (configuration.isSortAscending) {
             [assets addObject:model];
         } else {
             [assets insertObject:model atIndex:0];
         }
     }
 #endif
-    return assets.copy;
+    MNAssetCollection *assetCollection = [MNAssetCollection new];
+    assetCollection.result = result;
+    assetCollection.identifier = collection.localIdentifier;
+    assetCollection.localizedTitle = collection.localizedTitle;
+    assetCollection.title = collection.localizedTitle ? : @"未知相簿";
+    [assetCollection addAssets:assets];
+    return assetCollection;
 }
 
 + (NSArray <MNAsset *>*)assetsWithFetchResult:(PHFetchResult<PHAsset *>*)result configuration:(MNAssetPickConfiguration *)configuration {
@@ -241,7 +239,7 @@ static MNAssetHelper *_helper;
         }
     }
     /// 获取文件大小
-    if (model.fileSizeString.length <= 0 && !model.isCapturingModel) {
+    if (model.fileSizeString.length <= 0 && !model.isTakeModel) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             if (model.asset) {
                 if (@available(iOS 9.0, *)) {
@@ -283,15 +281,13 @@ static MNAssetHelper *_helper;
     self.imageOptions.networkAccessAllowed = NO;
     self.imageOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     [[PHImageManager defaultManager] requestImageForAsset:model.asset targetSize:model.renderSize contentMode:PHImageContentModeAspectFill options:self.imageOptions resultHandler:^(UIImage *result, NSDictionary *info) {
-        BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && result);
+        BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue] && result);
         if (succeed && result) {
             result = [result resizingOrientation];
             model.thumbnail = result;
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(model);
             });
-        } else {
-            if (completion) completion(nil);
         }
     }];
 }
@@ -302,7 +298,7 @@ static MNAssetHelper *_helper;
         return;
     }
     MNAsset *model = collection.assets.firstObject;
-    if ([model isCapturingModel]) {
+    if ([model isTakeModel]) {
         if (collection.assets.count <= 1) return;
         model = collection.assets[1];
     }

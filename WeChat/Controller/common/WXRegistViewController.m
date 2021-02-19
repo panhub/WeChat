@@ -170,7 +170,7 @@
         picker.configuration.cropScale = 1.f;
         picker.configuration.maxPickingCount = 1;
         picker.configuration.maxExportPixel = 40000;
-        picker.configuration.allowsCapturing = NO;
+        picker.configuration.allowsTakeAsset = NO;
         picker.configuration.allowsPreviewing = NO;
         picker.configuration.allowsOriginalExporting = NO;
         picker.configuration.allowsEditing = YES;

@@ -19,7 +19,7 @@
 #endif
 
 @interface MNAsset ()
-@property (nonatomic, getter=isCapturingModel) BOOL capturing;
+@property (nonatomic, getter=isTakeModel) BOOL taking;
 @end
 
 @implementation MNAsset
@@ -39,9 +39,9 @@
     return self;
 }
 
-+ (MNAsset *)capturingModel {
++ (MNAsset *)takeModel {
     MNAsset *model = [MNAsset new];
-    model->_capturing = YES;
+    model->_taking = YES;
     model->_enabled = YES;
     model->_source = MNAssetSourceResource;
     model->_thumbnail = [MNBundle imageForResource:@"icon_takepicHL"];
@@ -130,13 +130,13 @@
 
 #pragma mark - Setter
 - (void)setSelected:(BOOL)selected {
-    if (self.isCapturingModel) return;
+    if (self.isTakeModel) return;
     _selected = selected;
     if (!selected) self.selectIndex = 0;
 }
 
 - (void)setEnabled:(BOOL)enabled {
-    if (self.isCapturingModel) return;
+    if (self.isTakeModel) return;
     _enabled = enabled;
 }
 

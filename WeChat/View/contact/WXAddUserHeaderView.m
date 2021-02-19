@@ -45,7 +45,7 @@
             MNAssetPicker *picker = [[MNAssetPicker alloc] initWithType:buttonIndex];
             picker.configuration.cropScale = 1.f;
             picker.configuration.maxExportPixel = 100.f;
-            picker.configuration.allowsCapturing = NO;
+            picker.configuration.allowsTakeAsset = NO;
             picker.configuration.allowsEditing = YES;
             picker.configuration.allowsPickingGif = NO;
             picker.configuration.allowsPickingVideo = NO;

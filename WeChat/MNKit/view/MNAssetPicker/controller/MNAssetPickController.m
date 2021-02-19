@@ -166,7 +166,7 @@
             if (!indexPath || (self.touchIndexPath && indexPath.item == self.touchIndexPath.item) || indexPath.item >= self.collection.assets.count) return;
             self.touchIndexPath = indexPath;
             MNAsset *asset = self.collection.assets[indexPath.item];
-            if (!asset.isEnabled || asset.isCapturingModel) return;
+            if (!asset.isEnabled || asset.isTakeModel) return;
             [self didSelectAsset:asset];
         } break;
         case UIGestureRecognizerStateFailed:
@@ -202,7 +202,7 @@
     if (indexPath.item >= self.collection.assets.count) return;
     MNAsset *model = self.collection.assets[indexPath.item];
     if (!model.isEnabled || model.status == MNAssetStatusDownloading) return;
-    if (model.isCapturingModel) {
+    if (model.isTakeModel) {
         // 拍照/拍摄
         [self beginCapturing];
     } else if (self.configuration.maxPickingCount == 1) {
@@ -225,7 +225,7 @@
         }
     } else if (self.configuration.isAllowsPreviewing) {
         // 预览
-        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isCapturingModel == NO"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isTakeModel == NO"]];
         if (assets.count <= 0) return;
         MNAssetBrowser *browser = [MNAssetBrowser new];
         browser.assets = assets;
@@ -490,7 +490,7 @@
                         }];
                     } else {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            if (weakself.configuration.sortAscending) {
+                            if (weakself.configuration.isSortAscending) {
                                 [weakself.collection addAsset:assets.firstObject];
                             } else {
                                 [weakself.collection insertAssetAtFront:assets.firstObject];
@@ -536,7 +536,7 @@
                 if (completion) completion(NO);
                 return;
             }
-            if (self.configuration.sortAscending) {
+            if (self.configuration.isSortAscending) {
                 [self.collection addAsset:asset];
             } else {
                 [self.collection insertAssetAtFront:asset];
@@ -637,7 +637,7 @@
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:location];
     if (!indexPath) return nil;
     MNAsset *model = self.collection.assets[indexPath.item];
-    if (model.isCapturingModel || !model.thumbnail || model.status == MNAssetStatusDownloading) return nil;
+    if (model.isTakeModel || !model.thumbnail || model.status == MNAssetStatusDownloading) return nil;
     UIPreviewAction *action = [UIPreviewAction actionWithTitle:@"取消" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction *action, UIViewController *previewViewController) {
         NSLog(@"===取消===");
     }];
@@ -662,6 +662,7 @@
 
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
+    PHFetchResultChangeDetails *d = [changeInstance changeDetailsForFetchResult:self.collection.result];
     NSLog(@"====相册内容变动====");
 }
 
@@ -732,7 +733,7 @@
     _albumToolBar.title = collection.title;
     [self.collectionView reloadData];
     self.collectionView.hidden = collection.assets.count <= 0;
-    if (collection.assets.count > 0 && self.configuration.sortAscending) {
+    if (collection.assets.count > 0 && self.configuration.isSortAscending) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:collection.assets.count - 1 inSection:0];
         [self.collectionView scrollToItemAtIndexPath:indexPath
                                     atScrollPosition:UICollectionViewScrollPositionTop

@@ -424,7 +424,7 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
     picker.configuration.requestGifUseingPhotoPolicy = YES;
     picker.configuration.requestLivePhotoUseingPhotoPolicy = YES;
     picker.configuration.allowsEditing = NO;
-    picker.configuration.allowsCapturing = NO;
+    picker.configuration.allowsTakeAsset = NO;
     picker.configuration.maxPickingCount = 1;
     picker.configuration.maxExportPixel = 1000.f;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
@@ -466,7 +466,7 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
     picker.configuration.allowsPickingVideo = YES;
     picker.configuration.allowsPickingLivePhoto = NO;
     picker.configuration.maxCaptureDuration = 60.f;
-    picker.configuration.allowsCapturing = YES;
+    picker.configuration.allowsTakeAsset = YES;
     picker.configuration.allowsEditing = NO;
     picker.configuration.maxExportPixel = 1000.f;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
@@ -632,7 +632,7 @@ typedef NS_ENUM(NSInteger, WXChatUserType) {
     picker.configuration.requestGifUseingPhotoPolicy = YES;
     picker.configuration.requestLivePhotoUseingPhotoPolicy = YES;
     picker.configuration.allowsEditing = YES;
-    picker.configuration.allowsCapturing = YES;
+    picker.configuration.allowsTakeAsset = YES;
     picker.configuration.cropScale = 1.f;
     picker.configuration.maxExportPixel = 300.f;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {

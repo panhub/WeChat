@@ -173,7 +173,7 @@
     MNAssetPicker *imagePicker = [[MNAssetPicker alloc] init];
     imagePicker.configuration.maxPickingCount = 1;
     imagePicker.configuration.allowsEditing = NO;
-    imagePicker.configuration.allowsCapturing = NO;
+    imagePicker.configuration.allowsTakeAsset = NO;
     imagePicker.configuration.allowsPreviewing = NO;
     if (configurationHandler) configurationHandler(imagePicker.configuration);
     [imagePicker presentWithPickingHandler:resultHandler cancelHandler:nil];

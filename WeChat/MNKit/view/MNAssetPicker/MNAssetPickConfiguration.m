@@ -16,7 +16,7 @@
         self.minPickingCount = 1;
         self.maxPickingCount = 1;
         self.allowsEditing = NO;
-        self.allowsCapturing = NO;
+        self.allowsTakeAsset = NO;
         self.allowsWritToAlbum = YES;
         self.allowsPreviewing = NO;
         self.allowsPickingGif = NO;

@@ -10,57 +10,59 @@
 
 @implementation MNAssetCollection
 - (void)addAsset:(MNAsset *)asset {
-    NSMutableArray *dataArray = self.assets.mutableCopy;
-    if (dataArray.count) {
-        MNAsset *model = [dataArray lastObject];
-        if (model.isCapturingModel) {
-            [dataArray insertObject:asset atIndex:[dataArray indexOfObject:model]];
+    @synchronized (self) {
+        if (self.assets.count <= 0 || !self.assets.lastObject.isTakeModel) {
+            [self.assets addObject:asset];
         } else {
-            [dataArray addObject:asset];
+            [self.assets insertObject:asset atIndex:self.assets.count - 1];
         }
-    } else {
-        [dataArray addObject:asset];
-    }
-    self.assets = dataArray.copy;
-    MNAsset *model = [dataArray firstObject];
-    if (model.isCapturingModel) {
-        self.thumbnail = self.assets[1].thumbnail;
-    } else {
-        self.thumbnail = model.thumbnail;
+        if (self.assets.firstObject.isTakeModel) {
+            self.thumbnail = self.assets[1].thumbnail;
+        } else {
+            self.thumbnail = self.assets.firstObject.thumbnail;
+        }
     }
 }
 
 - (void)insertAssetAtFront:(MNAsset *)asset {
-    NSMutableArray *dataArray = self.assets.mutableCopy;
-    if (dataArray.count) {
-        MNAsset *model = [dataArray firstObject];
-        if (model.isCapturingModel) {
-            [dataArray insertObject:asset atIndex:1];
+    @synchronized (self) {
+        if (self.assets.count <= 0 || !self.assets.firstObject.isTakeModel) {
+            [self.assets insertObject:asset atIndex:0];
         } else {
-            [dataArray insertObject:asset atIndex:0];
+            [self.assets insertObject:asset atIndex:1];
         }
-    } else {
-        [dataArray insertObject:asset atIndex:0];
-    }
-    self.assets = dataArray.copy;
-    MNAsset *model = [dataArray firstObject];
-    if (model.isCapturingModel) {
-        self.thumbnail = self.assets[1].thumbnail;
-    } else {
-        self.thumbnail = model.thumbnail;
+        if (self.assets.firstObject.isTakeModel) {
+            self.thumbnail = self.assets[1].thumbnail;
+        } else {
+            self.thumbnail = self.assets.firstObject.thumbnail;
+        }
     }
 }
 
 - (void)removeAllAssets {
-    self.assets = @[];
+    @synchronized (self) {
+        [self.assets removeAllObjects];
+    }
 }
 
-- (void)removeAssets:(NSArray <MNAsset *>*)assets {
-    if (!self.assets) return;
-    NSMutableArray <MNAsset *>*temp = NSMutableArray.array;
-    [temp addObjectsFromArray:self.assets];
-    [temp removeObjectsInArray:assets];
-    self.assets = temp.copy;
+- (void)removeAssets:(NSArray<MNAsset *> *)assets {
+    @synchronized (self) {
+        [self.assets removeObjectsInArray:assets];
+    }
+}
+
+- (void)addAssets:(NSArray <MNAsset *>*)assets {
+    @synchronized (self) {
+        [self.assets addObjectsFromArray:assets];
+    }
+}
+
+#pragma mark - Getter
+- (NSMutableArray <MNAsset *>*)assets {
+    if (!_assets) {
+        _assets = NSMutableArray.new;
+    }
+    return _assets;
 }
 
 @end

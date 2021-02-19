@@ -104,7 +104,7 @@
     if (self.configuration && self.configuration.maxPickingCount > 1) {
         self.selectControl.index = model.selectIndex;
         self.selectControl.selected = model.selected;
-        self.selectControl.hidden = model.isCapturingModel;
+        self.selectControl.hidden = model.isTakeModel;
     }
     
     if (model.type == MNAssetTypeVideo) {
@@ -163,7 +163,7 @@
 }
 
 - (void)updateFileSize {
-    self.fileSizeLabel.text = self.asset.isCapturingModel ? @"" : self.asset.fileSizeString;
+    self.fileSizeLabel.text = self.asset.isTakeModel ? @"" : self.asset.fileSizeString;
     [self.fileSizeLabel sizeToFit];
     self.fileSizeLabel.width_mn = self.fileSizeLabel.text.length ? (self.fileSizeLabel.width_mn + MNAssetCellMargin) : 0.f;
     self.fileSizeLabel.height_mn = self.detailLabel.height_mn;

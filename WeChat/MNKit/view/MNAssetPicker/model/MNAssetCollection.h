@@ -29,9 +29,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong, nullable) UIImage *thumbnail;
 /**
+ 相簿检索结果
+ */
+@property (nonatomic, strong, nullable) PHFetchResult *result;
+/**
  相簿资源内容
  */
-@property (nonatomic, strong, nullable) NSArray <MNAsset *>*assets;
+@property (nonatomic, strong, nullable) NSMutableArray <MNAsset *>*assets;
 
 /**
  添加资源
@@ -52,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param assets 指定资源
  */
 - (void)removeAssets:(NSArray <MNAsset *>*)assets;
+/**
+ 添加指定资源
+ @param assets 指定资源
+ */
+- (void)addAssets:(NSArray <MNAsset *>*)assets;
 
 @end
 NS_ASSUME_NONNULL_END

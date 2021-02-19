@@ -52,9 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 */
 @property (nonatomic) NSTimeInterval maxCaptureDuration;
 /**
- 是否允许拍照/录像 <不完善 default NO>
+ 是否允许拍照/录像 <default NO>
  */
-@property (nonatomic, getter=isAllowsCapturing) BOOL allowsCapturing;
+@property (nonatomic, getter=isAllowsTakeAsset) BOOL allowsTakeAsset;
 /**
  是否允许存储拍照/录像到系统相册 <default YES>
  */
@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  是否显示空相簿 <default NO>
  */
-@property (nonatomic) BOOL showEmptyAlbum;
+@property (nonatomic, getter=isShowEmptyAlbum) BOOL showEmptyAlbum;
 /**
  列数 <default 3>
  */
@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  是否升序排列 <default YES>
  */
-@property (nonatomic) BOOL sortAscending;
+@property (nonatomic, getter=isSortAscending) BOOL sortAscending;
 /**
  图片调整比例<仅图片资源有效 <=0 不固定比例, default 0>
  */

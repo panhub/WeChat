@@ -122,7 +122,7 @@
                        otherButtonTitles:nil] show];
     } else if (indexPath.row == 1) {
         MNAssetPicker *picker = MNAssetPicker.new;
-        picker.configuration.allowsCapturing = YES;
+        picker.configuration.allowsTakeAsset = YES;
         picker.configuration.allowsMixPicking = NO;
         picker.configuration.allowsAutoDismiss = YES;
         picker.configuration.allowsPickingPhoto = YES;

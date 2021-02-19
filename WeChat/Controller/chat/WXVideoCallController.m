@@ -363,7 +363,7 @@ typedef NS_ENUM(NSInteger, VideoCallButtonTag) {
     picker.configuration.requestGifUseingPhotoPolicy = YES;
     picker.configuration.requestLivePhotoUseingPhotoPolicy = YES;
     picker.configuration.allowsEditing = NO;
-    picker.configuration.allowsCapturing = NO;
+    picker.configuration.allowsTakeAsset = NO;
     picker.configuration.maxPickingCount = 1;
     picker.configuration.maxExportPixel = 1000;
     picker.user_info = userInfo;

@@ -96,7 +96,7 @@
     } else if (indexPath.section == 1) {
         MNAssetPicker *picker = [[MNAssetPicker alloc] initWithType:indexPath.row];
         picker.configuration.maxExportPixel = 0.f;
-        picker.configuration.allowsCapturing = NO;
+        picker.configuration.allowsTakeAsset = NO;
         picker.configuration.allowsEditing = NO;
         picker.configuration.allowsPickingGif = NO;
         picker.configuration.allowsPickingVideo = NO;

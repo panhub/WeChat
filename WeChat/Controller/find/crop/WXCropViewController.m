@@ -124,7 +124,7 @@
     imagePicker.configuration.requestGifUseingPhotoPolicy = YES;
     imagePicker.configuration.requestLivePhotoUseingPhotoPolicy = YES;
     imagePicker.configuration.allowsEditing = YES;
-    imagePicker.configuration.allowsCapturing = YES;
+    imagePicker.configuration.allowsTakeAsset = YES;
     imagePicker.configuration.maxPickingCount = 1;
     imagePicker.configuration.maxExportPixel = 0.f;
     imagePicker.configuration.cropScale = 0.f;

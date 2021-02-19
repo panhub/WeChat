@@ -216,7 +216,7 @@
 - (void)navigationBarRightBarItemTouchUpInside:(UIView *)rightBarItem {
     MNAssetPicker *picker = [[MNAssetPicker alloc] init];
     picker.configuration.maxPickingCount = 10;
-    picker.configuration.maxExportPixel = 100.f;
+    picker.configuration.maxExportPixel = 1000.f;
     picker.configuration.allowsPickingAlbum = YES;
     picker.configuration.showEmptyAlbum = YES;
     picker.configuration.allowsPreviewing = YES;
@@ -226,7 +226,7 @@
     picker.configuration.allowsPickingLivePhoto = YES;
     picker.configuration.allowsDisplayFileSize = NO;
     picker.configuration.maxExportDuration = 60.f;
-    picker.configuration.allowsCapturing = YES;
+    picker.configuration.allowsTakeAsset = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
         NSLog(@"");
     } cancelHandler:nil];

@@ -81,6 +81,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) CGSize renderSize;
 /**
+ 是否是拍摄模型
+ */
+@property (nonatomic, readonly) BOOL isTakeModel;
+/**
  时长<仅视频资源有效>
  */
 @property (nonatomic) NSTimeInterval duration;
@@ -167,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  实例化拍照模型
  @return 拍照/录像资源模型<仅供展示使用>
  */
-+ (MNAsset *)capturingModel;
++ (MNAsset *)takeModel;
 
 /**
  依据资源内容实例化
@@ -213,12 +217,6 @@ NS_ASSUME_NONNULL_BEGIN
  @param fileSize 文件大小
  */
 - (void)updateFileSize:(long long)fileSize;
-
-/**
- 是否是拍摄模型
- @return 是否拍摄模型
- */
-- (BOOL)isCapturingModel;
 
 /**
  文件内存大小字符串表示法
