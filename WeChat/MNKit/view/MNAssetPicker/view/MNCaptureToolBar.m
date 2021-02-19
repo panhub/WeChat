@@ -231,8 +231,9 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
 
 - (void)resetCapturing {
     if (self.state <= MNCaptureToolStateWaiting) return;
-    if (self.state == MNCaptureToolStateRunning) {
-        self.state = MNCaptureToolStateWaiting;
+    MNCaptureToolState state = self.state;
+    self.state = MNCaptureToolStateWaiting;
+    if (state == MNCaptureToolStateRunning) {
         [UIView animateWithDuration:.3f animations:^{
             self.touchView.transform = CGAffineTransformIdentity;
             self.trackView.transform = CGAffineTransformIdentity;
@@ -244,7 +245,6 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
             self.state = MNCaptureToolStateIdle;
         }];
     } else {
-        self.state = MNCaptureToolStateWaiting;
         self.trackView.centerX_mn = self.touchView.centerX_mn = self.doneButton.centerX_mn;
         [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.closeButton.alpha = 1.f;
@@ -256,10 +256,6 @@ const CGFloat MNCaptureToolBarMaxHeight = MNCaptureToolBarMinHeight*MNCaptureBut
             self.state = MNCaptureToolStateIdle;
         }];
     }
-}
-
-- (void)setState:(MNCaptureToolState)state {
-    _state = state;
 }
 
 #pragma mark - Setter

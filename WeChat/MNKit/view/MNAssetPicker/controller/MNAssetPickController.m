@@ -469,13 +469,44 @@
 }
 
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)content {
+    __weak typeof(self) weakself = self;
+    __weak typeof(cameraController) vc = cameraController;
+    [cameraController.view showActivityDialog:@"请稍后"];
     if (self.configuration.isAllowsWritToAlbum) {
-        [cameraController.view showActivityDialog:@"请稍后"];
-        __weak typeof(cameraController) vc = cameraController;
         [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
             if (error || identifiers.count <= 0) {
-                [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"无法保存图片" : @"无法保存视频")];
-            } else if ([self insertContents:content]) {
+                [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"保存图片失败" : @"保存视频失败")];
+            } else {
+                [MNAssetHelper requestAssetWithLocalIdentifiers:identifiers configuration:self.configuration completion:^(NSArray<MNAsset *> * _Nullable assets) {
+                    if (!assets || assets.count <= 0) {
+                        [weakself insertContents:content completion:^(BOOL result) {
+                            if (result) {
+                                [vc.view closeDialogWithCompletionHandler:^{
+                                    [vc.navigationController popViewControllerAnimated:YES];
+                                }];
+                            } else {
+                                [vc.view showInfoDialog:@"操作失败"];
+                            }
+                        }];
+                    } else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (weakself.configuration.sortAscending) {
+                                [weakself.collection addAsset:assets.firstObject];
+                            } else {
+                                [weakself.collection insertAssetAtFront:assets.firstObject];
+                            }
+                            weakself.collection = weakself.collection;
+                            [vc.view closeDialogWithCompletionHandler:^{
+                                [vc.navigationController popViewControllerAnimated:YES];
+                            }];
+                        });
+                    }
+                }];
+            }
+        }];
+    } else {
+        [self insertContents:content completion:^(BOOL result) {
+            if (result) {
                 [vc.view closeDialogWithCompletionHandler:^{
                     [vc.navigationController popViewControllerAnimated:YES];
                 }];
@@ -483,35 +514,37 @@
                 [vc.view showInfoDialog:@"操作失败"];
             }
         }];
-    } else {
-        if ([self insertContents:content]) {
-            [cameraController.navigationController popViewControllerAnimated:YES];
-        } else {
-            [cameraController.view showInfoDialog:@"操作失败"];
-        }
     }
 }
 
-- (BOOL)insertContents:(id)content {
-    if ([content isKindOfClass:UIImage.class] && !self.configuration.isOriginalExporting) {
-        UIImage *image = content;
-        if (self.configuration.maxExportPixel > 0) {
-            image = [image resizingToMaxPix:self.configuration.maxExportPixel];
+- (void)insertContents:(id)contents completion:(void(^)(BOOL))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        id content = contents;
+        if ([content isKindOfClass:UIImage.class] && !self.configuration.isOriginalExporting) {
+            UIImage *image = content;
+            if (self.configuration.maxExportPixel > 0) {
+                image = [image resizingToMaxPix:self.configuration.maxExportPixel];
+            }
+            if (self.configuration.maxExportQuality > 0.f) {
+                image = [image resizingToQuality:self.configuration.maxExportQuality];
+            }
+            content = image ? : nil;
         }
-        if (self.configuration.maxExportQuality > 0.f) {
-            image = [image resizingToQuality:self.configuration.maxExportQuality];
-        }
-        if (image) content = image;
-    }
-    MNAsset *asset = [MNAsset assetWithContent:content configuration:self.configuration];
-    if (!asset) return NO;
-    if (self.configuration.sortAscending) {
-        [self.collection addAsset:asset];
-    } else {
-        [self.collection insertAssetAtFront:asset];
-    }
-    self.collection = self.collection;
-    return YES;
+        MNAsset *asset = [MNAsset assetWithContent:content configuration:self.configuration];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!asset) {
+                if (completion) completion(NO);
+                return;
+            }
+            if (self.configuration.sortAscending) {
+                [self.collection addAsset:asset];
+            } else {
+                [self.collection insertAssetAtFront:asset];
+            }
+            self.collection = self.collection;
+            if (completion) completion(YES);
+        });
+    });
 }
 
 #pragma mark - MNImageCropDelegate

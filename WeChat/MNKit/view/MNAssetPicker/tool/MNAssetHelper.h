@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param model 资源模型
  @param completion 结束回调
  */
-- (void)requestAssetThumbnail:(MNAsset *)model completion:(void(^)(MNAsset *))completion;
+- (void)requestAssetThumbnail:(MNAsset *)model completion:(void(^)(MNAsset *_Nullable))completion;
 
 /**
  获取相簿缩略图
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Get Content
 /**
- 获取一组资源的内容
+ 获取资源内容
  @param models 资源模型
  @param configuration 配置信息
  @param progress 当前数量进度值
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)requestContentWithAssets:(NSArray <MNAsset *>*)models configuration:(MNAssetPickConfiguration *_Nullable)configuration progress:(void(^_Nullable)(NSInteger total, NSInteger index))progress completion:(void(^)(NSArray <MNAsset *>*_Nullable))completion;
 
 /**
- 获取资源原始内容
+ 获取资源内容
  @param model 资源模型
  @param configuration 配置信息
  @param completion 完成回调
@@ -67,12 +67,20 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)requestAssetContent:(MNAsset *)model configuration:(MNAssetPickConfiguration *_Nullable)configuration completion:(void(^_Nullable)(MNAsset *_Nullable model))completion;
 
 /**
- 获取资源原始内容<预览时获取内容, 不记录请求id, 不触发资源下载回调>
+ 获取资源内容<预览时获取内容, 不记录请求id, 不触发资源下载回调>
  @param model 资源模型
  @param progress 进度回调
  @param completion 完成回调
  */
 + (void)requestAssetContent:(MNAsset *)model progress:(void(^_Nullable)(double, NSError *, MNAsset *))progress completion:(void(^_Nullable)(MNAsset *_Nullable))completion;
+
+/**
+ 获取资源内容<依据本地标识>
+ @param identifiers 本地标识集合
+ @param configuration 资源选择器配置
+ @param completion 完成回调
+ */
++ (void)requestAssetWithLocalIdentifiers:(NSArray <NSString *>*)identifiers configuration:(MNAssetPickConfiguration *_Nullable)configuration completion:(void(^)(NSArray <MNAsset *>*_Nullable))completion;
 
 /**
  取消资源获取请求

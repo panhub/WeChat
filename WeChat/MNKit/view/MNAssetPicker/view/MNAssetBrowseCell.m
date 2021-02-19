@@ -210,6 +210,8 @@
     __weak typeof(self) weakself = self;
     [[MNAssetHelper helper] requestAssetThumbnail:asset completion:^(MNAsset *model) {
         
+        if (!model) return;
+        
         __strong typeof(self) self = weakself;
         
         if (model != self.asset || self.state != MNAssetBrowseStateThumbnailLoading) return;

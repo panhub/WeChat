@@ -127,9 +127,29 @@ static MNAssetHelper *_helper;
 
 #pragma mark - Get Asset
 + (NSMutableArray <MNAsset *>*)fetchAssetsInAssetCollection:(PHAssetCollection *)collection options:(PHFetchOptions *)options configuration:(MNAssetPickConfiguration *)configuration {
-    NSMutableArray <MNAsset *>*dataArray = [NSMutableArray arrayWithCapacity:0];
+    NSMutableArray <MNAsset *>*assets = [NSMutableArray arrayWithCapacity:0];
     PHFetchResult<PHAsset *>*result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
-    CGSize renderSize = CGSizeIsEmpty(configuration.renderSize) ? CGSizeMake(350.f, 350.f) : configuration.renderSize;
+    [assets addObjectsFromArray:[self assetsWithFetchResult:result configuration:configuration]];
+#if !TARGET_IPHONE_SIMULATOR
+    /// 判断是否需要添加拍照模型<仅全部照片需要添加>
+    if ([self isCameraCollection:collection] && configuration.isAllowsCapturing && (configuration.isAllowsPickingPhoto || configuration.isAllowsPickingVideo)) {
+        MNAsset *model = [MNAsset capturingModel];
+        if (configuration.isAllowsPickingVideo && !configuration.isAllowsPickingPhoto) {
+            model.thumbnail = [MNBundle imageForResource:@"icon_takevideoHL"];
+        }
+        if (configuration.sortAscending) {
+            [assets addObject:model];
+        } else {
+            [assets insertObject:model atIndex:0];
+        }
+    }
+#endif
+    return assets.copy;
+}
+
++ (NSArray <MNAsset *>*)assetsWithFetchResult:(PHFetchResult<PHAsset *>*)result configuration:(MNAssetPickConfiguration *)configuration {
+    NSMutableArray <MNAsset *>*assets = [NSMutableArray arrayWithCapacity:0];
+    CGSize renderSize = (!configuration || CGSizeIsEmpty(configuration.renderSize)) ? CGSizeMake(350.f, 350.f) : configuration.renderSize;
     [result enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         MNAssetType type = [self assetTypeWithPHAsset:asset];
         if (type == MNAssetTypeVideo) {
@@ -156,23 +176,9 @@ static MNAssetHelper *_helper;
             model.duration = asset.duration;
             model.durationString = [NSDate timeStringWithInterval:@(asset.duration)];
         }
-        [dataArray addObject:model];
+        [assets addObject:model];
     }];
-#if !TARGET_IPHONE_SIMULATOR
-    /// 判断是否需要添加拍照模型<仅全部照片需要添加>
-    if ([self isCameraCollection:collection] && configuration.isAllowsCapturing && (configuration.isAllowsPickingPhoto || configuration.isAllowsPickingVideo)) {
-        MNAsset *model = [MNAsset capturingModel];
-        if (configuration.isAllowsPickingVideo && !configuration.isAllowsPickingPhoto) {
-            model.thumbnail = [MNBundle imageForResource:@"icon_takevideoHL"];
-        }
-        if (configuration.sortAscending) {
-            [dataArray addObject:model];
-        } else {
-            [dataArray insertObject:model atIndex:0];
-        }
-    }
-#endif
-    return dataArray.copy;
+    return assets.copy;
 }
 
 + (MNAssetType)assetTypeWithPHAsset:(PHAsset *)asset {
@@ -255,6 +261,20 @@ static MNAssetHelper *_helper;
     }
 }
 
++ (void)requestThumbnailWithAssets:(NSArray <MNAsset *>*)models atIndex:(NSInteger)index container:(NSMutableArray <MNAsset *>*)container completion:(void(^)(NSArray <MNAsset *>*))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if (index >= models.count) {
+            if (completion) completion(container.copy);
+            return;
+        }
+        MNAsset *model = models[index];
+        [[MNAssetHelper helper] requestAssetThumbnail:model completion:^(MNAsset * _Nullable asset) {
+            if (asset) [container addObject:asset];
+            [MNAssetHelper requestThumbnailWithAssets:models atIndex:index + 1 container:container completion:completion];
+        }];
+    });
+}
+
 - (void)requestAssetThumbnail:(MNAsset *)model completion:(void(^)(MNAsset *))completion {
     if (model.thumbnail) {
         if (completion) completion(model);
@@ -270,6 +290,8 @@ static MNAssetHelper *_helper;
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(model);
             });
+        } else {
+            if (completion) completion(nil);
         }
     }];
 }
@@ -296,6 +318,7 @@ static MNAssetHelper *_helper;
         BOOL succeed = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (succeed && result) {
             result = [result resizingOrientation];
+            model.thumbnail = result;
             collection.thumbnail = result;
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(collection);
@@ -572,6 +595,22 @@ static MNAssetHelper *_helper;
             }
         }];
     }
+}
+
++ (void)requestAssetWithLocalIdentifiers:(NSArray <NSString *>*)identifiers configuration:(MNAssetPickConfiguration *)configuration completion:(void(^)(NSArray <MNAsset *>*))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (!identifiers || identifiers.count <= 0) {
+            if (completion) completion(nil);
+            return;
+        }
+        PHFetchResult<PHAsset *>*result = [PHAsset fetchAssetsWithLocalIdentifiers:identifiers options:nil];
+        NSArray <MNAsset *>*assets = [self assetsWithFetchResult:result configuration:configuration];
+        if (assets.count <= 0) {
+            if (completion) completion(nil);
+            return;
+        }
+        [self requestThumbnailWithAssets:assets atIndex:0 container:NSMutableArray.new completion:completion];
+    });
 }
 
 + (void)cancelAssetRequest:(MNAsset *)asset {

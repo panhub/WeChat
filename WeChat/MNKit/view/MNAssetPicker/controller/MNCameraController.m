@@ -27,7 +27,9 @@
 @implementation MNCameraController
 - (instancetype)init {
     if (self = [super init]) {
-        self.filePath = MNCacheDirectoryAppending([@"video" stringByAppendingPathComponent:[MNFileHandle fileNameWithExtension:@"mp4"]]);
+        NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"MNKit/video/user_capture.mp4"];
+        [NSFileManager.defaultManager removeItemAtPath:filePath error:NULL];
+        self.filePath = filePath;
     }
     return self;
 }
@@ -223,7 +225,7 @@
             [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄大于%@s的视频", @(floor(self.configuration.minExportDuration))]];
             return;
         }
-        if (self.configuration.maxExportDuration > 0.f && (!self.configuration.isAllowsEditing || self.configuration.maxPickingCount > 1) && ceil(duration) > self.configuration.maxExportDuration) {
+        if (self.configuration.maxExportDuration > 0.f && ceil(duration) > self.configuration.maxExportDuration && (!self.configuration.isAllowsEditing || self.configuration.maxPickingCount > 1)) {
             [self.view showInfoDialog:[NSString stringWithFormat:@"请拍摄小于%@s的视频", @(ceil(self.configuration.maxExportDuration))]];
             return;
         }
