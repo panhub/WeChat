@@ -27,11 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  相簿检索结果
  */
-@property (nonatomic, strong, nullable) PHFetchResult *result;
+@property (nonatomic, strong) PHFetchResult *result;
 /**
  相簿资源内容
  */
-@property (nonatomic, strong, nullable) NSMutableArray <MNAsset *>*assets;
+@property (nonatomic, strong) NSMutableArray <MNAsset *>*assets;
 
 /**
  添加资源

@@ -13,13 +13,12 @@
 #import "MNAssetPickConfiguration.h"
 #import "PHAsset+MNAssetResource.h"
 #import "MNAssetExporter+MNExportMetadata.h"
-
 #if __has_include(<Photos/Photos.h>)
 #import <Photos/Photos.h>
 #endif
 
 @interface MNAsset ()
-@property (nonatomic, getter=isTakeModel) BOOL taking;
+@property (nonatomic) BOOL isTakeModel;
 @end
 
 @implementation MNAsset
@@ -32,6 +31,7 @@
         self.requestId = 0;
         self.downloadId = 0;
 #endif
+        self->_enabled = YES;
         self->_fileSizeString = @"";
         self->_status = MNAssetStatusUnknown;
         self->_source = MNAssetSourceUnknown;
@@ -41,8 +41,7 @@
 
 + (MNAsset *)takeModel {
     MNAsset *model = [MNAsset new];
-    model->_taking = YES;
-    model->_enabled = YES;
+    model->_isTakeModel = YES;
     model->_source = MNAssetSourceResource;
     model->_thumbnail = [MNBundle imageForResource:@"icon_takepicHL"];
     return model;
@@ -205,11 +204,11 @@
 #pragma mark - dealloc
 - (void)dealloc {
     self.content = nil;
-    self.sourceChangeHandler = nil;
-    self.thumbnailChangeHandler = nil;
     self.statusChangeHandler = nil;
-    self.progressChangeHandler = nil;
+    self.sourceChangeHandler = nil;
     self.fileSizeChangeHandler = nil;
+    self.progressChangeHandler = nil;
+    self.thumbnailChangeHandler = nil;
     [self cancelRequest];
     [self cancelDownload];
 }

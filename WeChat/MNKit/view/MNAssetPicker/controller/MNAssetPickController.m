@@ -129,6 +129,7 @@
 
 - (void)loadData {
     __weak typeof(self) weakself = self;
+    self.navigationController.view.userInteractionEnabled = NO;
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
         if (allowed) {
             [weakself.contentView showActivityDialog:@"加载中"];
@@ -141,9 +142,11 @@
                 if (dataArray.count) weakself.collection = dataArray.firstObject;
                 if (weakself.albumView) weakself.albumView.dataArray = weakself.collections;
                 [weakself.contentView closeDialog];
+                weakself.navigationController.view.userInteractionEnabled = YES;
             }];
         } else {
             weakself.collectionView.hidden = YES;
+            weakself.navigationController.view.userInteractionEnabled = YES;
             [[MNAlertView alertViewWithTitle:@"权限不足" message:@"请前往“设置-隐私-照片”打开应用的相册访问权限" handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:weakself.navigationController.view];
         }
     }];
@@ -452,7 +455,7 @@
 
 #pragma mark - MNCameraControllerDelegate
 - (void)cameraControllerDidCancel:(MNCameraController *)cameraController {
-    [cameraController.navigationController popViewControllerAnimated:[[UIApplication sharedApplication] applicationState] == UIApplicationStateActive];
+    [cameraController.navigationController popViewControllerAnimated:UIApplication.sharedApplication.applicationState == UIApplicationStateActive];
 }
 
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)content {

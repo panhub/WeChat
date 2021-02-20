@@ -59,13 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) MNAssetType type;
 /**
- 资源来源
- */
-@property (nonatomic) MNAssetSourceType source;
-/**
  下载状态
  */
 @property (nonatomic) MNAssetStatus status;
+/**
+ 资源来源
+ */
+@property (nonatomic) MNAssetSourceType source;
 /**
  图片: 调整后的图片
  视频: 路径

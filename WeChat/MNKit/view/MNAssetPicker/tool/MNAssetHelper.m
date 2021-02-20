@@ -163,7 +163,6 @@ static MNAssetHelper *_helper;
         MNAsset *model = [MNAsset new];
         model.type = type;
         model.asset = asset;
-        model.enabled = YES;
         model.renderSize = renderSize;
         if (type == MNAssetTypeVideo) {
             model.duration = asset.duration;
