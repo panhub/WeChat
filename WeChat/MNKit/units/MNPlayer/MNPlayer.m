@@ -7,6 +7,7 @@
 //
 
 #import "MNPlayer.h"
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <MediaPlayer/MPRemoteCommandCenter.h>
@@ -659,3 +660,4 @@ static void MNPlaySoundCompleteHandler(SystemSoundID soundID,void *clientData){
 }
 
 @end
+#endif

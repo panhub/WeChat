@@ -87,8 +87,11 @@
             //创建摄像设备输入流
             CMTime frameDuration = CMTimeMake(1, NSProcessInfo.processInfo.processorCount == 1 ? 15 : 30);
             if ([device lockForConfiguration:NULL] ) {
-                device.activeVideoMaxFrameDuration = frameDuration;
                 device.activeVideoMinFrameDuration = frameDuration;
+                device.activeVideoMaxFrameDuration = frameDuration;
+                if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+                    device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+                }
                 [device unlockForConfiguration];
             }
             NSError *error;

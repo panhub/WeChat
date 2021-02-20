@@ -7,6 +7,7 @@
 //
 
 #import "MNAudioRecorder.h"
+#if __has_include(<AVFoundation/AVFoundation.h>)
 #import <AVFoundation/AVFoundation.h>
 
 @interface MNAudioRecorder ()<AVAudioRecorderDelegate>
@@ -253,3 +254,4 @@
 }
 
 @end
+#endif

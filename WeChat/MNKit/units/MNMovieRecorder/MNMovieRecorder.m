@@ -172,6 +172,9 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     if ([device lockForConfiguration:NULL] ) {
         device.activeVideoMaxFrameDuration = frameDuration;
         device.activeVideoMinFrameDuration = frameDuration;
+        if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+            device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+        }
         [device unlockForConfiguration];
     }
     NSError *error;
@@ -562,6 +565,9 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     if ([device lockForConfiguration:NULL] ) {
         device.activeVideoMaxFrameDuration = frameDuration;
         device.activeVideoMinFrameDuration = frameDuration;
+        if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+            device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+        }
         [device unlockForConfiguration];
     }
     AVCaptureDeviceInput *videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:NULL];
