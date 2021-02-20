@@ -58,13 +58,6 @@ typedef NS_ENUM(NSInteger, MNMovieOrientation) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSString * MNMoviePresetName;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityLow;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityMedium;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePresetQualityHigh;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1280x720;
-FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
-
 @class MNMovieRecorder;
 @protocol MNMovieRecordDelegate <NSObject>
 @optional
@@ -90,7 +83,7 @@ FOUNDATION_EXTERN MNMoviePresetName const MNMoviePreset1920x1080;
 /**图像展示视图*/
 @property (nonatomic, weak) UIView *outputView;
 /**捕获质量*/
-@property (nonatomic, copy, nullable) MNMoviePresetName presetName;
+@property (nonatomic, copy) AVCaptureSessionPreset sessionPreset;
 /**捕获尺寸比例*/
 @property (nonatomic, readonly) MNMovieSizeRatio presetSizeRatio;
 /**事件回调*/

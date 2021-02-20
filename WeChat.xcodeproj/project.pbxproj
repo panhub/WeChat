@@ -5446,11 +5446,11 @@
 		E869C7612570EF640017025E /* MNAssetPicker */ = {
 			isa = PBXGroup;
 			children = (
-				E869C7642570EF640017025E /* controller */,
 				E869C7622570EF640017025E /* MNAssetPickConfiguration.h */,
 				E869C79D2570EF640017025E /* MNAssetPickConfiguration.m */,
 				E869C79E2570EF640017025E /* MNAssetPicker.h */,
 				E869C7632570EF640017025E /* MNAssetPicker.m */,
+				E869C7642570EF640017025E /* controller */,
 				E869C7712570EF640017025E /* model */,
 				E869C79F2570EF640017025E /* tool */,
 				E869C7762570EF640017025E /* view */,

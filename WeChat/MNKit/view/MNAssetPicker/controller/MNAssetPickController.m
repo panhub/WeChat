@@ -460,7 +460,7 @@
 
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)content {
     __weak typeof(cameraController) vc = cameraController;
-    [cameraController.view showActivityDialog:@"请稍后"];
+    [vc.view showActivityDialog:@"请稍后"];
     if (self.configuration.isAllowsWritToAlbum) {
         [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
             if (error || identifiers.count <= 0) {
@@ -631,9 +631,9 @@
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.navigationController.view.userInteractionEnabled == NO) return;
+        if (self.navigationController.view.userInteractionEnabled == NO || self.collectionView.isDragging) return;
         self.navigationController.view.userInteractionEnabled = NO;
-        [self.navigationController.view showActivityDialog:@"请稍后"];
+        [self.view showActivityDialog:@"请稍后"];
         NSMutableArray <MNAsset *>*selectedAssets = @[].mutableCopy;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -658,7 +658,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self reloadData];
                 if (self.albumView) [self.albumView reloadData];
-                [self.navigationController.view closeDialog];
+                [self.view closeDialog];
                 self.navigationController.view.userInteractionEnabled = YES;
             });
         });

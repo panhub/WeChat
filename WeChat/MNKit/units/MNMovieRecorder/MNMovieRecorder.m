@@ -29,12 +29,6 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     MNMovieRecordStatusFailed
 };
 
-MNMoviePresetName const MNMoviePresetQualityLow = @"com.mn.movie.preset.low";
-MNMoviePresetName const MNMoviePresetQualityMedium = @"com.mn.movie.preset.medium";
-MNMoviePresetName const MNMoviePresetQualityHigh = @"com.mn.movie.preset.high";
-MNMoviePresetName const MNMoviePreset1280x720 = @"com.mn.movie.preset.1280x720";
-MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080";
-
 @interface MNMovieRecorder ()<AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate, MNMovieWriteDelegate>
 @property (nonatomic) BOOL shouldSessionRunning;
 @property (nonatomic) MNMovieRecordStatus status;
@@ -67,7 +61,7 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 - (void)initialized {
     _frameRate = 30;
     _movieWriter = MNMovieWriter.new;
-    _presetName = MNMoviePresetQualityHigh;
+    _sessionPreset = AVCaptureSessionPresetHigh;
     _devicePosition = MNMovieDevicePositionBack;
     _movieOrientation = MNMovieOrientationPortrait;
     _resizeMode = MNMovieResizeModeResizeAspect;
@@ -740,54 +734,57 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
     if (!_session) {
         AVCaptureSession *session = [AVCaptureSession new];
         session.usesApplicationAudioSession = YES;
-        AVCaptureSessionPreset sessionPreset = [self sessionPresetWithName:self.presetName];
+        AVCaptureSessionPreset sessionPreset = self.sessionPreset;
         if ([session canSetSessionPreset:sessionPreset]) {
             session.sessionPreset = sessionPreset;
-        } else if ([session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
-            session.sessionPreset = AVCaptureSessionPreset1920x1080;
-        } else if ([session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-            session.sessionPreset = AVCaptureSessionPreset1280x720;
-        } else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium]) {
-            session.sessionPreset = AVCaptureSessionPresetMedium;
-        } else if (NSProcessInfo.processInfo.processorCount == 1 && [session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
-            session.sessionPreset = AVCaptureSessionPreset640x480;
-        } else if ([session canSetSessionPreset:AVCaptureSessionPresetLow]) {
-            session.sessionPreset = AVCaptureSessionPresetLow;
+        } else {
+            MNMovieSizeRatio presetSizeRatio = [self sizeRatioWithSessionPreset:sessionPreset];
+            if (presetSizeRatio <= MNMovieSizeRatio16x9) {
+                if ([session canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+                    session.sessionPreset = AVCaptureSessionPresetHigh;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+                    session.sessionPreset = AVCaptureSessionPreset1920x1080;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+                    session.sessionPreset = AVCaptureSessionPreset1280x720;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPresetiFrame1280x720]) {
+                    session.sessionPreset = AVCaptureSessionPresetiFrame1280x720;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPresetiFrame960x540]) {
+                    session.sessionPreset = AVCaptureSessionPresetiFrame960x540;
+                }
+            } else {
+                if ([session canSetSessionPreset:AVCaptureSessionPresetMedium]) {
+                    session.sessionPreset = AVCaptureSessionPresetMedium;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+                    session.sessionPreset = AVCaptureSessionPreset640x480;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPreset352x288]) {
+                    session.sessionPreset = AVCaptureSessionPreset352x288;
+                } else if ([session canSetSessionPreset:AVCaptureSessionPresetLow]) {
+                    session.sessionPreset = AVCaptureSessionPresetLow;
+                }
+            }
+            if (!session.sessionPreset) session.sessionPreset = AVCaptureSessionPresetInputPriority;
         }
         _session = session;
     }
     return _session;
 }
 
-- (AVCaptureSessionPreset)sessionPresetWithName:(MNMoviePresetName)presetName {
-    AVCaptureSessionPreset sessionPreset = AVCaptureSessionPreset1280x720;
-    if ([presetName isEqualToString:MNMoviePresetQualityHigh]) {
-        sessionPreset = AVCaptureSessionPresetHigh;
-    } else if ([presetName isEqualToString:MNMoviePresetQualityMedium]) {
-        sessionPreset = AVCaptureSessionPresetMedium;
-    } else if ([presetName isEqualToString:MNMoviePreset1280x720]) {
-        sessionPreset = AVCaptureSessionPreset1280x720;
-    } else if ([presetName isEqualToString:MNMoviePreset1920x1080]) {
-        sessionPreset = AVCaptureSessionPreset1920x1080;
-    } else if ([presetName isEqualToString:MNMoviePresetQualityLow]) {
-        sessionPreset = AVCaptureSessionPresetLow;
-    }
-    return sessionPreset;
-}
-
 - (MNMovieSizeRatio)presetSizeRatio {
     if (!_session || !self.session.sessionPreset) {
         return MNMovieSizeRatioUnknown;
     }
-    AVCaptureSessionPreset presetName = self.session.sessionPreset;
+    return [self sizeRatioWithSessionPreset:self.session.sessionPreset];
+}
+
+- (MNMovieSizeRatio)sizeRatioWithSessionPreset:(AVCaptureSessionPreset)sessionPreset {
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {
-        if ([presetName isEqualToString:AVCaptureSessionPreset3840x2160]) {
+        if ([sessionPreset isEqualToString:AVCaptureSessionPreset3840x2160]) {
             return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
         }
     }
 #endif
-    if ([presetName isEqualToString:AVCaptureSessionPresetHigh] || [presetName isEqualToString:AVCaptureSessionPreset1920x1080] || [presetName isEqualToString:AVCaptureSessionPreset1280x720] || [presetName isEqualToString:AVCaptureSessionPresetiFrame960x540]) {
+    if ([sessionPreset isEqualToString:AVCaptureSessionPresetHigh] || [sessionPreset isEqualToString:AVCaptureSessionPreset1920x1080] || [sessionPreset isEqualToString:AVCaptureSessionPreset1280x720] || [sessionPreset isEqualToString:AVCaptureSessionPresetiFrame1280x720] || [sessionPreset isEqualToString:AVCaptureSessionPresetiFrame960x540]) {
         return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
     }
     return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio3x4 : MNMovieSizeRatio4x3;
