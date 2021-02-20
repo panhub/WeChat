@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface MNAudioRecorder ()<AVAudioRecorderDelegate>
+@property(nonatomic) BOOL isPausing;
 @property(nonatomic) NSInteger capacity;
 @property(nonatomic) NSTimeInterval timeInterval;
 @property(nonatomic) NSTimeInterval powerInterval;
@@ -18,8 +19,7 @@
 @property(nonatomic, strong) NSTimer *powerTimer;
 @property(nonatomic, strong) AVAudioRecorder *recorder;
 @property(nonatomic, strong) NSMutableArray <NSNumber *>*powers;
-@property(nonatomic, copy) AVAudioSessionCategory sessionCategory;
-@property(nonatomic, getter=isPausing) BOOL pausing;
+@property(nonatomic, copy) AVAudioSessionCategory audioSessionCategory;
 @end
 
 @implementation MNAudioRecorder
@@ -28,12 +28,11 @@
     if (!self) return nil;
     self.sampleRate = 44100;
     self.meteringEnabled = YES;
-    self.bitDepth = MNRecordBitDepth16;
-    self.channel = MNRecordChannelStereo;
-    self.quality = MNRecordQualityMedium;
+    self.bitDepth = MNRecordBitDepthNon;
+    self.channel = MNRecordChannelSingle;
     self.powers = @[].mutableCopy;
-    self.sessionCategory = AVAudioSession.sharedInstance.category;
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    self.audioSessionCategory = AVAudioSession.sharedInstance.category;
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionWasInterruptedNotification:) name:AVAudioSessionInterruptionNotification object:nil];
     return self;
 }
 
@@ -50,8 +49,8 @@
     if (self.isRecording) return YES;
     if (![self makeRecordSessionActive]) return NO;
     if ([self.recorder record]) {
-        self.error = nil;
-        self.pausing = NO;
+        _error = nil;
+        _isPausing = NO;
         [self openTimer];
         if ([_delegate respondsToSelector:@selector(audioRecorderDidStartRecording:)]) {
             [_delegate audioRecorderDidStartRecording:self];
@@ -64,17 +63,17 @@
 #pragma mark - 停止
 - (void)stop {
     if (_recorder) {
+        _isPausing = NO;
         [_recorder stop];
-        self.pausing = NO;
     }
 }
 
 #pragma mark - 暂停
 - (void)pause {
-    if (self.isRecording) {
+    if (self.isRecording || self.timer) {
         [self closeTimer];
         [_recorder pause];
-        self.pausing = YES;
+        _isPausing = YES;
         if ([_delegate respondsToSelector:@selector(audioRecorderDidPauseRecording:)]) {
             [_delegate audioRecorderDidPauseRecording:self];
         }
@@ -84,7 +83,7 @@
 #pragma mark - 删除
 - (BOOL)deleteRecording {
     if (self.isRecording) return NO;
-    return [_recorder deleteRecording];
+    return (_recorder && [_recorder deleteRecording]);
 }
 
 #pragma mark - 更新音频测量值
@@ -175,17 +174,12 @@
     return !error;
 }
 
-- (BOOL)renewSessionActive {
-    if (!self.sessionCategory) return NO;
-    if ([AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) return YES;
-    NSError *error;
-    [[AVAudioSession sharedInstance] setCategory:self.sessionCategory error:&error];
-    if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
-    return !error;
-}
-
-- (void)didEnterBackgroundNotification:(NSNotification *)notify {
-    if (self.isRecording) [self pause];
+#pragma mark - Notification
+- (void)sessionWasInterruptedNotification:(NSNotification *)notify {
+    AVAudioSessionInterruptionType type = [[notify.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
+    if (type == AVAudioSessionInterruptionTypeBegan) {
+        [self pause];
+    }
 }
 
 #pragma mark - Getter
@@ -211,6 +205,8 @@
         [setings setObject:@(self.quality) forKey:AVEncoderAudioQualityKey];
         // 每个采样点位数 分为8、16、24、32
         if (self.bitDepth > MNRecordBitDepthNon) [setings setObject:@(self.bitDepth) forKey:AVLinearPCMBitDepthKey];
+        // 是否使用浮点采样
+        [setings setObject:@(self.isFloatKey) forKey:AVLinearPCMIsFloatKey];
         NSError *error;
         AVAudioRecorder *recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:self.filePath] settings:setings error:&error];
         if (!error && recorder) {
@@ -225,20 +221,24 @@
 
 #pragma mark - AVAudioRecorderDelegate
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag {
-    self.pausing = NO;
+    self.isPausing = NO;
     [self closeTimer];
-    [self renewSessionActive];
-    if (!flag && !self.error) self.error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"录音失败"}];
-    if ([_delegate respondsToSelector:@selector(audioRecorderDidFinishRecording:successfully:)]) {
-        [_delegate audioRecorderDidFinishRecording:self successfully:flag];
+    if (flag) {
+        if ([_delegate respondsToSelector:@selector(audioRecorderDidFinishRecording:)]) {
+            [_delegate audioRecorderDidFinishRecording:self];
+        }
+    } else {
+        if (!self.error) self.error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown userInfo:@{NSLocalizedDescriptionKey:@"录音失败"}];
+        if ([_delegate respondsToSelector:@selector(audioRecorderDidFailRecording:)]) {
+            [_delegate audioRecorderDidFailRecording:self];
+        }
     }
 }
 
 - (void)audioRecorderEncodeErrorDidOccur:(AVAudioRecorder *)recorder error:(NSError * __nullable)error {
-    self.pausing = NO;
+    self.isPausing = NO;
     self.error = error;
     [self closeTimer];
-    [self renewSessionActive];
     if ([_delegate respondsToSelector:@selector(audioRecorderDidFailRecording:)]) {
         [_delegate audioRecorderDidFailRecording:self];
     }

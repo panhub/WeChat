@@ -4,18 +4,18 @@
 //
 //  Created by Vincent on 2018/7/16.
 //  Copyright © 2018年 小斯. All rights reserved.
-//  录音 .wav
+//  录音
 
 #import <Foundation/Foundation.h>
 @class MNAudioRecorder;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MNAudioRecordDelegate <NSObject>
+@protocol MNAudioRecorderDelegate <NSObject>
 @optional
 - (void)audioRecorderDidStartRecording:(MNAudioRecorder *)recorder;
 - (void)audioRecorderDidPauseRecording:(MNAudioRecorder *)recorder;
-- (void)audioRecorderDidFinishRecording:(MNAudioRecorder *)recorder successfully:(BOOL)flag;
+- (void)audioRecorderDidFinishRecording:(MNAudioRecorder *)recorder;
 - (void)audioRecorderDidFailRecording:(MNAudioRecorder *)recorder;
 - (void)audioRecorderPeriodicRecording:(MNAudioRecorder *)recorder;
 - (void)audioRecorder:(MNAudioRecorder *)recorder periodicPower:(NSArray <NSNumber *>*)powers;
@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 typedef NS_ENUM(int, MNRecordChannel) {
-    MNRecordChannelMono = 1,
-    MNRecordChannelStereo
+    MNRecordChannelSingle = 1,
+    MNRecordChannelDouble
 };
 
 typedef NS_ENUM(int, MNRecordQuality) {
@@ -49,21 +49,19 @@ typedef NS_ENUM(int, MNRecordBitDepth) {
 /**是否录音中*/
 @property(nonatomic, readonly) BOOL isRecording;
 /**事件回调*/
-@property(nonatomic, weak, nullable) id<MNAudioRecordDelegate> delegate;
+@property(nonatomic, weak, nullable) id<MNAudioRecorderDelegate> delegate;
 /**时长*/
 @property(nonatomic, readonly) NSTimeInterval duration;
-/**声道 默认'MNRecordChannelStereo'*/
+/**声道*/
 @property(nonatomic) MNRecordChannel channel;
-/**质量 默认'MNRecordQualityMedium'*/
+/**质量*/
 @property(nonatomic) MNRecordQuality quality;
-/**采样率 默认44100*/
+/**采样率*/
 @property(nonatomic) int sampleRate;
-/**比特深度 (8、16、24、32) 默认 MNRecordBitDepth16
- * 基本上PCM流的质量由两个属性表示: 采样率和比特深度
- * 如果以WAV格式记录PCM使用AVLinearPCMBitDepthKey设置深度即可 使用编码器则以AVEncoderBitRateKey设置比特率
- * 采样率*比特深度*声道数 = 比特率
- */
+/**每个采样点位数(8、16、24、32)*/
 @property(nonatomic) MNRecordBitDepth bitDepth;
+/**是否浮点采样*/
+@property(nonatomic, getter=isFloatKey) BOOL floatKey;
 /**录音地址*/
 @property(nonatomic, copy) NSString *filePath;
 /**错误信息*/
