@@ -770,13 +770,11 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
 }
 
 - (MNMovieSizeRatio)presetSizeRatio {
-    if (!_session || !self.session.sessionPreset) {
-        return MNMovieSizeRatioUnknown;
-    }
     return [self sizeRatioWithSessionPreset:self.session.sessionPreset];
 }
 
 - (MNMovieSizeRatio)sizeRatioWithSessionPreset:(AVCaptureSessionPreset)sessionPreset {
+    if (!sessionPreset) return MNMovieSizeRatioUnknown;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {
         if ([sessionPreset isEqualToString:AVCaptureSessionPreset3840x2160]) {
