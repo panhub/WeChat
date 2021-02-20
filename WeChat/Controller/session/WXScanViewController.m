@@ -112,10 +112,6 @@
 }
 
 #pragma mark - MNScannerDelegate
-- (void)scanner:(MNScanner *)scanner didFailWithError:(NSError *)error {
-    [[MNAlertView alertViewWithTitle:nil message:error.localizedDescription handler:nil ensureButtonTitle:nil otherButtonTitles:@"确定", nil] showInView:self.view];
-}
-
 - (void)scannerDidStartRunning:(MNScanner *)scanner {
     [self.scanView startScanning];
 }
@@ -139,6 +135,17 @@
 - (void)scannerUpdateCurrentSampleBrightness:(CGFloat)brightnessValue {
     if (self.scanner.isOnTorch) return;
     self.lightLabel.hidden = self.lightButton.hidden = (brightnessValue > 1.f);
+}
+
+- (void)scanner:(MNScanner *)scanner didFailWithError:(NSError *)error {
+    if (error.code == AVErrorApplicationIsNotAuthorized) {
+        __weak typeof(self) weakself = self;
+        [[MNAlertView alertViewWithTitle:nil message:error.localizedDescription handler:^(MNAlertView * _Nonnull alertView, NSInteger buttonIndex) {
+            [weakself.navigationController popViewControllerAnimated:YES];
+        } ensureButtonTitle:nil otherButtonTitles:@"确定", nil] showInView:self.view];
+    } else {
+        [self.view showInfoDialog:error.localizedDescription];
+    }
 }
 
 - (void)scannerDidReadMetadataWithResult:(NSString *)result {
