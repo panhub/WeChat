@@ -776,6 +776,9 @@ MNMoviePresetName const MNMoviePreset1920x1080 = @"com.mn.movie.preset.1920x1080
 }
 
 - (MNMovieSizeRatio)presetSizeRatio {
+    if (!_session || !self.session.sessionPreset) {
+        return MNMovieSizeRatioUnknown;
+    }
     AVCaptureSessionPreset presetName = self.session.sessionPreset;
 #ifdef __IPHONE_9_0
     if (@available(iOS 9.0, *)) {

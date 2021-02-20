@@ -182,7 +182,7 @@
     self.player.delegate = nil;
     self.recorder.delegate = nil;
     [self.player removeAllURLs];
-    [self.recorder stopRecording];
+    [self.recorder cancelRecording];
     [self.recorder deleteRecording];
     if ([self.delegate respondsToSelector:@selector(cameraControllerDidCancel:)]) {
         [self.delegate cameraControllerDidCancel:self];
@@ -214,6 +214,7 @@
 
 - (void)captureToolBarDoneButtonClicked:(MNCaptureToolBar *)toolBar {
     // 判断资源类型
+    if (self.playView.alpha == 1.f) [self.player pause];
     if (self.imageView.alpha) {
         if ([self.delegate respondsToSelector:@selector(cameraController:didFinishWithContents:)]) {
             [self.delegate cameraController:self didFinishWithContents:self.imageView.image];

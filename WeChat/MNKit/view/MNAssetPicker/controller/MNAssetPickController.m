@@ -35,7 +35,7 @@
 @property (nonatomic, strong) MNAssetToolBar *assetToolBar;
 @property (nonatomic, strong) MNAlbumSelectControl *albumToolBar;
 @property (nonatomic, strong) MNAssetPickConfiguration *configuration;
-@property (nonatomic, strong) NSMutableArray <MNAsset *>*selectedArray;
+@property (nonatomic, strong) NSMutableArray <MNAsset *>*selectedAssets;
 @property (nonatomic, strong) NSMutableArray <MNAssetCollection *>*collections;
 @end
 
@@ -55,7 +55,7 @@
     if (self = [super init]) {
         self.configuration = configuration;
         self.collections = @[].mutableCopy;
-        self.selectedArray = @[].mutableCopy;
+        self.selectedAssets = @[].mutableCopy;
     }
     return self;
 }
@@ -96,7 +96,7 @@
     if (self.configuration.maxPickingCount > 1) {
         MNAssetToolBar *assetToolBar = [[MNAssetToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.view.width_mn, layout.sectionInset.bottom)];
         assetToolBar.delegate = self;
-        assetToolBar.assets = self.selectedArray;
+        assetToolBar.assets = self.selectedAssets;
         assetToolBar.bottom_mn = self.view.height_mn;
         assetToolBar.configuration = self.configuration;
         [self.view addSubview:assetToolBar];
@@ -127,7 +127,6 @@
     }
 }
 
-#pragma mark - Event
 - (void)loadData {
     __weak typeof(self) weakself = self;
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
@@ -150,6 +149,40 @@
     }];
 }
 
+- (void)reloadData {
+    // 标注处理
+    if (self.configuration.showPickingNumber) {
+        [self.selectedAssets enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj.selectIndex = idx + 1;
+        }];
+    }
+    // 判断是否超过限制
+    if (self.selectedAssets.count >= self.configuration.maxPickingCount) {
+        // 达到最大限制, 不可再选
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == YES"]];
+        [assets setValue:@(NO) forKey:@"enabled"];
+    } else {
+        // 可以继续再选择
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == NO"]];
+        [assets setValue:@(YES) forKey:@"enabled"];
+        // 再进行类型限制
+        if (self.selectedAssets.count > 0 && !self.configuration.isAllowsMixPicking) {
+            MNAssetType type = self.selectedAssets.firstObject.type;
+            if (type == MNAssetTypeVideo) {
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
+                [assets setValue:@(NO) forKey:@"enabled"];
+            } else {
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
+                [assets setValue:@(NO) forKey:@"enabled"];
+            }
+        }
+    }
+    // 更新视图
+    if (self.assetToolBar) [self.assetToolBar updateSubviews];
+    [self.collectionView reloadData];
+}
+
+#pragma mark - Event
 - (void)handPan:(UIPanGestureRecognizer *)recognizer {
     switch (recognizer.state) {
         case UIGestureRecognizerStateBegan:
@@ -202,8 +235,11 @@
     MNAsset *model = self.collection.assets[indexPath.item];
     if (!model.isEnabled || model.status == MNAssetStatusDownloading) return;
     if (model.isTakeModel) {
-        // 拍照/拍摄
-        [self beginCapturing];
+        // 拍摄
+        MNCameraController *vc = [MNCameraController new];
+        vc.delegate = self;
+        vc.configuration = self.configuration;
+        [self.navigationController pushViewController:vc animated:YES];
     } else if (self.configuration.maxPickingCount == 1) {
         if (self.configuration.isAllowsPreviewing) {
             // 预览
@@ -287,36 +323,6 @@
     });
 }
 
-#pragma mark - 开始拍摄
-- (void)beginCapturing {
-    __weak typeof(self) weakself = self;
-    [MNAuthenticator requestCameraAuthorizationStatusWithHandler:^(BOOL result) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (result) {
-                if (weakself.configuration.isAllowsPickingVideo) {
-                    [MNAuthenticator requestMicrophonePermissionWithHandler:^(BOOL allowed) {
-                        if (allowed) {
-                            MNCameraController *vc = [MNCameraController new];
-                            vc.delegate = weakself;
-                            vc.configuration = weakself.configuration;
-                            [weakself.navigationController pushViewController:vc animated:YES];
-                        } else {
-                            [[MNAlertView alertViewWithTitle:@"获取麦克风权限失败" message:nil handler:nil ensureButtonTitle:nil otherButtonTitles:@"确定", nil] showInView:weakself.navigationController.view];
-                        }
-                    }];
-                } else {
-                    MNCameraController *vc = [MNCameraController new];
-                    vc.delegate = weakself;
-                    vc.configuration = weakself.configuration;
-                    [weakself.navigationController pushViewController:vc animated:YES];
-                }
-            } else {
-                [[MNAlertView alertViewWithTitle:@"获取摄像权限失败" message:nil handler:nil ensureButtonTitle:nil otherButtonTitles:@"确定", nil] showInView:weakself.navigationController.view];
-            }
-        });
-    }];
-}
-
 #pragma mark - 选择内容完成
 - (void)didFinishPickingAssets:(NSArray <MNAsset *>*)assets {
     __weak typeof(self) weakself = self;
@@ -382,47 +388,16 @@
 
 #pragma mark - Common Delegate
 - (void)didSelectAsset:(MNAsset *)model {
-    /// 这里把 maxPickingCount == 1 情况, 因为不会到这里
-    if (model.selected) {
-        /// 取消选择
+    // 这里把 maxPickingCount == 1 情况, 因为不会到这里
+    if (model.isSelected) {
         model.selected = NO;
-        [self.selectedArray removeObject:model];
+        [self.selectedAssets removeObject:model];
     } else {
-        /// 选择
         model.selected = YES;
-        [self.selectedArray addObject:model];
+        [self.selectedAssets addObject:model];
     }
-    /// 判断是否超过限制
-    if (self.selectedArray.count >= self.configuration.maxPickingCount) {
-        /// 达到最大限制, 不可再选
-        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == YES"]];
-        [assets setValue:@(NO) forKey:@"enabled"];
-    } else {
-        /// 可以继续再选择
-        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == NO"]];
-        [assets setValue:@(YES) forKey:@"enabled"];
-        /// 再进行类型限制
-        if (self.selectedArray.count > 0 && !self.configuration.isAllowsMixPicking) {
-            MNAssetType type = self.selectedArray.firstObject.type;
-            if (type == MNAssetTypeVideo) {
-                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
-                [assets setValue:@(NO) forKey:@"enabled"];
-            } else {
-                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
-                [assets setValue:@(NO) forKey:@"enabled"];
-            }
-        }
-    }
-    /// 更新底部提示
-    if (self.assetToolBar) [self.assetToolBar updateSubviews];
-    /// 标注处理
-    if (self.configuration.showPickingNumber) {
-        [self.selectedArray enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            obj.selectIndex = idx + 1;
-        }];
-    }
-    /// 刷新数据
-    [self.collectionView reloadData];
+    // 刷新数据
+    [self reloadData];
 }
 
 #pragma mark - MNAlbumViewDelegate
@@ -432,9 +407,20 @@
     [albumView dismiss];
 }
 
+#pragma mark - MNAlbumSelectEvent
+- (void)albumToolBarClicked:(MNAlbumSelectControl *)toolBar {
+    if (self.collections.count <= 1) return;
+    toolBar.selected = !toolBar.selected;
+    if (toolBar.selected) {
+        [self.albumView show];
+    } else {
+        [self.albumView dismiss];
+    }
+}
+
 #pragma mark - MNAssetToolDelegate
 - (void)assetToolBarLeftBarItemClicked:(MNAssetToolBar *)toolBar {
-    MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:self.selectedArray];
+    MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:self.selectedAssets];
     vc.delegate = self;
     vc.events = MNAssetPreviewEventDone|MNAssetPreviewEventSelect;
     [self.navigationController pushViewController:vc animated:YES];
@@ -443,25 +429,24 @@
 - (void)assetToolBarClearButtonClicked:(MNAssetToolBar *)toolBar {
     [[MNAlertView alertViewWithTitle:nil message:@"确定清空所选内容?" handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
         if (buttonIndex != alertView.ensureButtonIndex) return;
-        [self.selectedArray removeAllObjects];
+        [self.selectedAssets removeAllObjects];
         [self.collections enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             [obj.assets setValue:@(NO) forKey:@"selected"];
             [obj.assets setValue:@(YES) forKey:@"enabled"];
         }];
         [self.collectionView reloadData];
         if (self.albumToolBar.selected) [self.albumView reloadData];
-        toolBar.assets = self.selectedArray;
     } ensureButtonTitle:@"确定" otherButtonTitles:@"取消", nil] show];
 }
 
 - (void)assetToolBarRightBarItemClicked:(MNAssetToolBar *)toolBar {
     /// 判断是否允许退出
     NSUInteger minCount = self.configuration.minPickingCount;
-    if (minCount > 0 && self.selectedArray.count < minCount) {
+    if (minCount > 0 && self.selectedAssets.count < minCount) {
         [[MNAlertView alertViewWithTitle:nil message:[NSString stringWithFormat:@"请至少选择%@项素材", @(minCount).stringValue] handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] show];
         return;
     }
-    [self didFinishPickingAssets:self.selectedArray.copy];
+    [self didFinishPickingAssets:self.selectedAssets.copy];
 }
 
 #pragma mark - MNCameraControllerDelegate
@@ -644,26 +629,30 @@
         if (self.navigationController.view.userInteractionEnabled == NO) return;
         self.navigationController.view.userInteractionEnabled = NO;
         [self.navigationController.view showActivityDialog:@"请稍后"];
+        NSMutableArray <MNAsset *>*selectedAssets = @[].mutableCopy;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 if (!obj.result || !obj.collection) return;
                 PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:obj.result];
                 if (!details) return;
                 NSArray <MNAsset *>*result = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == YES"]];
-                [self.selectedArray removeObjectsInArray:result];
+                [selectedAssets addObjectsFromArray:result];
+                [self.selectedAssets removeObjectsInArray:result];
                 MNAssetCollection *collection = [MNAssetHelper fetchAssetCollection:obj.collection configuration:self.configuration];
-                [self.collections replaceObjectAtIndex:[self.collections indexOfObject:obj] withObject:collection];
+                [self.collections replaceObjectAtIndex:idx withObject:collection];
+                [selectedAssets.copy enumerateObjectsUsingBlock:^(MNAsset * _Nonnull ast, NSUInteger idx, BOOL * _Nonnull stop) {
+                    NSArray <MNAsset *>*array = [collection.assets.copy filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.asset.localIdentifier == %@", ast.asset.localIdentifier]];
+                    if (array.count) {
+                        [selectedAssets removeObject:ast];
+                        [array setValue:@(YES) forKey:@"selected"];
+                        [self.selectedAssets addObjectsFromArray:array];
+                    }
+                }];
                 if (obj == self.collection) self->_collection = collection;
             }];
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.configuration.showPickingNumber) {
-                    [self.selectedArray enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                        obj.selectIndex = idx + 1;
-                    }];
-                }
-                [self.collectionView reloadData];
+                [self reloadData];
                 if (self.albumView) [self.albumView reloadData];
-                if (self.assetToolBar) [self.assetToolBar updateSubviews];
                 [self.navigationController.view closeDialog];
                 self.navigationController.view.userInteractionEnabled = YES;
             });
@@ -703,27 +692,16 @@
     }
 }
 
-#pragma mark - 选择相册
-- (void)albumToolBarClicked:(MNAlbumSelectControl *)toolBar {
-    if (self.collections.count <= 1) return;
-    toolBar.selected = !toolBar.selected;
-    if (toolBar.selected) {
-        [self.albumView show];
-    } else {
-        [self.albumView dismiss];
-    }
-}
-
 #pragma mark - Setter
 - (void)setCollection:(MNAssetCollection *)collection {
     /// 处理不可选
     [collection.assets setValue:@(YES) forKey:@"enabled"];
     if (self.configuration.maxPickingCount > 1 && collection.assets.count > 0) {
-        if (self.selectedArray.count >= self.configuration.maxPickingCount) {
+        if (self.selectedAssets.count >= self.configuration.maxPickingCount) {
             NSArray <MNAsset *>*assets = [collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO"]];
             [assets setValue:@(NO) forKey:@"enabled"];
-        } else if (self.selectedArray.count > 0 && !self.configuration.isAllowsMixPicking) {
-            MNAssetType type = self.selectedArray.firstObject.type;
+        } else if (self.selectedAssets.count > 0 && !self.configuration.isAllowsMixPicking) {
+            MNAssetType type = self.selectedAssets.firstObject.type;
             if (type == MNAssetTypeVideo) {
                 NSArray <MNAsset *>*assets = [collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
                 [assets setValue:@(NO) forKey:@"enabled"];
@@ -744,15 +722,6 @@
                                     atScrollPosition:UICollectionViewScrollPositionTop
                                             animated:NO];
     }
-}
-
-#pragma mark - Getter
-- (NSMutableArray <MNAsset *>*)selectedArray {
-    if (!_selectedArray) {
-        NSMutableArray <MNAsset *>*selectedArray = [NSMutableArray arrayWithCapacity:0];
-        _selectedArray = selectedArray;
-    }
-    return _selectedArray;
 }
 
 #pragma mark - Super
