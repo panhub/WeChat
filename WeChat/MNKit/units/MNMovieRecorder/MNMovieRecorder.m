@@ -96,7 +96,7 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
                 if ([weakself setupVideo] && [weakself setupAudio] && [weakself setupImage] ) {
                     [weakself setOutputView:weakself.outputView];
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakself.session startRunning];
+                        [weakself startRunning];
                     });
                 }
             }];
@@ -120,7 +120,7 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
                 if ([weakself setupVideo] && [weakself setupAudio]) {
                     [weakself setOutputView:weakself.outputView];
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakself.session startRunning];
+                        [weakself startRunning];
                     });
                 }
             }];
@@ -139,7 +139,7 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
             if ([weakself setupVideo] && [weakself setupImage]) {
                 [weakself setOutputView:weakself.outputView];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakself.session startRunning];
+                    [weakself startRunning];
                 });
             }
         }];

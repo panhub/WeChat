@@ -19,7 +19,6 @@
 @property(nonatomic, strong) NSTimer *powerTimer;
 @property(nonatomic, strong) AVAudioRecorder *recorder;
 @property(nonatomic, strong) NSMutableArray <NSNumber *>*powers;
-@property(nonatomic, copy) AVAudioSessionCategory audioSessionCategory;
 @end
 
 @implementation MNAudioRecorder
@@ -31,7 +30,6 @@
     self.bitDepth = MNRecordBitDepthNon;
     self.channel = MNRecordChannelSingle;
     self.powers = @[].mutableCopy;
-    self.audioSessionCategory = AVAudioSession.sharedInstance.category;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sessionWasInterruptedNotification:) name:AVAudioSessionInterruptionNotification object:nil];
     return self;
 }

@@ -7,6 +7,7 @@
 //  播放器
 
 #import <Foundation/Foundation.h>
+#if __has_include(<AVFoundation/AVFoundation.h>)
 @class MNPlayer, AVPlayerItem;
 
 typedef NS_ENUM(NSInteger, MNPlayerState) {
@@ -16,6 +17,8 @@ typedef NS_ENUM(NSInteger, MNPlayerState) {
     MNPlayerStatePause,
     MNPlayerStateFinished
 };
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol MNPlayerDelegate <NSObject>
 @optional
@@ -47,19 +50,19 @@ typedef NS_ENUM(NSInteger, MNPlayerState) {
 /**视频显示层*/
 @property (nonatomic, strong) CALayer *layer;
 /**事件代理*/
-@property (nonatomic, weak) id<MNPlayerDelegate> delegate;
+@property (nonatomic, weak, nullable) id<MNPlayerDelegate> delegate;
 /**标记自身状态*/
 @property (nonatomic, readonly) MNPlayerState state;
 /**是否在播放, 内部判断此时状态*/
 @property (nonatomic, readonly, getter=isPlaying) BOOL playing;
 /**错误*/
-@property (nonatomic, strong, readonly) NSError *error;
+@property (nonatomic, strong, readonly, nullable) NSError *error;
 /**当前的URL*/
-@property (nonatomic, strong, readonly) NSURL *playURL;
+@property (nonatomic, readonly, nullable) NSURL *currentPlayURL;
 /**获取所有播放链接*/
-@property (nonatomic, strong, readonly) NSArray <NSURL *>*playURLs;
+@property (nonatomic, strong, nullable) NSArray <NSURL *>*playURLs;
 /**当前的playerItem <AVPlayerItem>*/
-@property (nonatomic, strong, readonly) AVPlayerItem *playItem;
+@property (nonatomic, readonly, nullable) AVPlayerItem *currentPlayItem;
 /**当前的播放索引*/
 @property (nonatomic, readonly) NSUInteger playIndex;
 /**缓冲进度*/
@@ -87,7 +90,7 @@ typedef NS_ENUM(NSInteger, MNPlayerState) {
 
 - (void)addURL:(NSURL *)URL;
 
-- (void)insertURL:(NSURL *)URL afterURL:(NSURL *)afterURL;
+- (void)insertURL:(NSURL *)URL afterURL:(NSURL *_Nullable)afterURL;
 
 - (void)removeURL:(NSURL *)URL;
 
@@ -113,14 +116,14 @@ typedef NS_ENUM(NSInteger, MNPlayerState) {
  @param progress 指定进度 <0 - 1>
  @param completion 结束回调
  */
-- (void)seekToProgress:(CGFloat)progress completion:(void(^)(BOOL finished))completion;
+- (void)seekToProgress:(CGFloat)progress completion:(void(^_Nullable)(BOOL finished))completion;
 
 /**
  跳转到指定时间
  @param seconds 时间/秒
  @param completion 结束回调
  */
-- (void)seekToSeconds:(NSTimeInterval)seconds completion:(void(^)(BOOL finished))completion;
+- (void)seekToSeconds:(NSTimeInterval)seconds completion:(void(^_Nullable)(BOOL finished))completion;
 
 #pragma mark - 播放音效
 /**
@@ -138,3 +141,6 @@ typedef NS_ENUM(NSInteger, MNPlayerState) {
 + (void)playSoundID:(UInt32)soundID shake:(BOOL)shake;
 
 @end
+
+NS_ASSUME_NONNULL_END
+#endif

@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, WXChatVoiceInputState) {
 #define WXChatVoiceNormalBackgroundColor     [UIColor whiteColor]
 #define WXChatVoiceHighlightedBackgroundColor     UIColorWithSingleRGB(220.f)
 
-@interface WXChatVoiceInputView () <MNAudioRecordDelegate, WXChatVoiceRecordViewDelegate>
+@interface WXChatVoiceInputView () <MNAudioRecorderDelegate, WXChatVoiceRecordViewDelegate>
 @property (nonatomic) CGPoint previousPoint;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) MNAudioRecorder *recorder;

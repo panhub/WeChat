@@ -7,6 +7,7 @@
 //  录音
 
 #import <Foundation/Foundation.h>
+#if __has_include(<AVFoundation/AVFoundation.h>)
 @class MNAudioRecorder;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -129,3 +130,4 @@ typedef NS_ENUM(int, MNRecordBitDepth) {
 @end
 
 NS_ASSUME_NONNULL_END
+#endif

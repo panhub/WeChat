@@ -13,18 +13,16 @@
 #import <MediaPlayer/MPRemoteCommand.h>
 
 @interface MNPlayer()
-/**播放器*/
-@property (nonatomic, strong) AVPlayer *player;
-/**播放状态*/
-@property (nonatomic) MNPlayerState state;
-/**标记应该播放*/
-@property (nonatomic, getter=isShouldPlaying) BOOL shouldPlaying;
 /**监听者*/
 @property (nonatomic, weak) id observer;
+/**播放状态*/
+@property (nonatomic) MNPlayerState state;
 /**当前播放索引*/
 @property (nonatomic) NSUInteger playIndex;
-/**记录原会话类型*/
-@property (nonatomic, copy) AVAudioSessionCategory sessionCategory;
+/**播放器*/
+@property (nonatomic, strong) AVPlayer *player;
+/**标记应该播放*/
+@property (nonatomic, getter=isShouldPlaying) BOOL shouldPlaying;
 /**待播数组*/
 @property (nonatomic, strong) NSMutableArray <NSURL *>*URLs;
 /**播放缓存*/
@@ -65,7 +63,6 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     _state = MNPlayerStateUnknown;
     _URLs = [NSMutableArray arrayWithCapacity:1];
     _caches = [NSMutableDictionary dictionaryWithCapacity:1];
-    _sessionCategory = AVAudioSession.sharedInstance.category;
     /*
      AVPlayer存在于AVFoundation中,它更加接近于底层,所以灵活性也更强,AVPlayer本身并不能显示视频,而且它也不像MPMoviePlayerController有一个view属性.如果AVPlayer要显示必须创建一个播放器层AVPlayerLayer用于展示,播放器层继承于CALayer,有了AVPlayerLayer之添加到控制器视图的layer中即可。要使用AVPlayer首先了解一下几个常用的类和它的属性/方法(源自网络);
      AVAsset: 主要用于获取多媒体信息，是一个抽象类，不能直接使用
@@ -114,7 +111,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 - (BOOL)containsURL:(NSURL *)URL {
     __block BOOL exists = NO;
     [self.URLs enumerateObjectsUsingBlock:^(NSURL * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.path isEqualToString:URL.path]) {
+        if (URL.isFileURL ? [obj.path isEqualToString:URL.path] : [obj.absoluteString isEqualToString:URL.absoluteString]) {
             exists = YES;
             *stop = YES;
         }
@@ -132,7 +129,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         NSURL *U = self.URLs.count > _playIndex ? self.URLs[_playIndex] : nil;
         __block NSInteger index = self.URLs.count - 1;
         [self.URLs enumerateObjectsUsingBlock:^(NSURL * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj.path isEqualToString:afterURL.path]) {
+            if (afterURL.isFileURL ? [obj.path isEqualToString:afterURL.path] : [obj.absoluteString isEqualToString:afterURL.absoluteString]) {
                 index = idx;
                 *stop = YES;
             }
@@ -151,7 +148,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     __block NSURL *U;
     __block NSInteger index = 0;
     [self.URLs enumerateObjectsUsingBlock:^(NSURL * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.path isEqualToString:URL.path]) {
+        if (URL.isFileURL ? [obj.path isEqualToString:URL.path] : [obj.absoluteString isEqualToString:URL.absoluteString]) {
             U = obj;
             index = idx;
             *stop = YES;
@@ -187,11 +184,9 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     if (self.player.currentItem.status == AVPlayerStatusReadyToPlay) [self.player pause];
     [self removeObserverWithPlayerItem:self.player.currentItem];
     [self.player replaceCurrentItemWithPlayerItem:nil];
-    self->_playURL = nil;
-    self->_playItem = nil;
     self.state = MNPlayerStateUnknown;
-    if ([_delegate respondsToSelector:@selector(playerDidPlayTimeInterval:)]) {
-        [_delegate playerDidPlayTimeInterval:self];
+    if ([self.delegate respondsToSelector:@selector(playerDidPlayTimeInterval:)]) {
+        [self.delegate playerDidPlayTimeInterval:self];
     }
 }
 
@@ -206,11 +201,9 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         AVPlayerItem *playerItem = [self playerItemForURL:URL];
         [self addObserverWithPlayerItem:playerItem];
         [self.player replaceCurrentItemWithPlayerItem:playerItem];
-        self->_playURL = URL;
-        self->_playItem = playerItem;
     }
-    if ([_delegate respondsToSelector:@selector(playerDidChangePlayItem:)]) {
-        [_delegate playerDidChangePlayItem:self];
+    if ([self.delegate respondsToSelector:@selector(playerDidChangePlayItem:)]) {
+        [self.delegate playerDidChangePlayItem:self];
     }
 }
 
@@ -262,8 +255,8 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     AVPlayerItem *playerItem = (AVPlayerItem *)(notification.object);
     if (playerItem != _player.currentItem) return;
     BOOL playNext = NO;
-    if ([_delegate respondsToSelector:@selector(playerShouldPlayNextItem:)]) {
-        playNext = [_delegate playerShouldPlayNextItem:self];
+    if ([self.delegate respondsToSelector:@selector(playerShouldPlayNextItem:)]) {
+        playNext = [self.delegate playerShouldPlayNextItem:self];
     }
     if (playNext) {
         // 进度调整为开始部分, 避免播放上一曲时直接就是结束位置
@@ -278,8 +271,8 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         }
     } else {
         self.state = MNPlayerStateFinished;
-        if ([_delegate respondsToSelector:@selector(playerDidPlayToEndTime:)]) {
-            [_delegate playerDidPlayToEndTime:self];
+        if ([self.delegate respondsToSelector:@selector(playerDidPlayToEndTime:)]) {
+            [self.delegate playerDidPlayToEndTime:self];
         }
     }
 }
@@ -359,7 +352,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     if (_player.currentItem.error) [userInfo setObject:_player.currentItem.error forKey:NSUnderlyingErrorKey];
     self->_error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorDecodeFailed userInfo:userInfo.copy];
     self.state = MNPlayerStateFailed;
-    if ([_delegate respondsToSelector:@selector(playerDidPlayFailure:)]) [_delegate playerDidPlayFailure:self];
+    if ([self.delegate respondsToSelector:@selector(playerDidPlayFailure:)]) [self.delegate playerDidPlayFailure:self];
 }
 
 #pragma mark - Observe Value
@@ -401,23 +394,23 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         }
     } else if ([keyPath isEqualToString:AVPlayItemLoadedKeyPath]) {
         /// 缓存状态
-        if ([_delegate respondsToSelector:@selector(playerDidLoadTimeRanges:)]) {
-            [_delegate playerDidLoadTimeRanges:self];
+        if ([self.delegate respondsToSelector:@selector(playerDidLoadTimeRanges:)]) {
+            [self.delegate playerDidLoadTimeRanges:self];
         }
     } else if ([keyPath isEqualToString:AVPlayItemEmptyKeyPath]) {
         /// 缓冲不足
-        if ([_delegate respondsToSelector:@selector(playerLikelyBufferEmpty:)]) {
-            [_delegate playerLikelyBufferEmpty:self];
+        if ([self.delegate respondsToSelector:@selector(playerLikelyBufferEmpty:)]) {
+            [self.delegate playerLikelyBufferEmpty:self];
         }
     } else if ([keyPath isEqualToString:AVPlayItemKeepUpKeyPath]) {
         /// 缓冲够了 播放
-        if ([_delegate respondsToSelector:@selector(playerLikelyToKeepUp:)]) {
-            [_delegate playerLikelyToKeepUp:self];
+        if ([self.delegate respondsToSelector:@selector(playerLikelyToKeepUp:)]) {
+            [self.delegate playerLikelyToKeepUp:self];
         }
     }
 }
 
-#pragma mark - 通知
+#pragma mark - Notification
 /// 中断事件
 - (void)sessionInterruptionNotification:(NSNotification *)notification {
     AVAudioSessionInterruptionType type = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
@@ -524,8 +517,8 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 - (void)setState:(MNPlayerState)state {
     if (_state == state) return;
     _state = state;
-    if ([_delegate respondsToSelector:@selector(playerDidChangeState:)]) {
-        [_delegate playerDidChangeState:self];
+    if ([self.delegate respondsToSelector:@selector(playerDidChangeState:)]) {
+        [self.delegate playerDidChangeState:self];
     }
 }
 
@@ -549,7 +542,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 
 - (void)setPlayURLs:(NSArray<NSURL *> *)playURLs {
     [self removeAllURLs];
-    [self.URLs addObjectsFromArray:playURLs.copy];
+    if (playURLs) [self.URLs addObjectsFromArray:playURLs.copy];
 }
 
 #pragma mark - 设置会话
@@ -587,6 +580,15 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 
 - (NSArray <NSURL *>*)playURLs {
     return self.URLs.copy;
+}
+
+- (NSURL *)currentPlayURL {
+    if (self.URLs.count <= self.playIndex) return nil;
+    return [self.URLs objectAtIndex:self.playIndex];
+}
+
+- (AVPlayerItem *)currentPlayItem {
+    return self.player.currentItem;
 }
 
 - (float)buffer {

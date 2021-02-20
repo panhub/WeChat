@@ -288,7 +288,7 @@
         self.imageView.alpha = self.cameraControl.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.recorder stopRunning];
-        [self.player addURL:self.recorder.URL];
+        self.player.playURLs = @[self.recorder.URL];
         [self.player play];
     }];
 }
