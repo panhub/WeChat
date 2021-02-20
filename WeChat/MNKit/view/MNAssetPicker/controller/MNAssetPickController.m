@@ -248,6 +248,7 @@
             // 预览
             MNAssetPreviewController *vc = [[MNAssetPreviewController alloc] initWithAssets:@[model]];
             vc.delegate = self;
+            vc.allowsAutoPlaying = YES;
             vc.cleanAssetWhenDealloc = YES;
             vc .events = MNAssetPreviewEventDone;
             [self.navigationController pushViewController:vc animated:YES];
@@ -268,6 +269,7 @@
         MNAssetBrowser *browser = [MNAssetBrowser new];
         browser.assets = assets;
         browser.delegate = self;
+        browser.allowsAutoPlaying = YES;
         browser.cleanAssetWhenDealloc = YES;
         browser.backgroundColor = UIColor.blackColor;
         [browser presentInView:self.contentView fromIndex:[assets indexOfObject:model] animated:YES completion:nil];

@@ -17,6 +17,8 @@
 @property (nonatomic, strong) AVPlayer *player;
 /**播放状态*/
 @property (nonatomic) MNPlayerState state;
+/**标记应该播放*/
+@property (nonatomic, getter=isShouldPlaying) BOOL shouldPlaying;
 /**监听者*/
 @property (nonatomic, weak) id observer;
 /**当前播放索引*/
@@ -54,7 +56,6 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 - (instancetype)init {
     if (self = [super init]) {
         [self initialized];
-        [self handEvents];
     }
     return self;
 }
@@ -87,33 +88,25 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     _player = [AVPlayer new];
     /**添加周期性监听*/
     self.observeTime = CMTimeMake(1, 1);
-}
-
-- (void)handEvents {
     /**播放结束*/
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(playerItemDidPlayToEndTime:)
                                                  name:AVPlayerItemDidPlayToEndTimeNotification
                                                object:nil];
-    /**非活跃状态*/
+    /**中断*/
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didEnterBackgroundNotification:)
-                                                 name:UIApplicationDidEnterBackgroundNotification
-                                               object:nil];
-    /**活跃状态*/
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(willEnterForegroundNotification:)
-                                                 name:UIApplicationWillEnterForegroundNotification
-                                               object:nil];
-    /**电话打来*/
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(audioSessionInterruptionNotification:)
+                                             selector:@selector(sessionInterruptionNotification:)
                                                  name:AVAudioSessionInterruptionNotification
                                                object:nil];
     /**耳机*/
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(audioSessionRouteChangeNotification:)
+                                             selector:@selector(sessionRouteChangeNotification:)
                                                  name:AVAudioSessionRouteChangeNotification
+                                               object:nil];
+    /**提示音*/
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(sessionSilenceSecondaryAudioHintNotification:)
+                                                 name:AVAudioSessionSilenceSecondaryAudioHintNotification
                                                object:nil];
 }
 
@@ -425,51 +418,72 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
 }
 
 #pragma mark - 通知
-//前台
-- (void)willEnterForegroundNotification:(NSNotification *)notification {}
-//后台
-- (void)didEnterBackgroundNotification:(NSNotification *)notification {
-    if (!self.isPlaybackEnabled && self.isPlaying) {
-        [self pause];
-    }
-}
 /// 中断事件
-- (void)audioSessionInterruptionNotification:(NSNotification *)notification {
+- (void)sessionInterruptionNotification:(NSNotification *)notification {
     AVAudioSessionInterruptionType type = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
     AVAudioSessionInterruptionOptions option = [[notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey] integerValue];
-    AVAudioSessionSilenceSecondaryAudioHintType hintType = [[notification.userInfo objectForKey:AVAudioSessionSilenceSecondaryAudioHintTypeKey] integerValue];
     if (type == AVAudioSessionInterruptionTypeBegan) {
-        /// 中断
-        if (_state == MNPlayerStatePlaying) {
+        // 中断开始
+        if (self.state == MNPlayerStatePlaying) {
+            self.shouldPlaying = YES;
             [self pause];
         }
-    } else if (type == AVAudioSessionInterruptionTypeEnded) {
-        /// 中断结束
-    }
-    if (option == AVAudioSessionInterruptionOptionShouldResume) {
-        /// 中断结束
-    }
-    if (hintType == AVAudioSessionSilenceSecondaryAudioHintTypeBegin) {
-        /// 其他App开始占据Session
-        if (_state == MNPlayerStatePlaying) {
-            [self pause];
-        }
-    } else if (hintType == AVAudioSessionSilenceSecondaryAudioHintTypeEnd) {
-        /// 其他App开始释放Session
+    } else if (option == AVAudioSessionInterruptionOptionShouldResume && self.state >= MNPlayerStatePause && self.isShouldPlaying) {
+        // 中断结束并建议播放
+        self.shouldPlaying = NO;
+        [self play];
     }
 }
+
 /// 耳机通知
-- (void)audioSessionRouteChangeNotification:(NSNotification *)notification {
-    NSDictionary *dic = notification.userInfo;
-    int changeReason= [dic[AVAudioSessionRouteChangeReasonKey] intValue];
-    //等于AVAudioSessionRouteChangeReasonOldDeviceUnavailable表示旧输出不可用
-    if (changeReason==AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-        AVAudioSessionRouteDescription *routeDescription=dic[AVAudioSessionRouteChangePreviousRouteKey];
+- (void)sessionRouteChangeNotification:(NSNotification *)notification {
+    AVAudioSessionRouteChangeReason reason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+        AVAudioSessionRouteDescription *routeDescription = notification.userInfo[AVAudioSessionRouteChangePreviousRouteKey];
         AVAudioSessionPortDescription *portDescription= [routeDescription.outputs firstObject];
-        //原设备为耳机则暂停
-        if ([portDescription.portType isEqualToString:@"Headphones"]) {
+        if ([portDescription.portType isEqualToString:AVAudioSessionPortHeadphones]) {
+            if (self.state == MNPlayerStatePlaying) {
+                [self pause];
+            } else if (self.isShouldPlaying) {
+                self.shouldPlaying = NO;
+            }
+        }
+    } else if (reason == AVAudioSessionRouteChangeReasonCategoryChange) {
+        AVAudioSessionCategory sessionCategory = AVAudioSession.sharedInstance.category;
+        if (![sessionCategory isEqualToString:AVAudioSessionCategoryPlayback] && ![sessionCategory isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
+            if (self.state == MNPlayerStatePlaying) {
+                [self pause];
+            } else if (self.isShouldPlaying) {
+                self.shouldPlaying = NO;
+            }
+        }
+    } else if (reason == AVAudioSessionRouteChangeReasonOverride || reason == AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory || reason == AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory) {
+        if (self.state == MNPlayerStatePlaying) {
+            [self pause];
+        } else if (self.isShouldPlaying) {
+            self.shouldPlaying = NO;
+        }
+    } else if (reason == AVAudioSessionRouteChangeReasonWakeFromSleep) {
+        if (self.state >= MNPlayerStatePause && self.isShouldPlaying) {
+            self.shouldPlaying = NO;
+            [self play];
+        }
+    }
+}
+
+/// 提示音
+- (void)sessionSilenceSecondaryAudioHintNotification:(NSNotification *)notification {
+    AVAudioSessionSilenceSecondaryAudioHintType hintType = [[notification.userInfo objectForKey:AVAudioSessionSilenceSecondaryAudioHintTypeKey] integerValue];
+    if (hintType == AVAudioSessionSilenceSecondaryAudioHintTypeBegin) {
+        /// 提示音响起
+        if (self.state == MNPlayerStatePlaying) {
+            self.shouldPlaying = YES;
             [self pause];
         }
+    } else if (self.state >= MNPlayerStatePause && self.isShouldPlaying) {
+        /// 提示音结束
+        self.shouldPlaying = NO;
+        [self play];
     }
 }
 
