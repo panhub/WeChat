@@ -615,11 +615,13 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     point = [self.previewLayer captureDevicePointOfInterestForPoint:point];
     __block BOOL result = NO;
     [self performDeviceChangeHandler:^(AVCaptureDevice * _Nullable device) {
-        if (device && device.isFocusPointOfInterestSupported &&
-            [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-            device.focusPointOfInterest = point;
-            device.focusMode = AVCaptureFocusModeAutoFocus;
-            result = YES;
+        if (device && device.isFocusPointOfInterestSupported) {
+            AVCaptureFocusMode focusMode = [device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus] ? AVCaptureFocusModeContinuousAutoFocus : AVCaptureFocusModeAutoFocus;
+            if ([device isFocusModeSupported:focusMode]) {
+                device.focusPointOfInterest = point;
+                device.focusMode = focusMode;
+                result = YES;
+            }
         }
     }];
     return result;
@@ -788,6 +790,12 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
         }
     }
 #endif
+    if ([sessionPreset isEqualToString:AVCaptureSessionPresetInputPriority]) {
+        if (NSProcessInfo.processInfo.processorCount == 1) {
+            return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio3x4 : MNMovieSizeRatio4x3;
+        }
+        return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
+    }
     if ([sessionPreset isEqualToString:AVCaptureSessionPresetHigh] || [sessionPreset isEqualToString:AVCaptureSessionPreset1920x1080] || [sessionPreset isEqualToString:AVCaptureSessionPreset1280x720] || [sessionPreset isEqualToString:AVCaptureSessionPresetiFrame1280x720] || [sessionPreset isEqualToString:AVCaptureSessionPresetiFrame960x540]) {
         return self.movieOrientation <= MNMovieOrientationPortraitUpsideDown ? MNMovieSizeRatio9x16 : MNMovieSizeRatio16x9;
     }

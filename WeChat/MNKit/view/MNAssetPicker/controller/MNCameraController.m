@@ -14,11 +14,12 @@
 @interface MNCameraController () <MNCaptureToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate, MNPlayViewDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UIView *movieView;
+@property (nonatomic, strong) MNPlayView *playView;
 @property (nonatomic, strong) UIControl *cameraControl;
 @property (nonatomic, strong) UIImageView *focusView;
 @property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UIImageView *badgeView;
 @property (nonatomic, strong) MNMovieRecorder *recorder;
-@property (nonatomic, strong) MNPlayView *playView;
 @property (nonatomic, strong) MNCaptureToolBar *toolBar;
 @end
 
@@ -52,6 +53,13 @@
     playView.touchEnabled = YES;
     [self.contentView addSubview:playView];
     self.playView = playView;
+    
+    UIImageView *badgeView = [UIImageView imageViewWithFrame:CGRectMake(0.f, 0.f, 43.f, 43.f) image:[MNBundle imageForResource:@"record_play"]];
+    badgeView.alpha = 0.f;
+    badgeView.userInteractionEnabled = NO;
+    badgeView.center_mn = playView.bounds_center;
+    [playView addSubview:badgeView];
+    self.badgeView = badgeView;
     
     UIImageView *imageView = [UIImageView imageViewWithFrame:self.contentView.bounds image:nil];
     imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
@@ -114,6 +122,7 @@
             self.playView.top_mn = self.imageView.top_mn = self.movieView.top_mn = self.cameraControl.bottom_mn + interval;
             self.toolBar.bottom_mn = self.cameraControl.bottom_mn + interval + presetSize.height - (MNCaptureToolBarMaxHeight - MNCaptureToolBarMinHeight);
         }
+        self.badgeView.center_mn = [self.contentView convertPoint:self.contentView.bounds_center toView:self.playView];
     }
     
     [self.recorder prepareCapturing];
@@ -170,6 +179,19 @@
 #pragma mark - MNPlayerDelegate
 - (void)playerDidPlayFailure:(MNPlayer *)player {
     [self.view showInfoDialog:player.error.localizedDescription];
+}
+
+- (void)playerDidChangeState:(MNPlayer *)player {
+    if (player.state == MNPlayerStatePlaying && self.badgeView.alpha == 1.f) {
+        self.badgeView.transform = CGAffineTransformIdentity;
+        [UIView animateWithDuration:.25f animations:^{
+            self.badgeView.alpha = 0.f;
+            self.badgeView.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+        }];
+    } else if (player.state == MNPlayerStatePause) {
+        self.badgeView.alpha = 1.f;
+        self.badgeView.transform = CGAffineTransformIdentity;
+    }
 }
 
 - (void)playerDidPlayToEndTime:(MNPlayer *)player {
@@ -283,6 +305,7 @@
 
 - (void)movieRecorderDidFinishRecording:(MNMovieRecorder *)recorder {
     [self.toolBar stopCapturing];
+    self.badgeView.alpha = 0.f;
     [UIView animateWithDuration:.3f animations:^{
         self.playView.alpha = 1.f;
         self.imageView.alpha = self.cameraControl.alpha = 0.f;
