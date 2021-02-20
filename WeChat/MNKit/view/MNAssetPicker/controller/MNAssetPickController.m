@@ -662,8 +662,17 @@
 
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    PHFetchResultChangeDetails *d = [changeInstance changeDetailsForFetchResult:self.collection.result];
     NSLog(@"====相册内容变动====");
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (!obj.result) return;
+            PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:obj.result];
+            if (!details || !details.hasIncrementalChanges) return;
+            NSArray *objects = details.removedObjects;
+            if (objects.count <= 0) return;
+            [obj removePHAssets:objects];
+        }];
+    });
 }
 
 #pragma mark - MNNavigationBarDelegate
@@ -785,15 +794,17 @@
 
 #pragma mark - didReceiveMemoryWarning
 - (void)didReceiveMemoryWarning {
-    [self.collections enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSArray <MNAsset *>*assets = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO"]];
-        if (assets && assets.count) [obj removeAssets:assets];
-    }];
-    if (self.isAppear) {
-        [self reloadList];
-    } else {
-        [self setNeedsReloadList];
-    }
+    self.view.userInteractionEnabled = NO;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSArray <MNAsset *>*assets = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO"]];
+            if (assets && assets.count) [obj removeAssets:assets];
+        }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self reloadList];
+            self.view.userInteractionEnabled = YES;
+        });
+    });
 }
 
 #pragma mark - dealloc

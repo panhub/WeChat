@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MNAsset.h"
+@class PHAsset;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -61,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param assets 指定资源
  */
 - (void)addAssets:(NSArray <MNAsset *>*)assets;
+/**
+ 删除相册资源
+ @param assets 指定资源
+ */
+- (void)removePHAssets:(NSArray <PHAsset *>*)assets;
 
 @end
 NS_ASSUME_NONNULL_END

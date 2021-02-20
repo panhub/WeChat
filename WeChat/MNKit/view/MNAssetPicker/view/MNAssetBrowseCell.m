@@ -246,6 +246,8 @@
         [MNAssetHelper requestAssetContent:model progress:^(double pro, NSError *error, MNAsset *m) {
             
             __strong typeof(self) self = weakself;
+            
+            if (!m || m != self.asset) return;
     
             if (error) {
                 self.progressView.hidden = YES;

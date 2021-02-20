@@ -140,7 +140,18 @@
     _enabled = enabled;
 }
 
-- (void)setSource:(MNAssetSourceType)source {
+#pragma mark - Change
+- (void)updateStatus:(MNAssetStatus)status {
+    _status = status;
+    if (status == MNAssetStatusFailed) _progress = 0.f;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.statusChangeHandler) {
+            self.statusChangeHandler(self);
+        }
+    });
+}
+
+- (void)updateSource:(MNAssetSourceType)source {
     _source = source;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.sourceChangeHandler) {
@@ -149,26 +160,7 @@
     });
 }
 
-- (void)setThumbnail:(UIImage *)thumbnail {
-    _thumbnail = thumbnail;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.thumbnailChangeHandler) {
-            self.thumbnailChangeHandler(self);
-        }
-    });
-}
-
-- (void)setStatus:(MNAssetStatus)status {
-    _status = status;
-    if (status == MNAssetStatusFailed) self->_progress = 0.f;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.statusChangeHandler) {
-            self.statusChangeHandler(self);
-        }
-    });
-}
-
-- (void)setProgress:(double)progress {
+- (void)updateProgress:(double)progress {
     _progress = progress;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.progressChangeHandler) {
@@ -177,49 +169,23 @@
     });
 }
 
-- (void)setFileSize:(long long)fileSize {
+- (void)updateThumbnail:(UIImage *)thumbnail {
+    _thumbnail = thumbnail;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.thumbnailChangeHandler) {
+            self.thumbnailChangeHandler(self);
+        }
+    });
+}
+
+- (void)updateFileSize:(long long)fileSize {
     _fileSize = fileSize;
-    self->_fileSizeString = self.fileSizeStringValue;
+    _fileSizeString = self.fileSizeStringValue;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.fileSizeChangeHandler) {
             self.fileSizeChangeHandler(self);
         }
     });
-}
-
-#pragma mark - Change
-- (void)updateStatus:(MNAssetStatus)status {
-    if (status == _status) return;
-    [self willChangeValueForKey:@"status"];
-    self->_status = status;
-    [self didChangeValueForKey:@"status"];
-}
-
-- (void)updateSource:(MNAssetSourceType)source {
-    if (source == _source) return;
-    [self willChangeValueForKey:@"source"];
-    self->_source = source;
-    [self didChangeValueForKey:@"source"];
-}
-
-- (void)updateProgress:(double)progress {
-    if (progress == _progress) return;
-    [self willChangeValueForKey:@"progress"];
-    self->_progress = progress;
-    [self didChangeValueForKey:@"progress"];
-}
-
-- (void)updateThumbnail:(UIImage *)thumbnail {
-    [self willChangeValueForKey:@"thumbnail"];
-    self->_thumbnail = thumbnail;
-    [self didChangeValueForKey:@"thumbnail"];
-}
-
-- (void)updateFileSize:(long long)fileSize {
-    [self willChangeValueForKey:@"fileSize"];
-    self->_fileSize = fileSize;
-    self->_fileSizeString = self.fileSizeStringValue;
-    [self didChangeValueForKey:@"fileSize"];
 }
 
 #pragma mark - Getter

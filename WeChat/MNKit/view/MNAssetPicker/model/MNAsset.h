@@ -112,10 +112,6 @@ NS_ASSUME_NONNULL_BEGIN
  是否可选
  */
 @property (nonatomic, getter=isEnabled) BOOL enabled;
-/**
- 标识符
- */
-@property (nonatomic, copy, nullable) NSString *uuid;
 #if __has_include(<Photos/Photos.h>)
 /**
  系统资源

@@ -57,6 +57,18 @@
     }
 }
 
+- (void)removePHAssets:(NSArray <PHAsset *>*)phAssets {
+    @synchronized (self) {
+        NSArray <MNAsset *>*assets = self.assets.copy;
+        NSMutableArray <MNAsset *>*array = @[].mutableCopy;
+        [phAssets.copy enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSArray *result = [assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.asset.localIdentifier == %@", obj.localIdentifier]];
+            [array addObjectsFromArray:result];
+        }];
+        [self.assets removeObjectsInArray:array];
+    }
+}
+
 #pragma mark - Getter
 - (NSMutableArray <MNAsset *>*)assets {
     if (!_assets) {

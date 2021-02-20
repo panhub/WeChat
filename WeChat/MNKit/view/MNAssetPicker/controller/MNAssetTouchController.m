@@ -190,6 +190,7 @@
     if (self.state == MNAssetTouchStateWeight) return;
 #if __has_include(<Photos/Photos.h>)
     [MNAssetHelper requestAssetContent:self.asset progress:^(double pro, NSError *error, MNAsset *model) {
+        if (!model || model != self.asset) return;
         if (error) {
             self.progressView.hidden = YES;
             self.progressView.progress = 0.f;

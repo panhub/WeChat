@@ -101,9 +101,9 @@
     
     CGSize presetSize = CGSizeMultiplyToWidth((recorder.presetSizeRatio == MNMovieSizeRatio9x16 ? CGSizeMake(9.f, 16.f) : CGSizeMake(3.f, 4.f)), self.contentView.width_mn);
     presetSize.height = ceil(presetSize.height);
-    if (self.contentView.height - presetSize.height > 3.f) {
+    if (self.contentView.height_mn - presetSize.height > 3.f) {
         // 屏幕尺寸不合适
-        self.playView.size = self.imageView.size_mn = self.movieView.size_mn = presetSize;
+        self.playView.size_mn = self.imageView.size_mn = self.movieView.size_mn = presetSize;
         CGFloat interval = floor((self.contentView.height_mn - self.cameraControl.bottom_mn - MN_TAB_SAFE_HEIGHT - presetSize.height - self.toolBar.height_mn)/3.f);
         if (interval > ceil(MNCaptureToolBarMaxHeight - MNCaptureToolBarMinHeight)) {
             self.playView.top_mn = self.imageView.top_mn = self.movieView.top_mn = self.cameraControl.bottom_mn + interval;
