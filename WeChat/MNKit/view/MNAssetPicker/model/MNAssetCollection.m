@@ -7,6 +7,7 @@
 //
 
 #import "MNAssetCollection.h"
+#import "MNAsset.h"
 
 @implementation MNAssetCollection
 - (void)addAsset:(MNAsset *)asset {
@@ -57,6 +58,7 @@
     }
 }
 
+#if __has_include(<Photos/Photos.h>)
 - (void)removePHAssets:(NSArray <PHAsset *>*)phAssets {
     @synchronized (self) {
         NSArray <MNAsset *>*assets = self.assets.copy;
@@ -68,6 +70,7 @@
         [self.assets removeObjectsInArray:array];
     }
 }
+#endif
 
 #pragma mark - Getter
 - (NSMutableArray <MNAsset *>*)assets {

@@ -133,8 +133,7 @@ static MNAssetHelper *_helper;
 #endif
     MNAssetCollection *assetCollection = [MNAssetCollection new];
     assetCollection.result = result;
-    assetCollection.identifier = collection.localIdentifier;
-    assetCollection.localizedTitle = collection.localizedTitle;
+    assetCollection.collection = collection;
     assetCollection.title = collection.localizedTitle ? : @"未知相簿";
     if ([MNAssetHelper isCameraCollection:collection]) assetCollection.title = @"相机胶卷";
     [assetCollection addAssets:assets];
@@ -673,7 +672,6 @@ static MNAssetHelper *_helper;
 }
 #endif
 
-#if __has_include(<Photos/PHLivePhoto.h>)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 + (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto completion:(void(^_Nullable)(NSString *_Nullable, NSString *_Nullable))completion {
@@ -739,7 +737,6 @@ static MNAssetHelper *_helper;
     });
 }
 #pragma clang diagnostic pop
-#endif
 
 #pragma mark - Write
 + (void)writeImageToAlbum:(id)image completion:(void(^_Nullable)(NSString *_Nullable identifier, NSError *_Nullable error))completionHandler

@@ -35,8 +35,8 @@
 @property (nonatomic, strong) MNAssetToolBar *assetToolBar;
 @property (nonatomic, strong) MNAlbumSelectControl *albumToolBar;
 @property (nonatomic, strong) MNAssetPickConfiguration *configuration;
-@property (nonatomic, strong) NSArray <MNAssetCollection *>*collections;
 @property (nonatomic, strong) NSMutableArray <MNAsset *>*selectedArray;
+@property (nonatomic, strong) NSMutableArray <MNAssetCollection *>*collections;
 @end
 
 @implementation MNAssetPickController
@@ -54,6 +54,8 @@
 - (instancetype)initWithConfiguration:(MNAssetPickConfiguration *)configuration {
     if (self = [super init]) {
         self.configuration = configuration;
+        self.collections = @[].mutableCopy;
+        self.selectedArray = @[].mutableCopy;
     }
     return self;
 }
@@ -94,6 +96,7 @@
     if (self.configuration.maxPickingCount > 1) {
         MNAssetToolBar *assetToolBar = [[MNAssetToolBar alloc] initWithFrame:CGRectMake(0.f, 0.f, self.view.width_mn, layout.sectionInset.bottom)];
         assetToolBar.delegate = self;
+        assetToolBar.assets = self.selectedArray;
         assetToolBar.bottom_mn = self.view.height_mn;
         assetToolBar.configuration = self.configuration;
         [self.view addSubview:assetToolBar];
@@ -129,26 +132,26 @@
     __weak typeof(self) weakself = self;
     [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
         if (allowed) {
-            [weakself reloadData];
+            [weakself.contentView showActivityDialog:@"加载中"];
+            [MNAssetHelper fetchAssetCollectionsWithConfiguration:self.configuration completion:^(NSArray<MNAssetCollection *>*dataArray) {
+                [weakself.collections removeAllObjects];
+                [weakself.collections addObjectsFromArray:dataArray];
+                weakself.albumToolBar.hidden = dataArray.count <= 0;
+                weakself.albumToolBar.selectEnabled = dataArray.count > 1;
+                weakself.collectionView.hidden = dataArray.count <= 0;
+                if (dataArray.count) weakself.collection = dataArray.firstObject;
+                if (weakself.albumView) weakself.albumView.dataArray = weakself.collections;
+                [weakself.contentView closeDialog];
+            }];
         } else {
             weakself.collectionView.hidden = YES;
-            [[MNAlertView alertViewWithTitle:@"权限不足" message:@"请前往“设置-隐私-照片”打开应用的相册访问权限" handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] show];
+            [[MNAlertView alertViewWithTitle:@"权限不足" message:@"请前往“设置-隐私-照片”打开应用的相册访问权限" handler:nil ensureButtonTitle:@"确定" otherButtonTitles:nil] showInView:weakself.navigationController.view];
         }
     }];
 }
 
 - (void)reloadData {
-    __weak typeof(self) weakself = self;
-    [self.contentView showActivityDialog:@"加载中"];
-    [MNAssetHelper fetchAssetCollectionsWithConfiguration:self.configuration completion:^(NSArray<MNAssetCollection *>*dataArray) {
-        weakself.collections = dataArray;
-        weakself.albumToolBar.hidden = dataArray.count <= 0;
-        weakself.albumToolBar.selectEnabled = dataArray.count > 1;
-        weakself.collectionView.hidden = dataArray.count <= 0;
-        if (dataArray.count) weakself.collection = dataArray.firstObject;
-        if (weakself.albumView) weakself.albumView.dataArray = dataArray;
-        [weakself.contentView closeDialog];
-    }];
+    
 }
 
 - (void)handPan:(UIPanGestureRecognizer *)recognizer {
@@ -471,38 +474,15 @@
 }
 
 - (void)cameraController:(MNCameraController *)cameraController didFinishWithContents:(id)content {
-    __weak typeof(self) weakself = self;
     __weak typeof(cameraController) vc = cameraController;
     [cameraController.view showActivityDialog:@"请稍后"];
     if (self.configuration.isAllowsWritToAlbum) {
-        [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
+        [MNAssetHelper writeAssets:@[content] toAlbum:self.collection.collection.localizedTitle completion:^(NSArray<NSString *> * _Nullable identifiers, NSError * _Nullable error) {
             if (error || identifiers.count <= 0) {
                 [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"保存图片失败" : @"保存视频失败")];
             } else {
-                [MNAssetHelper requestAssetWithLocalIdentifiers:identifiers configuration:self.configuration completion:^(NSArray<MNAsset *> * _Nullable assets) {
-                    if (!assets || assets.count <= 0) {
-                        [weakself insertContents:content completion:^(BOOL result) {
-                            if (result) {
-                                [vc.view closeDialogWithCompletionHandler:^{
-                                    [vc.navigationController popViewControllerAnimated:YES];
-                                }];
-                            } else {
-                                [vc.view showInfoDialog:@"操作失败"];
-                            }
-                        }];
-                    } else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (weakself.configuration.isSortAscending) {
-                                [weakself.collection addAsset:assets.firstObject];
-                            } else {
-                                [weakself.collection insertAssetAtFront:assets.firstObject];
-                            }
-                            weakself.collection = weakself.collection;
-                            [vc.view closeDialogWithCompletionHandler:^{
-                                [vc.navigationController popViewControllerAnimated:YES];
-                            }];
-                        });
-                    }
+                [vc.view closeDialogWithCompletionHandler:^{
+                    [vc.navigationController popViewControllerAnimated:YES];
                 }];
             }
         }];
@@ -666,26 +646,29 @@
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
     NSLog(@"====相册内容变动====");
     // 正在下载数据 即将结束不做任何操作
-    if (self.navigationController.view.userInteractionEnabled == NO) return;
-    PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:self.collection.result];
-    NSArray *objects = details.insertedObjects;
-    if (objects.count) {
-        NSLog(@"inserted");
-    }
-    NSArray *abs = details.removedObjects;
-    if (abs.count) {
-        NSLog(@"removed");
-    }
-    return;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (!obj.result) return;
-            PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:obj.result];
-            if (!details || !details.hasIncrementalChanges) return;
-            NSArray *objects = details.removedObjects;
-            if (objects.count <= 0) return;
-            [obj removePHAssets:objects];
-        }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.navigationController.view.userInteractionEnabled == NO) return;
+        self.navigationController.view.userInteractionEnabled = NO;
+        [self.navigationController.view showActivityDialog:@"请稍后"];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if (!obj.result || !obj.collection) return;
+                PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:obj.result];
+                if (!details) return;
+                NSArray <MNAsset *>*result = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == YES"]];
+                [self.selectedArray removeObjectsInArray:result];
+                MNAssetCollection *collection = [MNAssetHelper fetchAssetCollection:obj.collection configuration:self.configuration];
+                [self.collections replaceObjectAtIndex:[self.collections indexOfObject:obj] withObject:collection];
+                if (obj == self.collection) self->_collection = collection;
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.albumView reloadData];
+                [self.collectionView reloadData];
+                [self.assetToolBar updateSubviews];
+                [self.navigationController.view closeDialog];
+                self.navigationController.view.userInteractionEnabled = YES;
+            });
+        });
     });
 }
 

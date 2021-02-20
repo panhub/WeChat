@@ -22,9 +22,12 @@
 @property (nonatomic, weak) MNAssetPickConfiguration *configuration;
 
 /**选择的资源*/
-@property (nonatomic, copy) NSArray <MNAsset *>*assets;
+@property (nonatomic, strong) NSArray <MNAsset *>*assets;
 
 /**交互代理*/
 @property (nonatomic, weak) id<MNAssetToolDelegate> delegate;
+
+/**刷新*/
+- (void)updateSubviews;
 
 @end

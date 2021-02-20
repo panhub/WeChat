@@ -120,26 +120,11 @@
 }
 
 #pragma mark - Setter
-- (void)setAssets:(NSArray<MNAsset *> *)assets {
-    _assets = assets.copy;
-    NSString *title = assets.count > 0 ? [NSString stringWithFormat:@"(%@)", @(assets.count)] : @"";
-    title = [@"确定" stringByAppendingString:title];
-    CGFloat right = self.doneButton.right_mn;
-    CGFloat width = [NSString stringSize:title font:self.doneButton.titleLabel.font].width;
-    width += 15.f;
-    self.doneButton.width_mn = width;
-    self.doneButton.right_mn = right;
-    [self.doneButton setTitle:title forState:UIControlStateNormal];
-    self.previewButton.enabled = self.clearButton.enabled = assets.count > 0;
-    self.doneButton.enabled = (assets.count > 0 && assets.count >= self.configuration.minPickingCount);
-    [self updateFileSizeControl];
-}
-
 - (void)setConfiguration:(MNAssetPickConfiguration *)configuration {
     _configuration = configuration;
     self.fileSizeControl.hidden = !configuration.isAllowsOriginalExporting;
     self.fileSizeLabel.hidden = (!configuration.isAllowsOriginalExporting && !configuration.isAllowsDisplayFileSize);
-    self.assets = self.assets;
+    [self updateSubviews];
     if (configuration.isAllowsPreviewing) {
         if (self.previewButton.right_mn <= self.clearButton.left_mn) return;
         self.previewButton.left_mn = self.clearButton.left_mn;
@@ -153,7 +138,21 @@
     }
 }
 
-#pragma mark - 更新原图控件
+#pragma mark - 更新控件
+- (void)updateSubviews {
+    NSString *title = self.assets.count > 0 ? [NSString stringWithFormat:@"(%@)", @(self.assets.count)] : @"";
+    title = [@"确定" stringByAppendingString:title];
+    CGFloat right = self.doneButton.right_mn;
+    CGFloat width = [NSString stringSize:title font:self.doneButton.titleLabel.font].width;
+    width += 15.f;
+    self.doneButton.width_mn = width;
+    self.doneButton.right_mn = right;
+    [self.doneButton setTitle:title forState:UIControlStateNormal];
+    self.previewButton.enabled = self.clearButton.enabled = self.assets.count > 0;
+    self.doneButton.enabled = (self.assets.count > 0 && self.assets.count >= self.configuration.minPickingCount);
+    [self updateFileSizeControl];
+}
+
 - (void)updateFileSizeControl {
     if (self.fileSizeLabel.isHidden) return;
     NSString *fileSizeString = self.configuration.isAllowsOriginalExporting ? @"原图" : @"";

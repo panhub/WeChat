@@ -7,8 +7,7 @@
 //  相簿
 
 #import <Foundation/Foundation.h>
-#import "MNAsset.h"
-@class PHAsset;
+@class PHAsset, PHAssetCollection, MNAsset;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,13 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSString *title;
 /**
- 原始相簿名称
+ 系统相簿
  */
-@property (nonatomic, copy, nullable) NSString *localizedTitle;
-/**
- 相簿标识符
- */
-@property (nonatomic, copy, nullable) NSString *identifier;
+@property (nonatomic, strong) PHAssetCollection *collection;
 /**
  相簿缩略图
  */
@@ -62,11 +57,13 @@ NS_ASSUME_NONNULL_BEGIN
  @param assets 指定资源
  */
 - (void)addAssets:(NSArray <MNAsset *>*)assets;
+#if __has_include(<Photos/Photos.h>)
 /**
  删除相册资源
  @param assets 指定资源
  */
 - (void)removePHAssets:(NSArray <PHAsset *>*)assets;
+#endif
 
 @end
 NS_ASSUME_NONNULL_END

@@ -27,6 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)fetchAssetCollectionsWithConfiguration:(MNAssetPickConfiguration *)configuration completion:(void(^)(NSArray <MNAssetCollection *>*_Nullable))completion;
 
+/**
+ 获取相簿数据
+ @param collection 系统资源集合
+ @param configuration 配置信息
+ */
++ (MNAssetCollection *)fetchAssetCollection:(PHAssetCollection *)collection configuration:(MNAssetPickConfiguration *)configuration;
+
 #pragma mark - Get Thumbnail
 /**
  获取资源缩略图
@@ -111,7 +118,6 @@ NS_ASSUME_NONNULL_BEGIN
            completionHandler:(void(^_Nullable)(NSString *_Nullable filePath))completionHandler;
 #endif
 
-#if __has_include(<Photos/PHLivePhoto.h>)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
 /**
@@ -130,7 +136,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)exportLivePhotoResources:(PHLivePhoto *)livePhoto imagePath:(NSString *)imagePath videoPath:(NSString *)videoPath completion:(void(^_Nullable)(BOOL result))completion;
 #pragma clang diagnostic pop
-#endif
 
 #pragma mark - Write
 /**
