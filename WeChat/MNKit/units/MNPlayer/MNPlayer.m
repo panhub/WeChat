@@ -450,7 +450,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
         }
     } else if (reason == AVAudioSessionRouteChangeReasonCategoryChange) {
         AVAudioSessionCategory sessionCategory = AVAudioSession.sharedInstance.category;
-        if (![sessionCategory isEqualToString:AVAudioSessionCategoryPlayback] && ![sessionCategory isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
+        if (![sessionCategory isEqualToString:AVAudioSessionCategoryPlayback] && ![sessionCategory isEqualToString:AVAudioSessionCategoryPlayAndRecord] && ![sessionCategory isEqualToString:AVAudioSessionCategoryAmbient]) {
             if (self.state == MNPlayerStatePlaying) {
                 [self pause];
             } else if (self.isShouldPlaying) {
@@ -572,15 +572,6 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     return error == nil;
 }
 
-- (BOOL)renewSessionActive {
-    if (!self.sessionCategory) return NO;
-    if ([AVAudioSession.sharedInstance.category isEqualToString:self.sessionCategory]) return YES;
-    NSError *error;
-    [[AVAudioSession sharedInstance] setCategory:self.sessionCategory error:&error];
-    if (!error) [[AVAudioSession sharedInstance] setActive:YES error:&error];
-    return !error;
-}
-
 #pragma mark - Getter
 - (BOOL)isPlaying {
     return _state == MNPlayerStatePlaying;
@@ -658,12 +649,11 @@ static void MNPlaySoundCompleteHandler(SystemSoundID soundID,void *clientData){
 
 #pragma mark - dealloc
 - (void)dealloc {
-    _delegate = nil;
     _layer = nil;
+    _delegate = nil;
     [self removeAllURLs];
     if (_observer) [_player removeTimeObserver:_observer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self renewSessionActive];
 }
 
 @end
