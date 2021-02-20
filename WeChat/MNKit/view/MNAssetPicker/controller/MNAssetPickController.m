@@ -321,6 +321,7 @@
 #pragma mark - 选择内容完成
 - (void)didFinishPickingAssets:(NSArray <MNAsset *>*)assets {
     __weak typeof(self) weakself = self;
+    self.navigationController.view.userInteractionEnabled = NO;
     [MNAssetHelper requestContentWithAssets:assets configuration:self.configuration progress:^(NSInteger total, NSInteger index) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *msg = [NSString stringWithFormat:@"正在下载%@/%@", @(index + 1), @(total)];
@@ -334,6 +335,7 @@
         NSArray <MNAsset *>*failAssets = [succAssets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.status != %@", @(MNAssetStatusCompleted)]];
         if (failAssets.count) [succAssets removeObjectsInArray:failAssets];
         dispatch_async(dispatch_get_main_queue(), ^{
+            weakself.navigationController.view.userInteractionEnabled = YES;
             [weakself.navigationController.view closeDialogWithCompletionHandler:^{
                 if (failAssets.count <= 0) {
                     // 获取资源成功
@@ -663,6 +665,18 @@
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
     NSLog(@"====相册内容变动====");
+    // 正在下载数据 即将结束不做任何操作
+    if (self.navigationController.view.userInteractionEnabled == NO) return;
+    PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:self.collection.result];
+    NSArray *objects = details.insertedObjects;
+    if (objects.count) {
+        NSLog(@"inserted");
+    }
+    NSArray *abs = details.removedObjects;
+    if (abs.count) {
+        NSLog(@"removed");
+    }
+    return;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if (!obj.result) return;
