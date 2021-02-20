@@ -150,10 +150,6 @@
     }];
 }
 
-- (void)reloadData {
-    
-}
-
 - (void)handPan:(UIPanGestureRecognizer *)recognizer {
     switch (recognizer.state) {
         case UIGestureRecognizerStateBegan:
@@ -418,7 +414,7 @@
         }
     }
     /// 更新底部提示
-    if (self.assetToolBar) self.assetToolBar.assets = self.selectedArray;
+    if (self.assetToolBar) [self.assetToolBar updateSubviews];
     /// 标注处理
     if (self.configuration.showPickingNumber) {
         [self.selectedArray enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -644,8 +640,6 @@
 
 #pragma mark - PHPhotoLibraryChangeObserver
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    NSLog(@"====相册内容变动====");
-    // 正在下载数据 即将结束不做任何操作
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.navigationController.view.userInteractionEnabled == NO) return;
         self.navigationController.view.userInteractionEnabled = NO;
@@ -662,9 +656,14 @@
                 if (obj == self.collection) self->_collection = collection;
             }];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.albumView reloadData];
+                if (self.configuration.showPickingNumber) {
+                    [self.selectedArray enumerateObjectsUsingBlock:^(MNAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                        obj.selectIndex = idx + 1;
+                    }];
+                }
                 [self.collectionView reloadData];
-                [self.assetToolBar updateSubviews];
+                if (self.albumView) [self.albumView reloadData];
+                if (self.assetToolBar) [self.assetToolBar updateSubviews];
                 [self.navigationController.view closeDialog];
                 self.navigationController.view.userInteractionEnabled = YES;
             });
