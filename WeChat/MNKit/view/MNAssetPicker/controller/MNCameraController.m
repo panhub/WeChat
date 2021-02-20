@@ -11,7 +11,7 @@
 #import "MNCaptureToolBar.h"
 #import "MNPlayView.h"
 
-@interface MNCameraController () <MNCaptureToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate>
+@interface MNCameraController () <MNCaptureToolDelegate, MNMovieRecordDelegate, MNPlayerDelegate, MNPlayViewDelegate>
 @property (nonatomic, strong) MNPlayer *player;
 @property (nonatomic, strong) UIView *movieView;
 @property (nonatomic, strong) UIControl *cameraControl;
@@ -41,14 +41,15 @@
     
     UIView *movieView = [[UIView alloc] initWithFrame:self.contentView.bounds];
     movieView.backgroundColor = [UIColor blackColor];
-    [movieView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(handTap:), nil)];
+    [movieView addGestureRecognizer:UITapGestureRecognizerCreate(self, @selector(movieViewTouchUpInside:), nil)];
     [self.contentView addSubview:movieView];
     self.movieView = movieView;
     
     MNPlayView *playView = [[MNPlayView alloc] initWithFrame:self.contentView.bounds];
     playView.alpha = 0.f;
-    playView.touchEnabled = NO;
+    playView.delegate = self;
     playView.scrollEnabled = NO;
+    playView.touchEnabled = YES;
     [self.contentView addSubview:playView];
     self.playView = playView;
     
@@ -130,9 +131,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.playView.alpha == 1.f) {
-        if (self.player.state > MNPlayerStatePlaying) [self.player play];
-    } else if (self.imageView.alpha == 0.f) {
+    if (self.imageView.alpha + self.playView.alpha == 0.f) {
         [self.recorder startRunning];
     }
 }
@@ -148,9 +147,9 @@
 }
 
 #pragma mark - Tap
-- (void)handTap:(UITapGestureRecognizer *)tap {
+- (void)movieViewTouchUpInside:(UITapGestureRecognizer *)tap {
     if (!self.focusView.hidden) return;
-    CGPoint point = [tap locationInView:self.movieView];
+    CGPoint point = [tap locationInView:tap.view];
     [self.recorder setFocus:point];
     self.focusView.center_mn = point;
     self.focusView.hidden = NO;
@@ -175,6 +174,16 @@
 
 - (void)playerDidPlayToEndTime:(MNPlayer *)player {
     [player play];
+}
+
+#pragma mark - MNPlayViewDelegate
+- (void)playViewDidClicked:(MNPlayView *)playView {
+    if (self.player.state <= MNPlayerStateFailed) return;
+    if (self.player.isPlaying) {
+        [self.player pause];
+    } else {
+        [self.player play];
+    }
 }
 
 #pragma mark - MNCaptureToolDelegate

@@ -159,20 +159,20 @@
     // 判断是否超过限制
     if (self.selectedAssets.count >= self.configuration.maxPickingCount) {
         // 达到最大限制, 不可再选
-        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == YES"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == NO && self.enabled == YES"]];
         [assets setValue:@(NO) forKey:@"enabled"];
     } else {
         // 可以继续再选择
-        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.isEnabled == NO"]];
+        NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == NO && self.enabled == NO"]];
         [assets setValue:@(YES) forKey:@"enabled"];
         // 再进行类型限制
         if (self.selectedAssets.count > 0 && !self.configuration.isAllowsMixPicking) {
             MNAssetType type = self.selectedAssets.firstObject.type;
             if (type == MNAssetTypeVideo) {
-                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type != %ld", type]];
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == NO && self.type != %ld", type]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             } else {
-                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.isSelected == NO && self.type == %ld", MNAssetTypeVideo]];
+                NSArray <MNAsset *>*assets = [self.collection.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == NO && self.type == %ld", MNAssetTypeVideo]];
                 [assets setValue:@(NO) forKey:@"enabled"];
             }
         }
@@ -435,8 +435,9 @@
             [obj.assets setValue:@(YES) forKey:@"enabled"];
         }];
         [self.collectionView reloadData];
+        [toolBar updateSubviews];
         if (self.albumToolBar.selected) [self.albumView reloadData];
-    } ensureButtonTitle:@"确定" otherButtonTitles:@"取消", nil] show];
+    } ensureButtonTitle:@"确定" otherButtonTitles:@"取消", nil] showInView:self.navigationController.view];
 }
 
 - (void)assetToolBarRightBarItemClicked:(MNAssetToolBar *)toolBar {
@@ -462,6 +463,7 @@
             if (error || identifiers.count <= 0) {
                 [vc.view showInfoDialog:([content isKindOfClass:UIImage.class] ? @"保存图片失败" : @"保存视频失败")];
             } else {
+                if ([content isKindOfClass:NSString.class]) [NSFileManager.defaultManager removeItemAtPath:content error:NULL];
                 [vc.view closeDialogWithCompletionHandler:^{
                     [vc.navigationController popViewControllerAnimated:YES];
                 }];
