@@ -9,7 +9,7 @@
 #ifndef MNNetworking_h
 #define MNNetworking_h
 
-#import "MNSSLPolicy.h"
+#import "MNTrustPolicy.h"
 #import "MNURLSession.h"
 #import "MNNetworkReachability.h"
 #import "MNURLRequestSerializer.h"

@@ -292,7 +292,7 @@
 
 #pragma mark - NSCopying
 - (id)copyWithZone:(NSZone *)zone {
-    MNPurchaseReceipt *receipt = [MNPurchaseReceipt allocWithZone:zone];
+    MNPurchaseReceipt *receipt = [[MNPurchaseReceipt allocWithZone:zone] init];
     receipt.local = _local;
     receipt.price = _price;
     receipt.restore = _restore;

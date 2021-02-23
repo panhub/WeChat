@@ -536,7 +536,7 @@
 		E869C9172570EF670017025E /* MNMovieRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6352570EF620017025E /* MNMovieRecorder.m */; };
 		E869C9182570EF670017025E /* MNURLRequestSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6392570EF620017025E /* MNURLRequestSerializer.m */; };
 		E869C9192570EF670017025E /* MNNetworkReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63B2570EF620017025E /* MNNetworkReachability.m */; };
-		E869C91A2570EF670017025E /* MNSSLPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63D2570EF620017025E /* MNSSLPolicy.m */; };
+		E869C91A2570EF670017025E /* MNTrustPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63D2570EF620017025E /* MNTrustPolicy.m */; };
 		E869C91B2570EF670017025E /* MNURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C63E2570EF620017025E /* MNURLSession.m */; };
 		E869C91C2570EF670017025E /* MNURLResponseSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6402570EF620017025E /* MNURLResponseSerializer.m */; };
 		E869C91D2570EF670017025E /* MNFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C6432570EF620017025E /* MNFileManager.m */; };
@@ -1922,12 +1922,12 @@
 		E869C6342570EF620017025E /* MNMovieRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNMovieRecorder.h; sourceTree = "<group>"; };
 		E869C6352570EF620017025E /* MNMovieRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNMovieRecorder.m; sourceTree = "<group>"; };
 		E869C6372570EF620017025E /* MNURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNURLSession.h; sourceTree = "<group>"; };
-		E869C6382570EF620017025E /* MNSSLPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNSSLPolicy.h; sourceTree = "<group>"; };
+		E869C6382570EF620017025E /* MNTrustPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNTrustPolicy.h; sourceTree = "<group>"; };
 		E869C6392570EF620017025E /* MNURLRequestSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNURLRequestSerializer.m; sourceTree = "<group>"; };
 		E869C63A2570EF620017025E /* MNNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNNetworking.h; sourceTree = "<group>"; };
 		E869C63B2570EF620017025E /* MNNetworkReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNNetworkReachability.m; sourceTree = "<group>"; };
 		E869C63C2570EF620017025E /* MNURLResponseSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNURLResponseSerializer.h; sourceTree = "<group>"; };
-		E869C63D2570EF620017025E /* MNSSLPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNSSLPolicy.m; sourceTree = "<group>"; };
+		E869C63D2570EF620017025E /* MNTrustPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNTrustPolicy.m; sourceTree = "<group>"; };
 		E869C63E2570EF620017025E /* MNURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNURLSession.m; sourceTree = "<group>"; };
 		E869C63F2570EF620017025E /* MNURLRequestSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MNURLRequestSerializer.h; sourceTree = "<group>"; };
 		E869C6402570EF620017025E /* MNURLResponseSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNURLResponseSerializer.m; sourceTree = "<group>"; };
@@ -4811,8 +4811,8 @@
 				E869C63A2570EF620017025E /* MNNetworking.h */,
 				E869C6412570EF620017025E /* MNNetworkReachability.h */,
 				E869C63B2570EF620017025E /* MNNetworkReachability.m */,
-				E869C6382570EF620017025E /* MNSSLPolicy.h */,
-				E869C63D2570EF620017025E /* MNSSLPolicy.m */,
+				E869C6382570EF620017025E /* MNTrustPolicy.h */,
+				E869C63D2570EF620017025E /* MNTrustPolicy.m */,
 				E869C63F2570EF620017025E /* MNURLRequestSerializer.h */,
 				E869C6392570EF620017025E /* MNURLRequestSerializer.m */,
 				E869C63C2570EF620017025E /* MNURLResponseSerializer.h */,
@@ -6446,7 +6446,7 @@
 				201DAEE522E894400063E88A /* WXTransferViewController.m in Sources */,
 				201DB09B22E8953C0063E88A /* WXMomentHeaderView.m in Sources */,
 				E869C9942570EF670017025E /* MNAsset.m in Sources */,
-				E869C91A2570EF670017025E /* MNSSLPolicy.m in Sources */,
+				E869C91A2570EF670017025E /* MNTrustPolicy.m in Sources */,
 				E869C9152570EF670017025E /* MNOperation.m in Sources */,
 				E869C91F2570EF670017025E /* MNExtern.m in Sources */,
 				E869C9652570EF670017025E /* MNMenuTransitionAnimator.m in Sources */,

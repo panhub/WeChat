@@ -7,6 +7,7 @@
 //
 
 #import "MNURLSession.h"
+#import <objc/runtime.h>
 
 static dispatch_queue_t mn_url_session_create_task_queue(void) {
     static dispatch_queue_t mn_url_session_task_queue;
@@ -238,7 +239,7 @@ static dispatch_queue_t mn_url_session_create_serialization_queue(void) {
 @property (readwrite, nonatomic, strong) NSURLSession *session;
 @property (readwrite, nonatomic, strong) NSURLSessionConfiguration *configuration;
 @property (readwrite, nonatomic, strong) NSOperationQueue *operationQueue;
-@property (readwrite, nonatomic, strong) MNSSLPolicy *SSLPolicy;
+@property (readwrite, nonatomic, strong) MNTrustPolicy *securityPolicy;
 @end
 
 #define Lock()    dispatch_semaphore_wait(self->_lock, DISPATCH_TIME_FOREVER)
@@ -279,7 +280,7 @@ static dispatch_queue_t mn_url_session_create_serialization_queue(void) {
                                                  delegate:self
                                             delegateQueue:self.operationQueue];
     
-    self.SSLPolicy = [MNSSLPolicy defaultPolicy];
+    self.securityPolicy = MNTrustPolicy.defaultPolicy;
     
     _lock = dispatch_semaphore_create(1);
     _delegateContainerRef = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
@@ -611,25 +612,23 @@ static dispatch_queue_t mn_url_session_create_serialization_queue(void) {
     __block NSURLCredential *credential = nil;
     if (self.didReceiveChallengeCallback) {
         disposition = self.didReceiveChallengeCallback(session, challenge, &credential);
-    } else {
-        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-            /*
-             此处服务器要求客户端的接收认证挑战方法是NSURLAuthenticationMethodServerTrust;
-             也就是说服务器端需要客户端返回一个根据认证挑战的保护空间提供的信任(即challenge.protectionSpace.serverTrust)产生的挑战证书;
-             而这个证书就需要使用credentialForTrust:来创建一个NSURLCredential对象;
-            */
-            //基于客户端的安全策略来决定是否信任该服务器, 不信任的话, 也就没必要响应挑战
-            if ([self.SSLPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust forDomain:challenge.protectionSpace.host]) {
-                /**信任就创建挑战证书*/
-                credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
-                if (credential) {
-                    /**挑战证书创建成功就用证书应战*/
-                    disposition = NSURLSessionAuthChallengeUseCredential;
-                }
-            } else {
-                /**不信任就取消挑战*/
-                disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
+    } else if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        /*
+         此处服务器要求客户端的接收认证挑战方法是NSURLAuthenticationMethodServerTrust;
+         也就是说服务器端需要客户端返回一个根据认证挑战的保护空间提供的信任(即challenge.protectionSpace.serverTrust)产生的挑战证书;
+         而这个证书就需要使用credentialForTrust:来创建一个NSURLCredential对象;
+        */
+        //基于客户端的安全策略来决定是否信任该服务器, 不信任的话, 也就没必要响应挑战
+        if ([self.securityPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust forDomain:challenge.protectionSpace.host]) {
+            /**信任就创建挑战证书*/
+            credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+            if (credential) {
+                /**挑战证书创建成功就用证书应战*/
+                disposition = NSURLSessionAuthChallengeUseCredential;
             }
+        } else {
+            /**不信任就取消挑战*/
+            disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
         }
     }
     if (completionHandler) {
@@ -648,6 +647,8 @@ static dispatch_queue_t mn_url_session_create_serialization_queue(void) {
         });
     }
 }
+
+static const void * const MNTaskAuthChallengeErrorKey = &MNTaskAuthChallengeErrorKey;
 
 #pragma mark - NSURLSessionTaskDelegate
 /**
@@ -682,29 +683,49 @@ static dispatch_queue_t mn_url_session_create_serialization_queue(void) {
  */
 - (void)URLSession:(NSURLSession *)session task:(nonnull NSURLSessionTask *)task didReceiveChallenge:(nonnull NSURLAuthenticationChallenge *)challenge completionHandler:(nonnull void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
     /**先默认使用系统框架自行验证*/
-    NSURLSessionAuthChallengeDisposition disposition = NSURLSessionAuthChallengePerformDefaultHandling;
     __block NSURLCredential *credential = nil;
+    NSURLSessionAuthChallengeDisposition disposition = NSURLSessionAuthChallengePerformDefaultHandling;
     if (self.taskDidReceiveChallengeCallback) {
         disposition = self.taskDidReceiveChallengeCallback(session, task, challenge, &credential);
-    } else {
-        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-            /*
-             此处服务器要求客户端的接收认证挑战方法是NSURLAuthenticationMethodServerTrust;
-             也就是说服务器端需要客户端返回一个根据认证挑战的保护空间提供的信任(即challenge.protectionSpace.serverTrust)产生的挑战证书;
-             而这个证书就需要使用credentialForTrust:来创建一个NSURLCredential对象;
-             */
-            //基于客户端的安全策略来决定是否信任该服务器, 不信任的话, 也就没必要响应挑战
-            if ([self.SSLPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust forDomain:challenge.protectionSpace.host]) {
-                /**信任就创建挑战证书*/
-                credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
-                if (credential) {
-                    /**挑战证书创建成功就用证书应战*/
-                    disposition = NSURLSessionAuthChallengeUseCredential;
-                }
-            } else {
-                /**不信任就取消挑战*/
-                disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
+    } else if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        /*
+         此处服务器要求客户端的接收认证挑战方法是NSURLAuthenticationMethodServerTrust;
+         也就是说服务器端需要客户端返回一个根据认证挑战的保护空间提供的信任(即challenge.protectionSpace.serverTrust)产生的挑战证书;
+         而这个证书就需要使用credentialForTrust:来创建一个NSURLCredential对象;
+         */
+        //基于客户端的安全策略来决定是否信任该服务器, 不信任的话, 也就没必要响应挑战
+        SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+        if ([self.securityPolicy evaluateServerTrust:serverTrust forDomain:challenge.protectionSpace.host]) {
+            /**信任就创建挑战证书*/
+            credential = [NSURLCredential credentialForTrust:serverTrust];
+            if (credential) {
+                /**挑战证书创建成功就用证书应战*/
+                disposition = NSURLSessionAuthChallengeUseCredential;
             }
+        } else {
+            /**不信任就取消挑战*/
+            // 标记认证HTTPS挑战失败
+            NSURL *URL = task.currentRequest.URL;
+            NSBundle *CFNetworkBundle = [NSBundle bundleWithIdentifier:@"com.apple.CFNetwork"];
+            NSString *defaultValue = @"The certificate for this server is invalid. You might be connecting to a server that is pretending to be “%@” which could put your confidential information at risk.";
+            NSString *descriptionFormat = NSLocalizedStringWithDefaultValue(@"Err-1202.w", nil, CFNetworkBundle, defaultValue, @"") ?: defaultValue;
+            NSString *localizedDescription = [descriptionFormat componentsSeparatedByString:@"%@"].count <= 2 ? [NSString localizedStringWithFormat:descriptionFormat, URL.host] : descriptionFormat;
+            NSMutableDictionary *userInfo = [@{
+                NSLocalizedDescriptionKey: localizedDescription
+            } mutableCopy];
+            if (serverTrust) {
+                userInfo[NSURLErrorFailingURLPeerTrustErrorKey] = (__bridge id)serverTrust;
+            }
+            if (URL) {
+                userInfo[NSURLErrorFailingURLErrorKey] = URL;
+                if (URL.absoluteString) {
+                    userInfo[NSURLErrorFailingURLStringErrorKey] = URL.absoluteString;
+                }
+            }
+            objc_setAssociatedObject(task, MNTaskAuthChallengeErrorKey,
+                                     [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorServerCertificateUntrusted userInfo:userInfo],
+                                     OBJC_ASSOCIATION_RETAIN);
+            disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
         }
     }
     if (completionHandler) {

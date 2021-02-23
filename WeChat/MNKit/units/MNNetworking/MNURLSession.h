@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "MNURLRequestSerializer.h"
 #import "MNURLResponseSerializer.h"
-#import "MNSSLPolicy.h"
+#import "MNTrustPolicy.h"
 
 #pragma mark Public Callback
 
@@ -91,7 +91,7 @@ typedef void (^MNURLSessionDownloadTaskMoveFileFailedCallback)(NSURLSessionDownl
 /**结束回调组*/
 @property (readwrite, nonatomic, strong) dispatch_group_t completionGroup;
 /**响应HTTPS SSL 挑战策略*/
-@property (readonly, nonatomic, strong) MNSSLPolicy *SSLPolicy;
+@property (readonly, nonatomic, strong) MNTrustPolicy *securityPolicy;
 
 #pragma mark - NSURLSessionDelegate Callback Attribute
 @property (readwrite, nonatomic, copy) MNURLSessionDidBecomeInvalidCallback didBecomeInvalidCallback;
