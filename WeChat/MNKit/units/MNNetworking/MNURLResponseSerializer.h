@@ -44,6 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**接受的响应码*/
 @property (nonatomic, copy) NSIndexSet *acceptableStatus;
 
+/**接受的响应数据类型*/
+@property (nonatomic, copy, nullable) NSSet <NSString *> *acceptableContentTypes;
+
 /**JSON格式编码选项*/
 @property (nonatomic) NSJSONReadingOptions JSONOptions;
 

@@ -202,7 +202,7 @@ static NSString * MNPercentEscapedStringFromString(NSString *string) {
 
 #pragma mark - NSCopying
 - (id)copyWithZone:(nullable NSZone *)zone {
-    MNURLRequestSerializer *serializer = [MNURLRequestSerializer allocWithZone:zone];
+    MNURLRequestSerializer *serializer = [[self.class allocWithZone:zone] init];
     serializer.body = self.body;
     serializer.query = self.query;
     serializer.boundary = self.boundary;

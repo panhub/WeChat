@@ -8,6 +8,7 @@
 
 #import "MNTrustPolicy.h"
 #import <AssertMacros.h>
+#import <Security/Security.h>
 
 /**比较秘钥是否相同*/
 static BOOL MNSecKeyIsEqualToKey(SecKeyRef key1, SecKeyRef key2) {
@@ -178,7 +179,7 @@ static NSArray * MNPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust) {
     //判断有域名, 且允许自建证书, 需要验证域名;
     //因为要验证域名, 所以必须不能是MNTrustModeNone或者添加到项目里的证书为0个;
     if (!self.allowsInvalidCertificate && ((self.mode == MNTrustModePublicKey && self.publicKeys.count <= 0) || (self.mode == MNTrustModeCertificate && self.certificates.count <= 0))) {
-        NSLog(@"policy unusable");
+        NSLog(@"MNTrustPolicy: policy unusable");
         return NO;
     }
     //用来装验证策略
@@ -264,7 +265,7 @@ static NSArray * MNPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust) {
 
 #pragma mark - NSCopying
 - (id)copyWithZone:(NSZone *)zone {
-    MNTrustPolicy *policy = [[MNTrustPolicy allocWithZone:zone] init];
+    MNTrustPolicy *policy = [[self.class allocWithZone:zone] init];
     policy.mode = self.mode;
     policy.validatesDomainName = self.validatesDomainName;
     policy.allowsInvalidCertificate = self.allowsInvalidCertificate;

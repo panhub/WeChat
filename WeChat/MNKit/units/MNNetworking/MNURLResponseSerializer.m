@@ -177,10 +177,10 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
     NSError *validationError = nil;
     //如果存在且是NSHTTPURLResponse
     if (response && [response isKindOfClass:[NSHTTPURLResponse class]]) {
-        NSSet <NSString *>*acceptSet = [self acceptContentSet];
+        NSSet <NSString *>*acceptableContentTypes = [self acceptableContentTypes];
         //判断自己能接受的数据类型和response的数据类型是否匹配，
         //如果不匹配数据类型，如果不匹配response，而且响应类型不为空或者数据长度不为0
-        if (acceptSet && ![acceptSet containsObject:[response MIMEType]] &&
+        if (acceptableContentTypes && ![acceptableContentTypes containsObject:[response MIMEType]] &&
             !([response MIMEType] == nil && [data length] <= 0)) {
             //说明解析数据肯定是失败的, 这时候要把解析错误信息放到error里。
             //如果数据长度大于0，而且有响应url
@@ -227,22 +227,27 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
 }
 
 #pragma mark - 可接受数据类型
-- (NSSet <NSString *>*)acceptContentSet {
-    NSSet <NSString *>*acceptSet;
+- (NSSet <NSString *>*)acceptableContentTypes {
+    if (_acceptableContentTypes) return _acceptableContentTypes;
+    NSSet <NSString *>*contentTypes;
     switch (self.serializationType) {
         case MNURLSerializationTypeJSON:
         {
             static NSSet <NSString *>*set;
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
-                set = [NSSet setWithObjects:
-                       @"text/html",
-                       @"application/json",
-                       @"text/json",
-                       @"text/plain",
-                       @"text/javascript", nil];
+                set = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript", nil];
             });
-            acceptSet = set;
+            contentTypes = set;
+        } break;
+        case MNURLSerializationTypeString:
+        {
+            static NSSet <NSString *>*set;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                set = [[NSSet alloc] initWithObjects:@"text/html", @"application/xml", @"text/plain", nil];
+            });
+            contentTypes = set;
         } break;
         case MNURLSerializationTypeXML:
         {
@@ -251,7 +256,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
             dispatch_once(&onceToken, ^{
                 set = [[NSSet alloc] initWithObjects:@"application/xml", @"text/xml", nil];
             });
-            acceptSet = set;
+            contentTypes = set;
         } break;
         case MNURLSerializationTypePlist:
         {
@@ -260,21 +265,23 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
             dispatch_once(&onceToken, ^{
                 set = [[NSSet alloc] initWithObjects:@"application/x-plist", nil];
             });
-            acceptSet = set;
+            contentTypes = set;
         } break;
         default:
             break;
     }
-    return acceptSet;
+    _acceptableContentTypes = contentTypes;
+    return _acceptableContentTypes;
 }
 
 #pragma mark - NSCopying
 - (id)copyWithZone:(NSZone *)zone {
-    MNURLResponseSerializer *serializer = [MNURLResponseSerializer allocWithZone:zone];
+    MNURLResponseSerializer *serializer = [[self.class allocWithZone:zone] init];
     serializer.stringEncoding = self.stringEncoding;
     serializer.serializationType = self.serializationType;
     serializer.JSONOptions = self.JSONOptions;
     serializer.acceptableStatus = self.acceptableStatus;
+    serializer.acceptableContentTypes = self.acceptableContentTypes;
     return serializer;
 }
 
