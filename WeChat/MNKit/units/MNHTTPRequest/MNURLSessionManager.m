@@ -14,9 +14,12 @@
 #import "MNURLUploadRequest.h"
 #import "MNURLDownloadRequest.h"
 #import "UIApplication+MNNetworkActivity.h"
+#import <objc/runtime.h>
 
 #define Lock()       dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER)
 #define Unlock()    dispatch_semaphore_signal(_semaphore)
+
+static const void * const MNURLRequestRetryCountKey = &MNURLRequestRetryCountKey;
 
 @interface MNURLSessionManager ()
 @property (nonatomic, strong) MNURLDatabase *database;
@@ -99,14 +102,15 @@ static MNURLSessionManager *_manager;
     // 判断是否需要重新请求并修改数据来源
     if ([request isKindOfClass:MNURLDataRequest.class]) {
         MNURLDataRequest *dataRequest = (MNURLDataRequest *)request;
+        NSInteger currentRetryCount = [objc_getAssociatedObject(dataRequest, MNURLRequestRetryCountKey) integerValue];
         // 判断是否需要重新请求
-        if (error && error.code != NSURLErrorCancelled && dataRequest.retryCount > 0 && dataRequest.currentRetryCount < dataRequest.retryCount) {
-            dataRequest.currentRetryCount ++;
+        if (error && error.code != NSURLErrorCancelled && dataRequest.retryCount > 0 && currentRetryCount < dataRequest.retryCount) {
+            objc_setAssociatedObject(dataRequest, MNURLRequestRetryCountKey, @(currentRetryCount + 1), OBJC_ASSOCIATION_RETAIN);
             [self resumeRequest:dataRequest];
             return;
         }
         // 重置请求计次
-        dataRequest.currentRetryCount = 0;
+        objc_setAssociatedObject(dataRequest, MNURLRequestRetryCountKey, @(0), OBJC_ASSOCIATION_RETAIN);
         // 记录数据来源
         dataRequest.dataSource = MNURLDataSourceNetwork;
     }
@@ -145,7 +149,7 @@ static MNURLSessionManager *_manager;
     if (request.method == MNURLHTTPMethodGet && request.cachePolicy == MNURLDataCachePolicyDontLoad) {
         id<NSCoding> cache = [self cacheForUrl:request.cacheForUrl timeoutInterval:request.cacheTimeOutInterval];
         if (cache) {
-            request.currentRetryCount = 0;
+            objc_setAssociatedObject(request, MNURLRequestRetryCountKey, @(0), OBJC_ASSOCIATION_RETAIN);
             request.dataSource = MNURLDataSourceCache;
             [request setValue:@(NO) forKey:MNURLPath(request.firstLoading)];
             [request didFinishWithResponseObject:cache error:nil];
@@ -155,7 +159,7 @@ static MNURLSessionManager *_manager;
     /**开启请求*/
     NSURLSessionDataTask *dataTask = [self dataTaskWithRequest:request];
     if (!dataTask) {
-        request.currentRetryCount = 0;
+        objc_setAssociatedObject(request, MNURLRequestRetryCountKey, @(0), OBJC_ASSOCIATION_RETAIN);
         [request setValue:@(NO) forKey:MNURLPath(request.firstLoading)];
         [request didFinishWithResponseObject:nil error:NSError.taskError];
         return NO;
@@ -164,7 +168,7 @@ static MNURLSessionManager *_manager;
     if (request.isAllowsNetworkActivity) [UIApplication startNetworkActivityIndicating];
     [self setRequest:request forTask:dataTask];
     /**回调请求开始*/
-    if (request.currentRetryCount <= 0) {
+    if ([objc_getAssociatedObject(request, MNURLRequestRetryCountKey) integerValue] <= 0) {
         dispatch_async(request.queue ? : dispatch_get_main_queue(), ^{
             if (request.startCallback) {
                 request.startCallback();

@@ -80,6 +80,9 @@ typedef void (^MNURLSessionDownloadTaskDidResumeCallback)(NSURLSession *session,
 /**下载结束后根据提供的路径移动资源失败回调*/
 typedef void (^MNURLSessionDownloadTaskMoveFileFailedCallback)(NSURLSessionDownloadTask *downloadTask, NSURL *location, NSError *error);
 
+FOUNDATION_EXTERN NSString * const MNNetworkingTaskErrorAuthChallengeKey;
+FOUNDATION_EXTERN NSString * const MNNetworkingTaskErrorDownloadPathKey;
+
 @interface MNURLSession : NSObject
 #pragma mark -  Attribute
 /**内部请求会话管理者*/

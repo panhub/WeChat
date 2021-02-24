@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, MNURLSerializationType) {
 };
 
 /**解析错误Domain*/
-FOUNDATION_EXTERN NSString * const _Nonnull MNURLResponseErrorDomain;
+FOUNDATION_EXTERN NSString * const _Nonnull MNURLResponseSerializationErrorDomain;
 /**请求失败信息key*/
 FOUNDATION_EXTERN NSString * const _Nonnull MNURLResponseFailingErrorKey;
 /**数据解析错误信息key*/

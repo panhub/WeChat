@@ -8,7 +8,7 @@
 
 #import "MNURLResponseSerializer.h"
 
-NSString * const MNURLResponseErrorDomain = @"com.mn.response.error.domain";
+NSString * const MNURLResponseSerializationErrorDomain = @"com.mn.response.serialization.error.domain";
 NSString * const MNURLResponseFailingErrorKey = @"com.mn.response.failing.error.key";
 NSString * const MNURLResponseSerializationErrorKey = @"com.mn.response.serialization.error.key";
 
@@ -72,8 +72,8 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
         //error为空, 或者错误为指定类型
         //验证出错的情况下error为空说明数据为nil 或 [response MIMEType] 为nil
-        //MNURLResponseErrorDomain 说明响应码或数据类型不被接受
-        if (!error || MNErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, MNURLResponseErrorDomain)) {
+        //MNURLResponseSerializationErrorDomain 说明响应码或数据类型不被接受
+        if (!error || MNErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, MNURLResponseSerializationErrorDomain)) {
             return nil;
         }
     }
@@ -102,7 +102,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
                                                          options:self.JSONOptions
                                                            error:&serializationError];
     } else {
-        serializationError = [NSError errorWithDomain:MNURLResponseErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
+        serializationError = [NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
     }
     if (!responseObject || serializationError) {
         //拿着json解析的error去填充错误信息
@@ -124,10 +124,10 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
         responseObject = [[NSString alloc] initWithData:data encoding:self.stringEncoding];
         if (responseObject.length <= 0) {
             responseObject = nil;
-            serializationError = [NSError errorWithDomain:MNURLResponseErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:@{NSLocalizedDescriptionKey:@"serialization data error"}];
+            serializationError = [NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:@{NSLocalizedDescriptionKey:@"serialization data error"}];
         }
     } else {
-        serializationError = [NSError errorWithDomain:MNURLResponseErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
+        serializationError = [NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
     }
     if (serializationError && error) {
         *error = MNErrorWithUnderlyingError(serializationError, *error);
@@ -155,7 +155,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
                                                                     format:NULL
                                                                      error:&serializationError];
     } else {
-        serializationError = [NSError errorWithDomain:MNURLResponseErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
+        serializationError = [NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"data is empty"}];
     }
     if (!responseObject || serializationError) {
         if (error) {
@@ -179,7 +179,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
     if (response && [response isKindOfClass:[NSHTTPURLResponse class]]) {
         NSSet <NSString *>*acceptSet = [self acceptContentSet];
         //判断自己能接受的数据类型和response的数据类型是否匹配，
-        //如果不匹配数据类型，如果不匹配response，而且响应类型不为空，数据长度不为0
+        //如果不匹配数据类型，如果不匹配response，而且响应类型不为空或者数据长度不为0
         if (acceptSet && ![acceptSet containsObject:[response MIMEType]] &&
             !([response MIMEType] == nil && [data length] <= 0)) {
             //说明解析数据肯定是失败的, 这时候要把解析错误信息放到error里。
@@ -194,7 +194,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
                     mutableUserInfo[MNURLResponseSerializationErrorKey] = data;
                 }
                 
-                validationError = MNErrorWithUnderlyingError([NSError errorWithDomain:MNURLResponseErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:mutableUserInfo], validationError);
+                validationError = MNErrorWithUnderlyingError([NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:mutableUserInfo], validationError);
             }
             
             responseIsValid = NO;
@@ -212,7 +212,7 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
                 mutableUserInfo[MNURLResponseSerializationErrorKey] = data;
             }
             
-            validationError = MNErrorWithUnderlyingError([NSError errorWithDomain:MNURLResponseErrorDomain code:NSURLErrorBadServerResponse userInfo:mutableUserInfo], validationError);
+            validationError = MNErrorWithUnderlyingError([NSError errorWithDomain:MNURLResponseSerializationErrorDomain code:NSURLErrorBadServerResponse userInfo:mutableUserInfo], validationError);
             
             responseIsValid = NO;
         }
