@@ -296,6 +296,8 @@
                 [NSFileManager.defaultManager removeItemAtPath:outputPath error:nil];
             }
             if (self.status == MNMovExportStatusCompleted && self.progress != 1.f) self.progress = 1.f;
+            self.audioInput = self.videoInput = nil;
+            self.audioOutput = self.videoOutput = nil;
             if (self.completionHandler) self.completionHandler(self.status, self.error);
         }];
     });
@@ -320,7 +322,7 @@
 }
 
 - (void)setFrameRate:(int)frameRate {
-    frameRate = MAX(15, MIN(frameRate, 60));
+    frameRate = MAX(24, MIN(frameRate, 60));
     _frameRate = frameRate;
 }
 
@@ -365,22 +367,22 @@
 }
 
 - (NSDictionary *)videoSetting {
+    AVAssetTrack *audioTrack = [self trackWithMediaType:AVMediaTypeAudio];
     AVAssetTrack *videoTrack = [self trackWithMediaType:AVMediaTypeVideo];
     CGSize naturalSize = CGSizeApplyAffineTransform(videoTrack.naturalSize, videoTrack.preferredTransform);
     naturalSize = CGSizeMake(fabs(naturalSize.width), fabs(naturalSize.height));
-    /*
-    float estimatedDataRate = videoTrack.estimatedDataRate;
+    float audioDataRate = audioTrack.estimatedDataRate;
+    float videoDataRate = videoTrack.estimatedDataRate;
+    float estimatedDataRate = audioDataRate + videoDataRate;
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = naturalSize.width*naturalSize.height*self.frameRate;
     }
-    */
-    CGFloat numPixels = naturalSize.width*naturalSize.height;
-    CGFloat bitsPerPixel = numPixels < (640.f*480.f) ? 4.05f : 11.f;
+    NSString *profileLevel = NSProcessInfo.processInfo.processorCount == 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
     NSDictionary *videoSetting = @{AVVideoCodecKey:AVVideoCodecH264,
                                     AVVideoWidthKey:@(naturalSize.width),
                                     AVVideoHeightKey:@(naturalSize.height),
                                     AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill,
-                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(numPixels*bitsPerPixel), AVVideoProfileLevelKey:AVVideoProfileLevelH264MainAutoLevel, AVVideoExpectedSourceFrameRateKey:@(self.frameRate)}};
+                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(estimatedDataRate), AVVideoProfileLevelKey:profileLevel, AVVideoExpectedSourceFrameRateKey:@(self.frameRate)}};
     return videoSetting;
 }
 

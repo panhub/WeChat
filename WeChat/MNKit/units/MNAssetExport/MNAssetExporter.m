@@ -494,7 +494,15 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
         CGFloat bitsPerPixel = width*height < (640.f*480.f) ? 4.05f : 11.f;
         return width*height*bitsPerPixel;
     }
-    return width*height*self.frameRate;
+    AVAssetTrack *audioTrack = [self.composition trackWithMediaType:AVMediaTypeAudio];
+    AVAssetTrack *videoTrack = [self.composition trackWithMediaType:AVMediaTypeVideo];
+    float audioDataRate = audioTrack.estimatedDataRate;
+    float videoDataRate = videoTrack.estimatedDataRate;
+    float estimatedDataRate = audioDataRate + videoDataRate;
+    if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
+        estimatedDataRate = width*height*self.frameRate;
+    }
+    return estimatedDataRate;
     /*
     // 获取原视频轨道的码率
     AVAssetTrack *videoTrack = [self.composition trackWithMediaType:AVMediaTypeVideo];
