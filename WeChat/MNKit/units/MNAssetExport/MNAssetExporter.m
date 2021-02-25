@@ -102,6 +102,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
         self.frameRate = 30;
         self.exportAudioTrack = YES;
         self.exportVideoTrack = YES;
+        self.usingHighBitRateExporting = YES;
         self.shouldOptimizeForNetworkUse = NO;
         self.presetName = MNAssetExportPresetHighestQuality;
         self.composition = AVMutableComposition.composition;
@@ -347,6 +348,8 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
                 [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
             }
             if (self.status == MNAssetExportStatusCompleted && self.progress < 1.f) self.progress = 1.f;
+            self.audioInput = self.videoInput = nil;
+            self.audioOutput = self.videoOutput = nil;
             if (self.completionHandler) self.completionHandler(self.status, self.error);
         }];
     });
@@ -391,17 +394,17 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 }
 
 - (void)addVideoInputForWriter:(AVAssetWriter *)assetWriter {
-    CGFloat width = self.renderSize.width;
-    CGFloat height = self.renderSize.height;
+    NSUInteger width = self.renderSize.width;
+    NSUInteger height = self.renderSize.height;
     //AVVideoMaxKeyFrameIntervalKey:@(100),
     NSDictionary *videoInputSettings = @{AVVideoWidthKey:@(width),
                                          AVVideoHeightKey:@(height),
                                          AVVideoCodecKey:AVVideoCodecH264,
                                          AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill,
                                          AVVideoCompressionPropertiesKey:@{
-                                                 AVVideoAverageBitRateKey:@(self.estimatedDataRate),
+                                                 AVVideoAverageBitRateKey:[NSNumber numberWithFloat:self.averageBitRate],
                                                  AVVideoProfileLevelKey:self.profileLevel,
-                                                 AVVideoExpectedSourceFrameRateKey:@(self.frameRate),
+                                                 AVVideoExpectedSourceFrameRateKey:[NSNumber numberWithInt:self.frameRate],
                                                  AVVideoCleanApertureKey:@{
                                                          AVVideoCleanApertureWidthKey:@(width),
                                                          AVVideoCleanApertureHeightKey:@(height),
@@ -483,10 +486,16 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     return AVVideoProfileLevelH264BaselineAutoLevel;
 }
 
-- (float)estimatedDataRate {
+- (float)averageBitRate {
     // 输出分辨率
     CGFloat width = self.renderSize.width;
     CGFloat height = self.renderSize.height;
+    if (self.usingHighBitRateExporting && !self.shouldOptimizeForNetworkUse) {
+        CGFloat bitsPerPixel = width*height < (640.f*480.f) ? 4.05f : 11.f;
+        return width*height*bitsPerPixel;
+    }
+    return width*height*self.frameRate;
+    /*
     // 获取原视频轨道的码率
     AVAssetTrack *videoTrack = [self.composition trackWithMediaType:AVMediaTypeVideo];
     float estimatedDataRate = videoTrack.estimatedDataRate;
@@ -502,9 +511,16 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     CGSize naturalSize = videoTrack.naturalSizeOfVideo;
     // 计算两者比率从而获得所需码率
     return ((width*height*self.frameRate)/(naturalSize.width*naturalSize.height*nominalFrameRate))*estimatedDataRate;
+    */
 }
 
 #pragma mark - Setter
+- (void)setStatus:(MNAssetExportStatus)status {
+    @synchronized (self) {
+        _status = status;
+    }
+}
+
 - (void)setFilePath:(NSString *)filePath {
     _filePath = nil;
     [self.composition removeAllTracks];

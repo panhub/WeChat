@@ -94,9 +94,11 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
 @property (nonatomic) CGSize renderSize;
 /**资源对象*/
 @property (nonatomic, strong, readonly) AVAsset *asset;
-/**是否针对网络使用进行优化*/
+/**使用高的比特率输出 default 'YES'*/
+@property (nonatomic) BOOL usingHighBitRateExporting;
+/**是否针对网络使用进行优化 default 'NO'*/
 @property (nonatomic) BOOL shouldOptimizeForNetworkUse;
-/**导出质量 default MNAssetExportPresetHighestQuality*/
+/**导出质量 default 'MNAssetExportPresetHighestQuality'*/
 @property (nonatomic, copy) MNAssetExportPresetName presetName;
 /**输出视频内容*/
 @property (nonatomic, getter=isExportVideoTrack) BOOL exportVideoTrack;

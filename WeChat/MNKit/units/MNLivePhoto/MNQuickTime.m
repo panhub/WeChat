@@ -368,15 +368,19 @@
     AVAssetTrack *videoTrack = [self trackWithMediaType:AVMediaTypeVideo];
     CGSize naturalSize = CGSizeApplyAffineTransform(videoTrack.naturalSize, videoTrack.preferredTransform);
     naturalSize = CGSizeMake(fabs(naturalSize.width), fabs(naturalSize.height));
+    /*
     float estimatedDataRate = videoTrack.estimatedDataRate;
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = naturalSize.width*naturalSize.height*self.frameRate;
     }
+    */
+    CGFloat numPixels = naturalSize.width*naturalSize.height;
+    CGFloat bitsPerPixel = numPixels < (640.f*480.f) ? 4.05f : 11.f;
     NSDictionary *videoSetting = @{AVVideoCodecKey:AVVideoCodecH264,
                                     AVVideoWidthKey:@(naturalSize.width),
                                     AVVideoHeightKey:@(naturalSize.height),
                                     AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill,
-                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(estimatedDataRate), AVVideoProfileLevelKey:AVVideoProfileLevelH264MainAutoLevel, AVVideoExpectedSourceFrameRateKey:@(self.frameRate)}};
+                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(numPixels*bitsPerPixel), AVVideoProfileLevelKey:AVVideoProfileLevelH264MainAutoLevel, AVVideoExpectedSourceFrameRateKey:@(self.frameRate)}};
     return videoSetting;
 }
 

@@ -8,13 +8,13 @@
 
 #import "MNURLSessionManager.h"
 #import "MNURLSession.h"
-#import <pthread/pthread.h>
 #import "MNURLDatabase.h"
 #import "MNURLDataRequest.h"
 #import "MNURLUploadRequest.h"
 #import "MNURLDownloadRequest.h"
 #import "UIApplication+MNNetworkActivity.h"
 #import <objc/runtime.h>
+#import <pthread/pthread.h>
 
 #define Lock()       dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER)
 #define Unlock()    dispatch_semaphore_signal(_semaphore)
