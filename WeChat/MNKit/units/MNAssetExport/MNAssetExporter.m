@@ -478,7 +478,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     MNAssetExportPresetName presetName = self.presetName;
     CGSize presetSize = MNAssetExportPresetSize(presetName);
     if (!MNAssetExportIsEmptySize(presetSize)) {
-        if (MIN(presetSize.width, presetSize.height) >= MNAssetExportPreset1080P) return AVVideoProfileLevelH264HighAutoLevel;
+        if (MIN(presetSize.width, presetSize.height) >= MNAssetExportPreset720P) return AVVideoProfileLevelH264HighAutoLevel;
         if (MAX(presetSize.width, presetSize.height) <= MNAssetExportPreset480P) return AVVideoProfileLevelH264BaselineAutoLevel;
         return AVVideoProfileLevelH264MainAutoLevel;
     }
@@ -502,7 +502,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = width*height*self.frameRate;
     }
-    if (self.shouldOptimizeForNetworkUse) estimatedDataRate = estimatedDataRate/2.f;
+    if (self.shouldOptimizeForNetworkUse) estimatedDataRate = estimatedDataRate/3.f*2.f;
     return estimatedDataRate;
 }
 

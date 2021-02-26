@@ -32,7 +32,7 @@
     self = [super init];
     if (self) {
         self.frameRate = 30;
-        self.stillDuration = 0.7f;
+        self.stillDuration = 0.73f;
         self.identifier = [[NSNumber numberWithLongLong:NSDate.date.timeIntervalSince1970*1000] stringValue];
     }
     return self;
