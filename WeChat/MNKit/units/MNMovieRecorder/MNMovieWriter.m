@@ -250,10 +250,11 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 - (BOOL)addVideoTrackWithSourceFormatDescription:(CMFormatDescriptionRef)formatDescription {
     CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
     NSUInteger numPixels = dimensions.width*dimensions.height;
-    CGFloat bitsPerPixel = numPixels < (640*480) ? 4.05 : 10.1;
+    CGFloat bitsPerPixel = numPixels < (640*480) ? 4.05f : 10.1f;
+    NSString *profileLevel = NSProcessInfo.processInfo.processorCount == 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
     NSDictionary *compression = @{AVVideoAverageBitRateKey: [NSNumber numberWithInteger:numPixels*bitsPerPixel],
                                   AVVideoExpectedSourceFrameRateKey:[NSNumber numberWithInt:self.frameRate],
-                                  AVVideoMaxKeyFrameIntervalKey: [NSNumber numberWithInt:self.frameRate]};
+                                  AVVideoMaxKeyFrameIntervalKey: [NSNumber numberWithInt:self.frameRate], AVVideoProfileLevelKey:profileLevel};
     NSDictionary *settings = @{AVVideoCodecKey:AVVideoCodecH264,
                                AVVideoWidthKey:[NSNumber numberWithInteger:dimensions.width],
                               AVVideoHeightKey:[NSNumber numberWithInteger:dimensions.height],
