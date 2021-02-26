@@ -251,7 +251,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
     NSUInteger numPixels = dimensions.width*dimensions.height;
     CGFloat bitsPerPixel = numPixels < (640*480) ? 4.05f : 10.1f;
-    NSString *profileLevel = NSProcessInfo.processInfo.processorCount == 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
+    NSString *profileLevel = NSProcessInfo.processInfo.processorCount <= 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
     NSDictionary *compression = @{AVVideoAverageBitRateKey: [NSNumber numberWithInteger:numPixels*bitsPerPixel],
                                   AVVideoExpectedSourceFrameRateKey:[NSNumber numberWithInt:self.frameRate],
                                   AVVideoMaxKeyFrameIntervalKey: [NSNumber numberWithInt:self.frameRate], AVVideoProfileLevelKey:profileLevel};
@@ -304,7 +304,8 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
         if (status >= MNMovieWriteStatusWriting) {
             shouldNotifyDelegate = YES;
             if (status >= MNMovieWriteStatusFinish) {
-                [self teardownAssetWriterAndInputs];
+                self.writer = nil;
+                self.audioInput = self.videoInput = nil;
                 if (status >= MNMovieWriteStatusCancelled) {
                     if (self.URL) [NSFileManager.defaultManager removeItemAtURL:self.URL error:nil];
                 }
@@ -327,12 +328,6 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
             }
         });
     }
-}
-
-- (void)teardownAssetWriterAndInputs {
-    _writer = nil;
-    _videoInput = nil;
-    _audioInput = nil;
 }
 
 #pragma mark - Getter

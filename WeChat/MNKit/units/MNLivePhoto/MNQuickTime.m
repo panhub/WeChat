@@ -279,7 +279,7 @@
 
     // 等待结果
     dispatch_group_notify(group, dispatch_queue_create("com.mn.mov.finish.queue", DISPATCH_QUEUE_SERIAL), ^{
-        [assetReader cancelReading];
+        if (assetReader.status == AVAssetReaderStatusReading) [assetReader cancelReading];
         [assetWriter finishWritingWithCompletionHandler:^{
             if (assetWriter.error) {
                 self.error = assetWriter.error;
@@ -316,17 +316,23 @@
 }
 
 #pragma mark - Setter
+- (void)setStatus:(MNMovExportStatus)status {
+    @synchronized (self) {
+        _status = status;
+    }
+}
+
 - (void)setProgress:(float)progress {
     _progress = progress;
     if (self.progressHandler) self.progressHandler(progress);
 }
 
-- (void)setFrameRate:(int)frameRate {
-    frameRate = MAX(24, MIN(frameRate, 60));
-    _frameRate = frameRate;
+#pragma mark - Getter
+- (int)frameRate {
+    if (NSProcessInfo.processInfo.processorCount <= 1) return 15;
+    return MAX(24, MIN(_frameRate, 60));
 }
 
-#pragma mark - Getter
 - (AVAssetTrack *)trackWithMediaType:(AVMediaType)mediaType {
     NSArray <AVAssetTrack *>*tracks = [self.videoAsset tracksWithMediaType:mediaType];
     if (tracks.count <= 0) return nil;
@@ -377,7 +383,7 @@
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = naturalSize.width*naturalSize.height*self.frameRate;
     }
-    NSString *profileLevel = NSProcessInfo.processInfo.processorCount == 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
+    NSString *profileLevel = NSProcessInfo.processInfo.processorCount <= 1 ? AVVideoProfileLevelH264MainAutoLevel : AVVideoProfileLevelH264HighAutoLevel;
     NSDictionary *videoSetting = @{AVVideoCodecKey:AVVideoCodecH264,
                                     AVVideoWidthKey:@(naturalSize.width),
                                     AVVideoHeightKey:@(naturalSize.height),

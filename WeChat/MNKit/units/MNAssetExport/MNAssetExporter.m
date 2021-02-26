@@ -455,6 +455,11 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     return self.composition.copy;
 }
 
+- (int)frameRate {
+    if (NSProcessInfo.processInfo.processorCount <= 1) return 15;
+    return MAX(24, MIN(_frameRate, 60));
+}
+
 - (CGSize)renderSize {
     if (MNAssetExportIsEmptySize(_renderSize)) {
         CGSize presetSize = MNAssetExportPresetSize(self.presetName);
@@ -518,11 +523,6 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     [self.composition removeAllTracks];
     _filePath = filePath.copy;
     [self appendAssetWithContentsOfFile:filePath];
-}
-
-- (void)setFrameRate:(int)frameRate {
-    frameRate = MAX(15, MIN(frameRate, 60));
-    _frameRate = frameRate;
 }
 
 - (void)setProgress:(float)progress {
