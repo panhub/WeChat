@@ -405,6 +405,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
                                                  AVVideoAverageBitRateKey:[NSNumber numberWithFloat:self.averageBitRate],
                                                  AVVideoProfileLevelKey:self.profileLevel,
                                                  AVVideoExpectedSourceFrameRateKey:[NSNumber numberWithInt:self.frameRate],
+                                                 AVVideoMaxKeyFrameIntervalKey:[NSNumber numberWithInt:self.frameRate],
                                                  AVVideoCleanApertureKey:@{
                                                          AVVideoCleanApertureWidthKey:@(width),
                                                          AVVideoCleanApertureHeightKey:@(height),
@@ -487,11 +488,10 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 }
 
 - (float)averageBitRate {
-    // 输出分辨率
     CGFloat width = self.renderSize.width;
     CGFloat height = self.renderSize.height;
     if (self.usingHighBitRateExporting && !self.shouldOptimizeForNetworkUse) {
-        CGFloat bitsPerPixel = width*height < (640.f*480.f) ? 4.05f : 11.f;
+        CGFloat bitsPerPixel = width*height < (640.f*480.f) ? 4.05f : 10.1f;
         return width*height*bitsPerPixel;
     }
     AVAssetTrack *audioTrack = [self.composition trackWithMediaType:AVMediaTypeAudio];
@@ -502,24 +502,8 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = width*height*self.frameRate;
     }
+    if (self.shouldOptimizeForNetworkUse) estimatedDataRate = estimatedDataRate/2.f;
     return estimatedDataRate;
-    /*
-    // 获取原视频轨道的码率
-    AVAssetTrack *videoTrack = [self.composition trackWithMediaType:AVMediaTypeVideo];
-    float estimatedDataRate = videoTrack.estimatedDataRate;
-    // 如果获取不成功 则依据自身渲染尺寸与帧率计算
-    if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
-        CGSize presetSize = MNAssetExportPresetSize(self.presetName);
-        float bitRate = MNAssetExportIsEmptySize(presetSize) ? width*height : presetSize.width*presetSize.height;
-        return bitRate*self.frameRate;
-    }
-    // 获取原视频轨道的帧率与分辨率
-    float nominalFrameRate = videoTrack.nominalFrameRate;
-    if (isnan(nominalFrameRate) || nominalFrameRate <= 0.f) nominalFrameRate = self.frameRate;
-    CGSize naturalSize = videoTrack.naturalSizeOfVideo;
-    // 计算两者比率从而获得所需码率
-    return ((width*height*self.frameRate)/(naturalSize.width*naturalSize.height*nominalFrameRate))*estimatedDataRate;
-    */
 }
 
 #pragma mark - Setter

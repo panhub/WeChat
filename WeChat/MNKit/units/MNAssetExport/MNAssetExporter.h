@@ -94,7 +94,7 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
 @property (nonatomic) CGSize renderSize;
 /**资源对象*/
 @property (nonatomic, strong, readonly) AVAsset *asset;
-/**使用高的比特率输出 default 'YES'*/
+/**使用高比特率输出 default 'YES' 开启时应关闭 'shouldOptimizeForNetworkUse'*/
 @property (nonatomic) BOOL usingHighBitRateExporting;
 /**是否针对网络使用进行优化 default 'NO'*/
 @property (nonatomic) BOOL shouldOptimizeForNetworkUse;

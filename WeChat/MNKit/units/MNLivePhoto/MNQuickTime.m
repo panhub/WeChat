@@ -382,7 +382,7 @@
                                     AVVideoWidthKey:@(naturalSize.width),
                                     AVVideoHeightKey:@(naturalSize.height),
                                     AVVideoScalingModeKey:AVVideoScalingModeResizeAspectFill,
-                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(estimatedDataRate), AVVideoProfileLevelKey:profileLevel, AVVideoExpectedSourceFrameRateKey:@(self.frameRate)}};
+                        AVVideoCompressionPropertiesKey:@{AVVideoAverageBitRateKey:@(estimatedDataRate), AVVideoProfileLevelKey:profileLevel, AVVideoExpectedSourceFrameRateKey:[NSNumber numberWithInt:self.frameRate], AVVideoMaxKeyFrameIntervalKey:[NSNumber numberWithInt:self.frameRate]}};
     return videoSetting;
 }
 
