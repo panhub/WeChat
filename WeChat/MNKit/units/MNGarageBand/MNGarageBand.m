@@ -16,8 +16,8 @@
         NSString *m4aPath = [NSString stringWithFormat:@"%@/%@.m4a", NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject, [NSNumber numberWithLongLong:NSDate.date.timeIntervalSince1970*1000]];
         // 输出m4a
         MNAssetExportSession *exportSession = MNAssetExportSession.new;
-        exportSession.filePath = videoPath;
-        exportSession.outputPath = m4aPath;
+        exportSession.URL = [NSURL fileURLWithPath:videoPath];
+        exportSession.outputURL = [NSURL fileURLWithPath:m4aPath];
         exportSession.exportAudioTrack = YES;
         exportSession.exportVideoTrack = NO;
         exportSession.outputFileType = AVFileTypeAppleM4A;

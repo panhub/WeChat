@@ -16,8 +16,8 @@
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler
 {
     MNAssetExporter *exporter = MNAssetExporter.new;
-    exporter.filePath = filePath;
-    exporter.outputPath = outputPath;
+    exporter.URL = [NSURL fileURLWithPath:filePath];
+    exporter.outputURL = [NSURL fileURLWithPath:outputPath];
     exporter.exportAudioTrack = NO;
     exporter.presetName = MNAssetExportPresetHighestQuality;
     [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
@@ -29,8 +29,8 @@
                                  completionHandler:(MNAssetExportCompletionHandler)completionHandler
 {
     MNAssetExporter *exporter = MNAssetExporter.new;
-    exporter.filePath = filePath;
-    exporter.outputPath = outputPath;
+    exporter.URL = [NSURL fileURLWithPath:filePath];
+    exporter.outputURL = [NSURL fileURLWithPath:outputPath];
     exporter.exportVideoTrack = NO;
     [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
 }
@@ -46,8 +46,8 @@
                         completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
-    exporter.filePath = filePath;
-    exporter.outputPath = outputPath;
+    exporter.URL = [NSURL fileURLWithPath:filePath];
+    exporter.outputURL = [NSURL fileURLWithPath:outputPath];
     if (presetName) exporter.presetName = presetName;
     exporter.outputFileType = AVFileTypeMPEG4;
     [exporter exportAsynchronouslyWithProgressHandler:progressHandler completionHandler:completionHandler];
@@ -60,8 +60,8 @@
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
-    exporter.filePath = filePath;
-    exporter.outputPath = outputPath;
+    exporter.URL = [NSURL fileURLWithPath:filePath];
+    exporter.outputURL = [NSURL fileURLWithPath:outputPath];
     if (presetName) exporter.presetName = presetName;
     exporter.exportAudioTrack = NO;
     exporter.outputFileType = AVFileTypeMPEG4;
@@ -74,8 +74,8 @@
                                  completionHandler:(MNAssetExportSessionCompletionHandler)completionHandler
 {
     MNAssetExportSession *exporter = MNAssetExportSession.new;
-    exporter.filePath = filePath;
-    exporter.outputPath = outputPath;
+    exporter.URL = [NSURL fileURLWithPath:filePath];
+    exporter.outputURL = [NSURL fileURLWithPath:outputPath];
     exporter.exportVideoTrack = NO;
     exporter.presetName = AVAssetExportPresetAppleM4A;
     exporter.outputFileType = AVFileTypeAppleM4A;

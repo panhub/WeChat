@@ -349,7 +349,7 @@
         });
     };
     MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:self.videoPath];
-    exporter.outputPath = outputPath;
+    exporter.outputURL = [NSURL fileURLWithPath:self.videoPath];
     exporter.outputRect = self.videoOutputRect;
     exporter.presetName = MNAssetExportPresetHighestQuality;
     exporter.renderSize = exporter.outputRect.size;
