@@ -34,11 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**本地文件路径*/
 @property (nonatomic, copy) NSURL *URL;
 
-/**预期的视频播放方向*/
-@property (nonatomic) AVCaptureVideoOrientation movieOrientation;
-
 /**摄像头*/
 @property (nonatomic) AVCaptureDevicePosition devicePosition;
+
+/**预期的视频方向*/
+@property (nonatomic) AVCaptureVideoOrientation movieOrientation;
+
+/**当前的拍摄方向*/
+@property (nonatomic) AVCaptureVideoOrientation currentCaptureOrientation;
 
 /**事件代理*/
 @property (nonatomic, weak, nullable) id<MNMovieWriteDelegate> delegate;

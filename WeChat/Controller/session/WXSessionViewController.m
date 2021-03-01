@@ -228,7 +228,6 @@
     //picker.configuration.maxExportDuration = 60.f;
     picker.configuration.allowsTakeAsset = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
-        
         [self.view showProgressDialog:@"导出中"];
         NSString *outputPath = MNCacheDirectoryAppending(@"bbbbbbb.mp4");
         MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:assets.firstObject.content];

@@ -36,20 +36,13 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
 @property (nonatomic, strong) dispatch_queue_t writQueue;
 @property (nonatomic, strong) AVAssetWriterInput *videoInput;
 @property (nonatomic, strong) AVAssetWriterInput *audioInput;
-@property (nonatomic) UIDeviceOrientation deviceOrientation;
 @end
 
 @implementation MNMovieWriter
 - (instancetype)init {
     if (self = [super init]) {
         self.movieOrientation = AVCaptureVideoOrientationPortrait;
-        self.deviceOrientation = UIDevice.currentDevice.orientation;
         self.writQueue = dispatch_queue_create("com.mn.movie.write.queue", DISPATCH_QUEUE_SERIAL);
-        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(deviceOrientationDidChangeNotification)
-                                                     name:UIDeviceOrientationDidChangeNotification
-                                                   object:nil];
     }
     return self;
 }
@@ -262,7 +255,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     if ([self.writer canApplyOutputSettings:settings forMediaType:AVMediaTypeVideo]) {
         AVAssetWriterInput *videoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:settings];
         videoInput.expectsMediaDataInRealTime = YES;
-        videoInput.transform = [self transformFromMovieOrientationTo:self.movieOrientation];
+        videoInput.transform = self.movieInputTransform;
         if ([self.writer canAddInput:videoInput]){
             [self.writer addInput:videoInput];
             self.videoInput = videoInput;
@@ -337,15 +330,10 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     }
 }
 
-#pragma mark - Notification
-- (void)deviceOrientationDidChangeNotification {
-    self.deviceOrientation = UIDevice.currentDevice.orientation;
-}
-
 #pragma mark - Tool
-- (CGAffineTransform)transformFromMovieOrientationTo:(AVCaptureVideoOrientation)orientation {
-    CGFloat orientationAngleOffset = [self angleFromPortraitOrientationTo:orientation];
-    CGFloat videoOrientationAngleOffset = [self angleFromPortraitOrientationTo:self.videoOrientation];
+- (CGAffineTransform)movieInputTransform {
+    CGFloat orientationAngleOffset = [self rotationFromOrientation:self.movieOrientation];
+    CGFloat videoOrientationAngleOffset = [self rotationFromOrientation:self.currentCaptureOrientation];
     CGFloat angleOffset;
     if (self.devicePosition == AVCaptureDevicePositionBack) {
         angleOffset = videoOrientationAngleOffset - orientationAngleOffset + M_PI_2;
@@ -356,7 +344,7 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return transform;
 }
 
-- (CGFloat)angleFromPortraitOrientationTo:(AVCaptureVideoOrientation)orientation {
+- (CGFloat)rotationFromOrientation:(AVCaptureVideoOrientation)orientation {
     CGFloat angle = 0.0;
     switch (orientation){
         case AVCaptureVideoOrientationPortrait:
@@ -375,28 +363,6 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     return angle;
 }
 
-- (AVCaptureVideoOrientation)videoOrientation {
-    AVCaptureVideoOrientation orientation;
-    switch (self.movieOrientation) {
-        case UIDeviceOrientationPortrait:
-            orientation = AVCaptureVideoOrientationPortrait;
-            break;
-        case UIDeviceOrientationLandscapeLeft:
-            orientation = AVCaptureVideoOrientationLandscapeRight;
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            orientation = AVCaptureVideoOrientationLandscapeLeft;
-            break;
-        case UIDeviceOrientationPortraitUpsideDown:
-            orientation = AVCaptureVideoOrientationPortraitUpsideDown;
-            break;
-        default:
-            orientation = AVCaptureVideoOrientationPortrait;
-            break;
-    }
-    return orientation;
-}
-
 - (void)setURL:(NSURL *)URL {
     if (!URL.isFileURL) return;
     [NSFileManager.defaultManager removeItemAtURL:URL error:nil];
@@ -404,11 +370,6 @@ typedef NS_ENUM(NSInteger, MNMovieWriteStatus) {
     if ([NSFileManager.defaultManager createDirectoryAtPath:URL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil]) {
         _URL = URL.copy;
     }
-}
-
-- (void)dealloc {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-    [UIDevice.currentDevice endGeneratingDeviceOrientationNotifications];
 }
 
 @end

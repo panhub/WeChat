@@ -293,6 +293,7 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     self.movieWriter.frameRate = self.frameRate;
     self.movieWriter.devicePosition = (AVCaptureDevicePosition)self.devicePosition;
     self.movieWriter.movieOrientation = (AVCaptureVideoOrientation)self.movieOrientation;
+    self.movieWriter.currentCaptureOrientation = self.captureOrientation;
     [self.movieWriter startWriting];
 }
 
@@ -324,7 +325,7 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
         return;
     }
     AVCaptureConnection *imageConnection = [self.imageOutput connectionWithMediaType:AVMediaTypeVideo];
-    if (imageConnection.isVideoOrientationSupported) imageConnection.videoOrientation = self.videoOrientation;
+    if (imageConnection.isVideoOrientationSupported) imageConnection.videoOrientation = self.captureOrientation;
     [self.imageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
         if (error || imageDataSampleBuffer == NULL) {
             if (completion) completion(nil);
@@ -843,9 +844,9 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     return device;
 }
 
-- (AVCaptureVideoOrientation)videoOrientation {
+- (AVCaptureVideoOrientation)captureOrientation {
     AVCaptureVideoOrientation orientation;
-    switch (self.movieOrientation) {
+    switch (UIDevice.currentDevice.orientation) {
         case UIDeviceOrientationPortrait:
             orientation = AVCaptureVideoOrientationPortrait;
             break;

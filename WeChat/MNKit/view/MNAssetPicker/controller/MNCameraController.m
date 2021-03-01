@@ -316,6 +316,10 @@
     }];
 }
 
+- (void)movieRecorderDidCancelRecording:(MNMovieRecorder *)recorder {
+    [self.toolBar resetCapturing];
+}
+
 - (void)movieRecorder:(MNMovieRecorder *)recorder didFailWithError:(NSError *)error {
     if (error.code == AVErrorApplicationIsNotAuthorized) {
         [[MNAlertView alertViewWithTitle:nil message:error.localizedDescription handler:^(MNAlertView *alertView, NSInteger buttonIndex) {
