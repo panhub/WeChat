@@ -228,6 +228,8 @@
     picker.configuration.maxExportDuration = 60.f;
     picker.configuration.allowsTakeAsset = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
+        UIImage *image = assets.firstObject.content;
+        image = image.compressImage;
         NSLog(@"");
     } cancelHandler:nil];
     return;

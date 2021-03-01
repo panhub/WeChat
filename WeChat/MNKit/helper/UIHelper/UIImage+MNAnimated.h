@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSUInteger loopCount;
 
 /**是否是GIF*/
-@property (nonatomic, readonly, getter=isAnimatedImage) BOOL animatedImage;
+@property (nonatomic, readonly) BOOL isAnimatedImage;
 
 /**
  依据数据流创建图片对象

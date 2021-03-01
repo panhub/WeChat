@@ -30,7 +30,7 @@
         if (!image) image = [UIImage imageNamed:@"cook_banner-4"];
         CGSize size = image.size;
         if (size.height > size.width) {
-            image = [image cropImageInRect:CGRectMake(0.f, MEAN(size.height - size.width), size.width, size.width)];
+            image = [image cropInRect:CGRectMake(0.f, MEAN(size.height - size.width), size.width, size.width)];
         }
         size = CGSizeMultiplyToWidth(image.size, self.width_mn);
         self.height_mn = size.height;

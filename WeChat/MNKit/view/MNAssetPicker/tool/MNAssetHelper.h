@@ -154,7 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  存储图片/视频
- @param assets 资源集合<UIImage, NSData, NSString, NSURL, PHLivePhoto>
+ @param assets 资源集合<UIImage, NSData, NSString, NSURL, PHLivePhoto, NSArray>
  @param albumName 相册名
  @param completion 完成回调
  */

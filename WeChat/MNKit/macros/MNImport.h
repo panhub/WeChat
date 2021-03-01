@@ -71,6 +71,7 @@
 #import "UIImage+MNAttributed.h"
 #import "UIImage+MNBlurEffect.h"
 #import "UIImage+MNGradient.h"
+#import "UIImage+MNResizing.h"
 #import "UIImage+MNHelper.h"
 #import "UIWindow+MNHelper.h"
 #import "UIAlertView+MNHelper.h"

@@ -464,6 +464,7 @@
 		E80828E025D26C2800968E8B /* MNMovieWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = E80828DF25D26C2800968E8B /* MNMovieWriter.m */; };
 		E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 200FC0D022215926002B7763 /* libc++.tbd */; };
 		E840D4C1240D4F81001553B9 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2077A6602286C73D000EFB85 /* ExternalAccessory.framework */; };
+		E868C9E725EA2A5400397272 /* UIImage+MNResizing.m in Sources */ = {isa = PBXBuildFile; fileRef = E868C9E625EA2A5400397272 /* UIImage+MNResizing.m */; };
 		E869C8CB2570EF670017025E /* MNExtendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C57B2570EF610017025E /* MNExtendViewController.m */; };
 		E869C8CC2570EF670017025E /* MNBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C57C2570EF610017025E /* MNBaseViewController.m */; };
 		E869C8CD2570EF670017025E /* MNNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = E869C57D2570EF610017025E /* MNNavigationController.m */; };
@@ -1779,6 +1780,8 @@
 		E80828DF25D26C2800968E8B /* MNMovieWriter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MNMovieWriter.m; sourceTree = "<group>"; };
 		E81CD977240F95BC0063B8F8 /* SEInline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SEInline.h; sourceTree = "<group>"; };
 		E85F0B37240DE59500B7DA54 /* WeChat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeChat.entitlements; sourceTree = "<group>"; };
+		E868C9E525EA2A5400397272 /* UIImage+MNResizing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+MNResizing.h"; sourceTree = "<group>"; };
+		E868C9E625EA2A5400397272 /* UIImage+MNResizing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+MNResizing.m"; sourceTree = "<group>"; };
 		E869C57B2570EF610017025E /* MNExtendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNExtendViewController.m; sourceTree = "<group>"; };
 		E869C57C2570EF610017025E /* MNBaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNBaseViewController.m; sourceTree = "<group>"; };
 		E869C57D2570EF610017025E /* MNNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNNavigationController.m; sourceTree = "<group>"; };
@@ -5664,6 +5667,8 @@
 				E869C7EA2570EF650017025E /* UIImage+MNAttributed.m */,
 				E869C8022570EF650017025E /* UIImage+MNBlurEffect.h */,
 				E869C7DA2570EF650017025E /* UIImage+MNBlurEffect.m */,
+				E868C9E525EA2A5400397272 /* UIImage+MNResizing.h */,
+				E868C9E625EA2A5400397272 /* UIImage+MNResizing.m */,
 				E869C7FC2570EF650017025E /* UIImage+MNFont.h */,
 				E869C7E02570EF650017025E /* UIImage+MNFont.m */,
 				E869C7DD2570EF650017025E /* UIImage+MNGradient.h */,
@@ -6641,6 +6646,7 @@
 				201DAF6122E8945F0063E88A /* WXMomentPicture.m in Sources */,
 				E869C9452570EF670017025E /* MNNumberKeyboard.m in Sources */,
 				E869C9062570EF670017025E /* MNQuickTime.m in Sources */,
+				E868C9E725EA2A5400397272 /* UIImage+MNResizing.m in Sources */,
 				2055D6A022E007180012E43E /* NSArray+YYAdd.m in Sources */,
 				E869C8CE2570EF670017025E /* UIViewController+MNInterface.m in Sources */,
 				E869C8CC2570EF670017025E /* MNBaseViewController.m in Sources */,

@@ -164,7 +164,7 @@
         for (NSInteger idx = 0; idx < self.row; idx++) {
             for (NSInteger i = 0; i < self.column; i++) {
                 CGRect rect = CGRectMake(imageSize.width/self.column*i, imageSize.height/self.row*idx, imageSize.width/self.column, imageSize.height/self.row);
-                UIImage *cropImage = [self.image cropImageInRect:rect];
+                UIImage *cropImage = [self.image cropInRect:rect];
                 if (cropImage) [self.subImages addObject:cropImage];
             }
         }

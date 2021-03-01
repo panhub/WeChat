@@ -788,8 +788,8 @@ static MNAssetHelper *_helper;
         }
         [MNAuthenticator requestAlbumAuthorizationStatusWithHandler:^(BOOL allowed) {
             if (allowed) {
-                NSMutableArray <NSString *>*identifiers = @[].mutableCopy;
-                NSMutableArray <PHObjectPlaceholder *>*placeholders = @[].mutableCopy;
+                NSMutableArray <NSString *>*identifiers = [NSMutableArray arrayWithCapacity:assets.count];
+                NSMutableArray <PHObjectPlaceholder *>*placeholders = [NSMutableArray arrayWithCapacity:assets.count];
                 [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
                     [assets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * _Nonnull stop) {
                         PHObjectPlaceholder *placeholder;
@@ -799,7 +799,7 @@ static MNAssetHelper *_helper;
                             } else return;
                         } else if ([obj isKindOfClass:NSData.class]) {
                             obj = [UIImage imageWithData:(NSData *)obj];
-                        } else if ([obj isKindOfClass:NSURL.class] && ![NSFileManager.defaultManager fileExistsAtPath:((NSURL*)obj).path]) return;
+                        } else if ([obj isKindOfClass:NSURL.class] && ((NSURL *)obj).isFileURL && ![NSFileManager.defaultManager fileExistsAtPath:((NSURL*)obj).path]) return;
                         if ([obj isKindOfClass:NSURL.class]) {
                             if ([((NSURL *)obj).path.pathExtension.lowercaseString isEqualToString:@"gif"]) {
                                 placeholder = [[PHAssetChangeRequest creationRequestForAssetFromImageAtFileURL:(NSURL *)obj] placeholderForCreatedAsset];
@@ -821,12 +821,24 @@ static MNAssetHelper *_helper;
                                 [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
                                 placeholder = [request placeholderForCreatedAsset];
                             }
+                        } else if ([obj isKindOfClass:NSArray.class] && ((NSArray *)obj).count == 2) {
+                            NSArray *array = (NSArray *)obj;
+                            NSURL *firstURL = [array.firstObject isKindOfClass:NSURL.class] ? array.firstObject : ([array.firstObject isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:array.firstObject] : nil);
+                            NSURL *lastURL = [array.lastObject isKindOfClass:NSURL.class] ? array.lastObject : ([array.lastObject isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:array.lastObject] : nil);
+                            NSURL *videoURL = [firstURL.path.pathExtension.lowercaseString isEqualToString:@"mov"] ? firstURL : lastURL;
+                            NSURL *imageURL = videoURL == firstURL ? lastURL : firstURL;
+                            if (videoURL.isFileURL && imageURL.isFileURL && [NSFileManager.defaultManager fileExistsAtPath:videoURL.path] && [NSFileManager.defaultManager fileExistsAtPath:imageURL.path]) {
+                                PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+                                [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:nil];
+                                [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:nil];
+                                placeholder = [request placeholderForCreatedAsset];
+                            }
                         }
     #pragma clang diagnostic pop
     #endif
                         if (placeholder) {
-                            [identifiers addObject:placeholder.localIdentifier];
                             [placeholders addObject:placeholder];
+                            [identifiers addObject:placeholder.localIdentifier];
                         }
                     }];
                     if (placeholders.count) {
@@ -878,9 +890,9 @@ static MNAssetHelper *_helper;
 }
 
 + (void)writeLivePhotoWithImagePath:(id)imagePath videoPath:(id)videoPath completion:(void(^)(NSString *, NSError *))completion {
-    NSURL *videoURL = [videoPath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:videoPath] : videoPath;
-    NSURL *imageURL = [imagePath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:imagePath] : imagePath;
-    if (!videoURL || !imageURL || ![NSFileManager.defaultManager fileExistsAtPath:imageURL.path] || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path]) {
+    NSURL *videoURL = [videoPath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:videoPath] : ([videoPath isKindOfClass:NSURL.class] ? videoPath : nil);
+    NSURL *imageURL = [imagePath isKindOfClass:NSString.class] ? [NSURL fileURLWithPath:imagePath] : ([imagePath isKindOfClass:NSURL.class] ? imagePath : nil);
+    if (!videoURL.isFileURL || !imageURL.isFileURL || ![NSFileManager.defaultManager fileExistsAtPath:videoURL.path] || ![NSFileManager.defaultManager fileExistsAtPath:imageURL.path]) {
         if (completion) completion(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:@"LivePhoto文件不存在"}]);
         return;
     }
