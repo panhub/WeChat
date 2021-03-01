@@ -230,11 +230,11 @@
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
         
         [self.view showProgressDialog:@"导出中"];
-        NSString *outputPath = MNCacheDirectoryAppending(@"aaaaa.mp4");
+        NSString *outputPath = MNCacheDirectoryAppending(@"bbbbbbb.mp4");
         MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:assets.firstObject.content];
         exporter.usingHighBitRateExporting = NO;
         exporter.outputURL = [NSURL fileURLWithPath:outputPath];
-        [exporter appendAssetWithFileOfURL:[NSURL fileURLWithPath:assets.lastObject.content]];
+        //[exporter appendAssetWithFileOfURL:[NSURL fileURLWithPath:assets.lastObject.content]];
         [exporter exportAsynchronouslyWithProgressHandler:^(float progress) {
             dispatch_async_main(^{
                 [self.view updateDialogProgress:MIN(.99f, progress)];
