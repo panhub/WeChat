@@ -246,6 +246,8 @@
                     self.progress = progress;
                 } else {
                     [assetReader cancelReading];
+                    [self.videoInput markAsFinished];
+                    self.status = MNMovExportStatusFailed;
                 }
                 CFRelease(nextSampleBuffer);
             } else {
@@ -265,6 +267,8 @@
                 if (nextSampleBuffer && self.status == MNMovExportStatusExporting) {
                     if (![self.audioInput appendSampleBuffer:nextSampleBuffer]) {
                         [assetReader cancelReading];
+                        [self.audioInput markAsFinished];
+                        self.status = MNMovExportStatusFailed;
                     }
                     CFRelease(nextSampleBuffer);
                 } else {
@@ -373,13 +377,13 @@
 }
 
 - (NSDictionary *)videoSetting {
-    AVAssetTrack *audioTrack = [self trackWithMediaType:AVMediaTypeAudio];
+    //AVAssetTrack *audioTrack = [self trackWithMediaType:AVMediaTypeAudio];
     AVAssetTrack *videoTrack = [self trackWithMediaType:AVMediaTypeVideo];
     CGSize naturalSize = CGSizeApplyAffineTransform(videoTrack.naturalSize, videoTrack.preferredTransform);
     naturalSize = CGSizeMake(fabs(naturalSize.width), fabs(naturalSize.height));
-    float audioDataRate = audioTrack.estimatedDataRate;
+    //float audioDataRate = audioTrack.estimatedDataRate;
     float videoDataRate = videoTrack.estimatedDataRate;
-    float estimatedDataRate = audioDataRate + videoDataRate;
+    float estimatedDataRate = videoDataRate; // + audioDataRate
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = naturalSize.width*naturalSize.height*self.frameRate;
     }

@@ -225,12 +225,30 @@
     picker.configuration.allowsPickingVideo = YES;
     picker.configuration.allowsPickingLivePhoto = YES;
     picker.configuration.allowsDisplayFileSize = NO;
-    picker.configuration.maxExportDuration = 60.f;
+    //picker.configuration.maxExportDuration = 60.f;
     picker.configuration.allowsTakeAsset = YES;
     [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
-        UIImage *image = assets.firstObject.content;
-        image = image.compressImage;
-        NSLog(@"");
+        
+        [self.view showProgressDialog:@"导出中"];
+        NSString *outputPath = MNCacheDirectoryAppending(@"aaaaa.mp4");
+        MNAssetExporter *exporter = [[MNAssetExporter alloc] initWithAssetAtPath:assets.firstObject.content];
+        exporter.usingHighBitRateExporting = NO;
+        exporter.outputURL = [NSURL fileURLWithPath:outputPath];
+        [exporter appendAssetWithFileOfURL:[NSURL fileURLWithPath:assets.lastObject.content]];
+        [exporter exportAsynchronouslyWithProgressHandler:^(float progress) {
+            dispatch_async_main(^{
+                [self.view updateDialogProgress:MIN(.99f, progress)];
+            });
+        } completionHandler:^(MNAssetExportStatus status, NSError * _Nullable error) {
+            dispatch_async_main(^{
+                if (status == MNAssetExportStatusCompleted) {
+                    NSLog(@"%@", outputPath);
+                    [self.view showCompletedDialog:@"已导出视频"];
+                } else {
+                    [self.view showInfoDialog:error.localizedDescription];
+                }
+            });
+        }];
     } cancelHandler:nil];
     return;
     @weakify(self);

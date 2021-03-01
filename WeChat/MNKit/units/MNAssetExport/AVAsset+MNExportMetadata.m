@@ -27,8 +27,8 @@
 
 + (AVURLAsset *)assetWithMediaOfURL:(NSURL *)URL {
     if (!URL) return nil;
-    if (URL.isFileURL && ![NSFileManager.defaultManager fileExistsAtPath:URL.path]) return nil;
-    return [AVURLAsset URLAssetWithURL:URL options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@(YES)}];
+    if (!URL || (URL.isFileURL && ![NSFileManager.defaultManager fileExistsAtPath:URL.path])) return nil;
+    return [AVURLAsset URLAssetWithURL:URL options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@(URL.isFileURL)}];
 }
 
 #pragma mark - 获取媒体音/视素材

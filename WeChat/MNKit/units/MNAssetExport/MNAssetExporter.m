@@ -111,19 +111,24 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 }
 
 - (instancetype)initWithAsset:(AVURLAsset *)asset {
-    if (asset.URL.path.length <= 0) return nil;
-    return [self initWithAssetAtPath:asset.URL.path];
+    self = [self init];
+    if (!self) return nil;
+    if (asset.URL.isFileURL) self.URL = asset.URL;
+    return self;
 }
 
 - (instancetype)initWithAssetAtPath:(NSString *)filePath {
     self = [self init];
     if (!self) return nil;
-    self.filePath = filePath;
+    self.URL = [NSURL fileURLWithPath:filePath];
     return self;
 }
 
 - (instancetype)initWithAssetOfURL:(NSURL *)fileURL {
-    return [self initWithAssetAtPath:fileURL.path];
+    self = [self init];
+    if (!self) return nil;
+    self.URL = fileURL;
+    return self;
 }
 
 #pragma mark - Export
@@ -147,19 +152,19 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
 
 - (void)exporting {
     
+    // 检查输出路径
+    if (!self.outputURL || !self.outputURL.isFileURL) {
+        [self finishExportWithError:[NSError errorWithDomain:NSURLErrorDomain
+                                                        code:NSURLErrorBadURL
+                                                    userInfo:@{NSLocalizedDescriptionKey:@"output URL invalid"}]];
+        return;
+    }
+    
     // 检查输出参数
     if (self.exportVideoTrack && MNAssetExportIsEmptySize(self.outputRect.size)) {
         [self finishExportWithError:[NSError errorWithDomain:AVFoundationErrorDomain
                                                         code:AVErrorExportFailed
                                                     userInfo:@{NSLocalizedDescriptionKey:@"output rect error"}]];
-        return;
-    }
-    
-    // 检查输入目录
-    if (self.outputPath.length <= 0 || ![NSFileManager.defaultManager createDirectoryAtPath:[self.outputPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:nil]) {
-        [self finishExportWithError:[NSError errorWithDomain:NSURLErrorDomain
-                                                        code:NSURLErrorCannotCreateFile
-                                                    userInfo:@{NSLocalizedDescriptionKey:@"create output directory failed"}]];
         return;
     }
     
@@ -224,7 +229,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     
     // 资源写入者
     AVFileType fileType = (videoTrack && self.isExportVideoTrack) ? AVFileTypeMPEG4 : AVFileTypeAppleM4A;
-    AVAssetWriter *assetWriter = [AVAssetWriter assetWriterWithURL:[NSURL fileURLWithPath:self.outputPath] fileType:fileType error:&error];
+    AVAssetWriter *assetWriter = [AVAssetWriter assetWriterWithURL:self.outputURL fileType:fileType error:&error];
     if (error) {
         [self finishExportWithError:error];
         return;
@@ -251,7 +256,8 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     }
     
     // 删除输出文件
-    [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:self.outputURL error:nil];
+    [NSFileManager.defaultManager createDirectoryAtPath:self.outputURL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil];
     
     // 开始输出
     if (![assetReader startReading]) {
@@ -284,6 +290,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
                         self.progress = progress;
                     } else {
                         [assetReader cancelReading];
+                        [self.videoInput markAsFinished];
                         self.status = MNAssetExportStatusFailed;
                         NSLog(@"video write fail");
                     }
@@ -315,6 +322,7 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
                         }
                     } else {
                         [assetReader cancelReading];
+                        [self.audioInput markAsFinished];
                         self.status = MNAssetExportStatusFailed;
                         NSLog(@"audio write fail");
                     }
@@ -338,14 +346,14 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
                 self.error = assetWriter.error;
                 if (self.status == MNAssetExportStatusExporting) self.status = MNAssetExportStatusFailed;
             }
-            if (![NSFileManager.defaultManager fileExistsAtPath:self.outputPath]) {
+            if (![NSFileManager.defaultManager fileExistsAtPath:self.outputURL.path]) {
                 if (!self.error) self.error = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorExportFailed userInfo:@{NSLocalizedDescriptionKey:@"export failed"}];
                 if (self.status != MNAssetExportStatusCancelled) self.status = MNAssetExportStatusFailed;
             } else if (self.status == MNAssetExportStatusExporting) {
                 self.status = MNAssetExportStatusCompleted;
             }
             if (self.status == MNAssetExportStatusCancelled || self.status == MNAssetExportStatusFailed) {
-                [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+                [NSFileManager.defaultManager removeItemAtURL:self.outputURL error:nil];
             }
             if (self.status == MNAssetExportStatusCompleted && self.progress < 1.f) self.progress = 1.f;
             self.audioInput = self.videoInput = nil;
@@ -499,11 +507,11 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
         CGFloat bitsPerPixel = width*height < (640.f*480.f) ? 4.05f : 10.1f;
         return width*height*bitsPerPixel;
     }
-    AVAssetTrack *audioTrack = [self.composition trackWithMediaType:AVMediaTypeAudio];
+    //AVAssetTrack *audioTrack = [self.composition trackWithMediaType:AVMediaTypeAudio];
     AVAssetTrack *videoTrack = [self.composition trackWithMediaType:AVMediaTypeVideo];
-    float audioDataRate = audioTrack.estimatedDataRate;
+    //float audioDataRate = audioTrack.estimatedDataRate;
     float videoDataRate = videoTrack.estimatedDataRate;
-    float estimatedDataRate = audioDataRate + videoDataRate;
+    float estimatedDataRate = videoDataRate; // + audioDataRate
     if (isnan(estimatedDataRate) || estimatedDataRate <= 0.f) {
         estimatedDataRate = width*height*self.frameRate;
     }
@@ -518,11 +526,10 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     }
 }
 
-- (void)setFilePath:(NSString *)filePath {
-    _filePath = nil;
+- (void)setURL:(NSURL *)URL {
+    _URL = URL.copy;
     [self.composition removeAllTracks];
-    _filePath = filePath.copy;
-    [self appendAssetWithContentsOfFile:filePath];
+    [self appendAssetWithFileOfURL:_URL];
 }
 
 - (void)setProgress:(float)progress {
@@ -551,12 +558,12 @@ static float MNAssetExportPresetProgressive (MNAssetExportPresetName presetName)
     return (result && (videoTrack || audioTrack));
 }
 
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath {
-    return [self appendAsset:[AVAsset assetWithMediaAtPath:filePath]];
+- (BOOL)appendAssetWithFileOfURL:(NSURL *)URL {
+    return [self appendAsset:[AVAsset assetWithMediaOfURL:URL]];
 }
 
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath mediaType:(AVMediaType)mediaType {
-    return [self appendAssetTrack:[[AVAsset assetWithMediaAtPath:filePath] trackWithMediaType:mediaType]];
+- (BOOL)appendAssetTrackWithFileOfURL:(NSURL *)URL mediaType:(AVMediaType)mediaType {
+    return [self appendAssetTrack:[[AVAsset assetWithMediaOfURL:URL] trackWithMediaType:mediaType]];
 }
 
 - (BOOL)appendAssetTrack:(AVAssetTrack *)assetTrack {

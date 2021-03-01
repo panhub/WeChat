@@ -223,6 +223,7 @@
                 [NSFileManager.defaultManager removeItemAtPath:outputPath error:nil];
             }
             if (self.status == MNVideoGenerateStatusCompleted && self.progress < 1.f) self.progress = 1.f;
+            self.videoInput = nil;
             if (self.completionHandler) self.completionHandler(self.status, self.error);
         }];
     });

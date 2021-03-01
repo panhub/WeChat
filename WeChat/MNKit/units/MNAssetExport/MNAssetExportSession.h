@@ -25,11 +25,13 @@ typedef void(^MNAssetExportSessionProgressHandler)(float progress);
 typedef void(^MNAssetExportSessionCompletionHandler)(AVAssetExportSessionStatus status, NSError *_Nullable error);
 
 @interface MNAssetExportSession : NSObject
+/**视频路径*/
+@property (nonatomic, copy) NSURL *URL;
+/**输出路径*/
+@property (nonatomic, copy) NSURL *outputURL;
 /**资源对象, 内部依据初始化自行转化*/
 @property (nonatomic, strong, readonly) AVAsset *asset;
-/**视频路径*/
-@property (nonatomic, copy) NSString *filePath;
-/**质量 AVAssetExportPresetHighestQuality */
+/**质量 default 'AVAssetExportPresetHighestQuality' */
 @property (nonatomic, copy) NSString *presetName;
 /**文件封装格式*/
 @property (nonatomic, copy) AVFileType outputFileType;
@@ -39,9 +41,7 @@ typedef void(^MNAssetExportSessionCompletionHandler)(AVAssetExportSessionStatus 
 @property (nonatomic) CGRect outputRect;
 /**输出分辨率 outputRect有效时有效*/
 @property (nonatomic) CGSize renderSize;
-/**输出路径*/
-@property (nonatomic, copy) NSString *outputPath;
-/**是否针对网络使用进行优化*/
+/**是否针对网络使用进行优化 default 'NO'*/
 @property (nonatomic) BOOL shouldOptimizeForNetworkUse;
 /**输出视频内容*/
 @property (nonatomic, getter=isExportVideoTrack) BOOL exportVideoTrack;
@@ -103,18 +103,18 @@ typedef void(^MNAssetExportSessionCompletionHandler)(AVAssetExportSessionStatus 
 
 /**
  追加媒体资源
- @param filePath 媒体资源路径
+ @param URL 媒体资源路径
  @return 是否追加成功
  */
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath;
+- (BOOL)appendAssetWithFileOfURL:(NSURL *)URL;
 
 /**
  追加媒体素材
- @param filePath 媒体资源路径
+ @param URL 媒体资源路径
  @param mediaType 媒体类型
  @return 是否追加成功
  */
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath mediaType:(AVMediaType)mediaType;
+- (BOOL)appendAssetTrackWithFileOfURL:(NSURL *)URL mediaType:(AVMediaType)mediaType;
 
 /**
  追加媒体素材

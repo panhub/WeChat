@@ -42,26 +42,31 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     if (self = [super init]) {
         self.exportAudioTrack = YES;
         self.exportVideoTrack = YES;
-        self.shouldOptimizeForNetworkUse = YES;
+        self.shouldOptimizeForNetworkUse = NO;
         self.composition = AVMutableComposition.composition;
     }
     return self;
 }
 
 - (instancetype)initWithAsset:(AVURLAsset *)asset {
-    if (asset.URL.path.length <= 0) return nil;
-    return [self initWithAssetAtPath:asset.URL.path];
+    self = [self init];
+    if (!self) return nil;
+    if (asset.URL.isFileURL) self.URL = asset.URL;
+    return self;
 }
 
 - (instancetype)initWithAssetAtPath:(NSString *)filePath {
     self = [self init];
     if (!self) return nil;
-    self.filePath = filePath;
+    self.URL = [NSURL fileURLWithPath:filePath];
     return self;
 }
 
 - (instancetype)initWithAssetOfURL:(NSURL *)fileURL {
-    return [self initWithAssetAtPath:fileURL.path];
+    self = [self init];
+    if (!self) return nil;
+    self.URL = fileURL;
+    return self;
 }
 
 #pragma mark - Export
@@ -83,15 +88,13 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 
 - (void)exporting {
     
-    /*
-    // 检查输出参数
-    if (self.exportVideoTrack && MNAssetExportSessionIsEmptySize(self.outputRect.size)) {
-        [self finishExportWithError:[NSError errorWithDomain:AVFoundationErrorDomain
-                                                        code:AVErrorExportFailed
-                                                    userInfo:@{NSLocalizedDescriptionKey:@"output rect error"}]];
+    // 检查输出路径
+    if (!self.outputURL || !self.outputURL.isFileURL) {
+        [self finishExportWithError:[NSError errorWithDomain:NSURLErrorDomain
+                                                        code:NSURLErrorBadURL
+                                                    userInfo:@{NSLocalizedDescriptionKey:@"output URL invalid"}]];
         return;
     }
-    */
     
     // 检查媒体文件
     if (self.composition.tracks.count <= 0) {
@@ -144,13 +147,14 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
         return;
     }
     
-    // 删除本地文件<若存在>
-    [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+    // 删除本地文件
+    [NSFileManager.defaultManager removeItemAtURL:self.outputURL error:nil];
+    [NSFileManager.defaultManager createDirectoryAtPath:self.outputURL.path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil];
     
     // 开始输出
     AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:composition.copy presetName:[self presetCompatibleWithAsset:composition.copy]];
     exporter.outputFileType = self.outputFileType ? : ((videoTrack && self.isExportVideoTrack) ? AVFileTypeMPEG4 : AVFileTypeAppleM4A);
-    exporter.outputURL = [NSURL fileURLWithPath:self.outputPath];
+    exporter.outputURL = self.outputURL;
     exporter.shouldOptimizeForNetworkUse = self.shouldOptimizeForNetworkUse;
     [self setVideoCompositionForExportSession:exporter];
     [exporter addObserver:self forKeyPath:MNAssetExportObserverKey options:NSKeyValueObservingOptionNew context:nil];
@@ -163,7 +167,7 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
         self.exportSession = nil;
         self.displayLink.paused = YES;
         [weakexporter removeObserver:self forKeyPath:MNAssetExportObserverKey];
-        if (status != AVAssetExportSessionStatusCompleted) [NSFileManager.defaultManager removeItemAtPath:self.outputPath error:nil];
+        if (status != AVAssetExportSessionStatusCompleted) [NSFileManager.defaultManager removeItemAtURL:self.outputURL error:nil];
         if (self.completionHandler) self.completionHandler(self.status, self.error);
     }];
 }
@@ -212,16 +216,6 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return _renderSize;
 }
 
-/*
-- (CGRect)outputRect {
-    if (CGRectIsEmpty(_outputRect)) {
-        CGSize naturalSize = [[self.composition trackWithMediaType:AVMediaTypeVideo] naturalSizeOfVideo];
-        _outputRect = (CGRect){CGPointZero, naturalSize};
-    }
-    return _outputRect;
-}
-*/
-
 - (CADisplayLink *)displayLink {
     if (!_displayLink) {
         CADisplayLink *displayLink = [CADisplayLink displayLinkWithTarget:[MNWeakProxy proxyWithTarget:self] selector:@selector(tip:)];
@@ -258,11 +252,10 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
 }
 
 #pragma mark - Setter
-- (void)setFilePath:(NSString *)filePath {
-    _filePath = nil;
+- (void)setURL:(NSURL *)URL {
+    _URL = URL.copy;
     [self.composition removeAllTracks];
-    _filePath = filePath.copy;
-    [self appendAssetWithContentsOfFile:filePath];
+    [self appendAssetWithFileOfURL:_URL];
 }
 
 - (void)setProgress:(float)progress {
@@ -311,12 +304,12 @@ static BOOL MNAssetExportSessionIsEmptySize (CGSize size) {
     return (result && (videoTrack || audioTrack));
 }
 
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath {
-    return [self appendAsset:[AVAsset assetWithMediaAtPath:filePath]];
+- (BOOL)appendAssetWithFileOfURL:(NSURL *)URL {
+    return [self appendAsset:[AVAsset assetWithMediaOfURL:URL]];
 }
 
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath mediaType:(AVMediaType)mediaType {
-    return [self appendAssetTrack:[[AVAsset assetWithMediaAtPath:filePath] trackWithMediaType:mediaType]];
+- (BOOL)appendAssetTrackWithFileOfURL:(NSURL *)URL mediaType:(AVMediaType)mediaType {
+    return [self appendAssetTrack:[[AVAsset assetWithMediaOfURL:URL] trackWithMediaType:mediaType]];
 }
 
 - (BOOL)appendAssetTrack:(AVAssetTrack *)assetTrack {

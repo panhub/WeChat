@@ -83,9 +83,9 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
 /**帧率*/
 @property (nonatomic) int frameRate;
 /**视频路径*/
-@property (nonatomic, copy) NSString *filePath;
+@property (nonatomic, copy) NSURL *URL;
 /**输出路径*/
-@property (nonatomic, copy) NSString *outputPath;
+@property (nonatomic, copy) NSURL *outputURL;
 /**裁剪片段*/
 @property (nonatomic) CMTimeRange timeRange;
 /**裁剪区域*/
@@ -160,18 +160,18 @@ FOUNDATION_EXTERN BOOL MNAssetExportIsEmptySize (CGSize);
 
 /**
  追加媒体资源
- @param filePath 媒体资源路径
+ @param URL 媒体资源路径
  @return 是否追加成功
  */
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath;
+- (BOOL)appendAssetWithFileOfURL:(NSURL *)URL;
 
 /**
  追加媒体素材
- @param filePath 媒体资源路径
+ @param URL 媒体资源路径
  @param mediaType 媒体类型
  @return 是否追加成功
  */
-- (BOOL)appendAssetWithContentsOfFile:(NSString *)filePath mediaType:(AVMediaType)mediaType;
+- (BOOL)appendAssetTrackWithFileOfURL:(NSURL *)URL mediaType:(AVMediaType)mediaType;
 
 /**
  追加媒体素材
