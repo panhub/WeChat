@@ -375,7 +375,7 @@
 // 后台
 - (void)didEnterBackgroundNotification:(NSNotification *)notify {
     if (self.shouldSessionRunning) {
-        [self.session stopRunning];
+        [_session stopRunning];
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(scannerDidStopRunning:)]) {
                 [self.delegate scannerDidStopRunning:self];

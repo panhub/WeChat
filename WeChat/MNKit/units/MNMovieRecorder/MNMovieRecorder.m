@@ -301,7 +301,6 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
-    [self closeTorch];
     [self.movieWriter finishWriting];
 }
 
@@ -309,7 +308,6 @@ typedef NS_ENUM(NSInteger, MNMovieRecordStatus) {
     @synchronized (self) {
         if (self.status != MNMovieRecordStatusRecording) return;
     }
-    [self closeTorch];
     [self.movieWriter cancelWriting];
 }
 
