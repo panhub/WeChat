@@ -635,32 +635,46 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.navigationController.view.userInteractionEnabled == NO || self.collectionView.isDragging) return;
         self.navigationController.view.userInteractionEnabled = NO;
-        [self.view showActivityDialog:@"请稍后"];
+        __block BOOL shouldReloadData = NO;
+        [self.collectionView showActivityDialog:@"请稍后"];
         NSMutableArray <MNAsset *>*selectedAssets = @[].mutableCopy;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             [self.collections.copy enumerateObjectsUsingBlock:^(MNAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 if (!obj.result || !obj.collection) return;
                 PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:obj.result];
-                if (!details) return;
-                NSArray <MNAsset *>*result = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == YES"]];
-                [selectedAssets addObjectsFromArray:result];
-                [self.selectedAssets removeObjectsInArray:result];
+                if (!details || (details.removedObjects.count + details.insertedObjects.count <= 0)) return;
+                shouldReloadData = YES;
+                NSArray <MNAsset *>*selecteds = [obj.assets filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.selected == YES"]];
+                [selectedAssets addObjectsFromArray:selecteds];
+                [self.selectedAssets removeObjectsInArray:selecteds];
                 MNAssetCollection *collection = [MNAssetHelper fetchAssetCollection:obj.collection configuration:self.configuration];
                 [self.collections replaceObjectAtIndex:idx withObject:collection];
                 [selectedAssets.copy enumerateObjectsUsingBlock:^(MNAsset * _Nonnull ast, NSUInteger idx, BOOL * _Nonnull stop) {
-                    NSArray <MNAsset *>*array = [collection.assets.copy filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.asset.localIdentifier == %@", ast.asset.localIdentifier]];
-                    if (array.count) {
+                    NSArray <MNAsset *>*result = [collection.assets.copy filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.asset.localIdentifier == %@", ast.asset.localIdentifier]];
+                    if (result.count) {
+                        MNAsset *asset = result.firstObject;
+                        asset.selected = YES;
+                        asset.selectIndex = ast.selectIndex;
                         [selectedAssets removeObject:ast];
-                        [array setValue:@(YES) forKey:@"selected"];
-                        [self.selectedAssets addObjectsFromArray:array];
+                        [self.selectedAssets addObject:asset];
                     }
                 }];
                 if (obj == self.collection) self->_collection = collection;
             }];
+            // 对选择资源排序
+            if (shouldReloadData && self.configuration.showPickingNumber && self.selectedAssets.count) {
+                NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"selectIndex" ascending:YES];
+                NSArray <MNAsset *>*result = [self.selectedAssets sortedArrayUsingDescriptors:@[descriptor]];
+                [self.selectedAssets removeAllObjects];
+                [self.selectedAssets addObjectsFromArray:result];
+            }
+            // 主线程刷新UI
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self reloadData];
-                if (self.albumView) [self.albumView reloadData];
-                [self.view closeDialog];
+                if (shouldReloadData) {
+                    [self reloadData];
+                    if (self.albumView) [self.albumView reloadData];
+                }
+                [self.collectionView closeDialog];
                 self.navigationController.view.userInteractionEnabled = YES;
             });
         });
