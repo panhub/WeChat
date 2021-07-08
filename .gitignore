@@ -2,7 +2,9 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-## 高德地图SDK https://lbs.amap.com
+## 高德官网 https://lbs.amap.com
+## 高德定位SDK https://lbs.amap.com/api/ios-location-sdk/download/
+## 高德地图SDK https://lbs.amap.com/api/ios-sdk/download/
 ## WeChat/Vendor/AMap/AMap.bundle
 ## *.framework
 WeChat/Vendor/AMap/
