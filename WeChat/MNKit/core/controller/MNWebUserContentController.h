@@ -1,6 +1,6 @@
 //
 //  MNWebUserContentController.h
-//  SQB_ScreenShot
+//  MNKit
 //
 //  Created by Vincent on 2019/2/14.
 //  Copyright © 2019年 AiZhe. All rights reserved.

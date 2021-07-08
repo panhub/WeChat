@@ -5366,13 +5366,13 @@
 		E869C6992570EF630017025E /* emoji */ = {
 			isa = PBXGroup;
 			children = (
-				E869C69A2570EF630017025E /* MNEmojiAttachment.h */,
+				E869C6A02570EF630017025E /* MNEmoji.h */,
 				E869C69B2570EF630017025E /* MNEmoji.m */,
-				E869C69C2570EF630017025E /* MNEmojiManager.m */,
-				E869C69D2570EF630017025E /* MNEmojiPacket.h */,
+				E869C69A2570EF630017025E /* MNEmojiAttachment.h */,
 				E869C69E2570EF630017025E /* MNEmojiAttachment.m */,
 				E869C69F2570EF630017025E /* MNEmojiManager.h */,
-				E869C6A02570EF630017025E /* MNEmoji.h */,
+				E869C69C2570EF630017025E /* MNEmojiManager.m */,
+				E869C69D2570EF630017025E /* MNEmojiPacket.h */,
 				E869C6A12570EF630017025E /* MNEmojiPacket.m */,
 			);
 			path = emoji;

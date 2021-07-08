@@ -63,7 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSArray <NSURL *>*playURLs;
 /**当前的playerItem <AVPlayerItem>*/
 @property (nonatomic, readonly, nullable) AVPlayerItem *currentPlayItem;
-/**当前的播放索引*/
+/**对播放的资源缓存*/
+@property (nonatomic, getter=isUsingCacheForPlayerItem) BOOL usingCacheForPlayerItem;
+/**当前的播放索引, 由内部维护*/
 @property (nonatomic, readonly) NSUInteger playIndex;
 /**缓冲进度*/
 @property (nonatomic, readonly) float buffer;
@@ -84,11 +86,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithURLs:(NSArray <NSURL *>*)URLs;
 
-- (instancetype)initWithURL:(NSURL *)URL;
+- (instancetype)initWithURL:(NSURL *_Nullable)URL;
 
 - (BOOL)containsURL:(NSURL *)item;
 
 - (void)addURL:(NSURL *)URL;
+
+- (void)insertURL:(NSURL *)URL atIndex:(NSUInteger)index;
 
 - (void)insertURL:(NSURL *)URL afterURL:(NSURL *_Nullable)afterURL;
 

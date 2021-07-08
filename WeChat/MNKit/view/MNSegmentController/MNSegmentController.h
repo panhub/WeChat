@@ -4,7 +4,7 @@
 //
 //  Created by Vincent on 2018/4/14.
 //  Copyright © 2018年 小斯. All rights reserved.
-// 
+//  分段控制器
 
 #import "MNSegmentViewController.h"
 #import "MNSegmentConfiguration.h"

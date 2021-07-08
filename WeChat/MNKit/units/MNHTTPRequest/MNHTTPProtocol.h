@@ -1,6 +1,6 @@
 //
 //  MNHTTPProtocol.h
-//  SQB_ScreenShot
+//  MNKit
 //
 //  Created by Vincent on 2019/1/31.
 //  Copyright © 2019年 AiZhe. All rights reserved.

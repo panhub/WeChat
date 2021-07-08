@@ -8,6 +8,7 @@
 
 #import "MNPlayer.h"
 #if __has_include(<AVFoundation/AVFoundation.h>)
+#import "NSObject+MNObserving.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <MediaPlayer/MPRemoteCommandCenter.h>
@@ -58,6 +59,7 @@
 - (void)initialized {
     _playIndex = 0;
     _state = MNPlayerStateUnknown;
+    _usingCacheForPlayerItem = YES;
     _URLs = [NSMutableArray arrayWithCapacity:1];
     _caches = [NSMutableDictionary dictionaryWithCapacity:1];
     /*
@@ -120,23 +122,28 @@
     [self insertURL:URL afterURL:nil];
 }
 
-- (void)insertURL:(NSURL *)URL afterURL:(NSURL *)afterURL {
+- (void)insertURL:(NSURL *)URL atIndex:(NSUInteger)index {
     if (!URL) return;
+    NSURL *U = self.URLs.count > _playIndex ? self.URLs[_playIndex] : nil;
+    if (index >= self.URLs.count) {
+        [self.URLs addObject:URL];
+    } else {
+        [self.URLs insertObject:URL atIndex:MAX(0, index)];
+    }
+    if (U) _playIndex = [self.URLs indexOfObject:U];
+}
+
+- (void)insertURL:(NSURL *)URL afterURL:(NSURL *)afterURL {
+    __block NSUInteger index = self.URLs.count;
     if (afterURL) {
-        NSURL *U = self.URLs.count > _playIndex ? self.URLs[_playIndex] : nil;
-        __block NSInteger index = self.URLs.count - 1;
         [self.URLs enumerateObjectsUsingBlock:^(NSURL * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if (afterURL.isFileURL ? [obj.path isEqualToString:afterURL.path] : [obj.absoluteString isEqualToString:afterURL.absoluteString]) {
-                index = idx;
+                index = idx + 1;
                 *stop = YES;
             }
         }];
-        index ++;
-        [self.URLs insertObject:URL atIndex:index];
-        if (U) _playIndex = [self.URLs indexOfObject:U];
-    } else {
-        [self.URLs addObject:URL];
     }
+    [self insertURL:URL atIndex:index];
 }
 
 - (void)removeURL:(NSURL *)URL {
@@ -195,7 +202,7 @@
     /// 获取当前播放源, 建立异步链接
     @synchronized (self) {
         NSURL *URL = self.URLs[self.playIndex];
-        AVPlayerItem *playerItem = [self playerItemForURL:URL];
+        AVPlayerItem *playerItem = [self itemForURL:URL];
         [self addObserverWithPlayerItem:playerItem];
         [self.player replaceCurrentItemWithPlayerItem:playerItem];
     }
@@ -484,18 +491,18 @@
 }
 
 #pragma mark - Cache
-- (AVPlayerItem *)playerItemForURL:(NSURL *)URL {
-    NSString *path = URL.path;
-    AVPlayerItem *playerItem = [self.caches objectForKey:path];
+- (AVPlayerItem *)itemForURL:(NSURL *)URL {
+    NSString *key = URL.isFileURL ? URL.path : URL.absoluteString;
+    AVPlayerItem *playerItem = [self.caches objectForKey:key];
     if (!playerItem) {
         playerItem = [[AVPlayerItem alloc] initWithURL:URL];
         /// 改变播放速率支持
         for (AVPlayerItemTrack *track in playerItem.tracks) {
-            if ([track.assetTrack.mediaType isEqual:AVMediaTypeAudio]) {
+            if ([track.assetTrack.mediaType isEqualToString:AVMediaTypeAudio]) {
                 track.enabled = YES;
             }
         }
-        if (playerItem && path.length > 0) [self.caches setObject:playerItem forKey:path];
+        if (playerItem && key.length && self.isUsingCacheForPlayerItem) [self.caches setObject:playerItem forKey:key];
     }
     return playerItem;
 }

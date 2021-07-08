@@ -1,6 +1,6 @@
 //
 //  MNSwitch.h
-//  SHPhoto
+//  MNKit
 //
 //  Created by Vicent on 2020/6/2.
 //  Copyright © 2020 Vicent. All rights reserved.

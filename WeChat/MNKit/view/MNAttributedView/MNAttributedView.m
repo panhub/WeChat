@@ -1,6 +1,6 @@
 //
 //  MNAttributedView.m
-//  SQB_ScreenShot
+//  MNKit
 //
 //  Created by Vincent on 2019/2/18.
 //  Copyright © 2019年 AiZhe. All rights reserved.
