@@ -14,8 +14,6 @@
 #ifndef MNMacro_h
 #define MNMacro_h
 
-#define MN_IS_SIMULATOR   UIDeviceSimulator()
-
 #if DEBUG
 #define MN_IS_DEBUG   YES
 #else
@@ -32,7 +30,7 @@
 
 #define MN_THEME_COLOR  MN_R_G_B(30.f, 144.f, 25.f)
 
-#define MN_APP_DOWNLOAD_URL(appId)  [@"https://apps.apple.com/cn/app/id" stringByAppendString:appId]
+#define MN_DOWNLOAD_URL(appId)  [@"https://apps.apple.com/cn/app/id" stringByAppendString:appId]
 
 #ifdef __cplusplus
 #define MNKIT_EXTERN_C_BEGIN  extern "C" {

@@ -25,7 +25,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.identifier = MNFileHandle.fileName;
+        self.identifier = NSString.identifier;
     }
     return self;
 }

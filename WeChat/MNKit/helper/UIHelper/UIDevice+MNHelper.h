@@ -18,7 +18,7 @@
  */
 @property (nonatomic, readonly, class) NSString *model;
 /**
- 生成唯一标识符 理论上不刷机不该表
+ 生成唯一标识符, 理论上不刷机不改变
  */
 @property (nonatomic, readonly, class) NSString *identifier;
 /**
@@ -30,35 +30,24 @@
  */
 @property (nonatomic, readonly, class) NSString *address;
 
-/**
- *获取设备类型(e.g. @"iPhone", @"iPod touch")
- *@return 设备类型
- */
-FOUNDATION_EXPORT NSString* UIDeviceModel (void);
-
-/**
- *获取设备名称(用户自定义 e.g. "My iPhone")
- *@return 设备名称(用户自定义)
- */
-FOUNDATION_EXPORT NSString* UIDeviceName (void);
 
 /**
  *是否为手机
- *@return 是否为手机
+ *@return YES为手机 NO为其它
  */
-FOUNDATION_EXPORT BOOL UIInterfacePhoneModel (void);
+FOUNDATION_EXPORT BOOL MN_IS_PHONE (void);
 
 /**
  *是否为Pad
- *@return 是否为Pad
+ *@return YES为Pad NO为其它
  */
-FOUNDATION_EXPORT BOOL UIInterfacePadModel (void);
+FOUNDATION_EXPORT BOOL MN_IS_PAD (void);
 
 /**
  *是否是模拟器
  *@return YES真机 NO模拟器
  */
-FOUNDATION_EXPORT BOOL UIDeviceSimulator (void);
+FOUNDATION_EXPORT BOOL MN_IS_SIMULATOR (void);
 
 /**
  *获取 系统版本号(NSString)
@@ -70,7 +59,7 @@ FOUNDATION_EXPORT NSString* IOS_VERSION (void);
  获取 系统版本号(CGFloat)
  @return 系统(iOS)版本号
  */
-FOUNDATION_EXPORT CGFloat IOS_VERSION_NUMBER (void);
+FOUNDATION_EXPORT CGFloat IOS_VERSION_NUM (void);
 
 /**
  当前系统版本是否是某个版本

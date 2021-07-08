@@ -24,7 +24,7 @@
 
 + (WXWebpage *)webpageWithImage:(UIImage *)image {
     if (!image) image = [UIImage imageNamed:@"favorite_link"];
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *imagePath = [WechatHelper.helper.momentPath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];
     if (![MNFileHandle writeImage:image toFile:imagePath error:nil]) return nil;
     WXWebpage *webpage = WXWebpage.new;
@@ -34,7 +34,7 @@
 }
 
 + (WXWebpage *)webpageWithWebFavorite:(WXFavorite *)favorite session:(WXSession *)session {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *imagePath = [WechatHelper.helper.sessionPath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];
     if (![MNFileHandle writeImage:favorite.image toFile:imagePath error:nil]) return nil;
     WXWebpage *webpage = WXWebpage.new;
@@ -48,7 +48,7 @@
 
 + (WXWebpage *)webpageWithImageData:(NSData *)imageData {
     if (!imageData) imageData = [UIImage imageNamed:@"favorite_link"].imageData;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *imagePath = [WechatHelper.helper.momentPath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];
     if (![MNFileHandle writeData:imageData toFile:imagePath error:nil]) return nil;
     WXWebpage *webpage = WXWebpage.new;

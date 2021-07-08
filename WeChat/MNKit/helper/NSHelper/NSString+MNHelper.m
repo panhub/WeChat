@@ -7,6 +7,7 @@
 //
 
 #import "NSString+MNHelper.h"
+#import "NSString+MNCoding.h"
 #if __has_include(<CoreLocation/CLLocation.h>)
 #import <CoreLocation/CLLocation.h>
 #endif
@@ -148,6 +149,16 @@ CGSize NSStringBoundingSize (NSString *string, CGSize size, NSDictionary *attrib
 
 
 @implementation NSString (MNHelper)
+#pragma mark - 唯一字符串
++ (NSString *)identifier {
+    //设备UUID
+    NSString *identifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    //当前时空UUID
+    NSString *uuidString = [[NSUUID UUID] UUIDString];
+    //拼接文件名
+    NSString *fileName = [NSString stringWithFormat:@"%@-%@-%@-%@", identifier, uuidString, [NSNumber numberWithLongLong:[[NSDate date] timeIntervalSince1970]*1000], @(__COUNTER__)];
+    return fileName.md5String32;
+}
 
 #pragma mark - 自身长度
 - (NSRange)rangeOfAll {

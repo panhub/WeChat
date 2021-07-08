@@ -131,6 +131,10 @@ FOUNDATION_EXPORT CGSize NSStringBoundingSize (NSString *string, CGSize size, NS
 
 @interface NSString (MNHelper)
 /**
+ 获取唯一字符串
+ */
+@property (nonatomic, class, readonly) NSString *identifier;
+/**
  获取自身Range
  */
 @property (nonatomic, readonly) NSRange rangeOfAll;

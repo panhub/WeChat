@@ -20,7 +20,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.identifier = MNFileHandle.fileName;
+        self.identifier = NSString.identifier;
     }
     return self;
 }
@@ -29,7 +29,7 @@
     if (!image || session.length <= 0) return nil;
     NSData *imageData = [NSData dataWithImage:image];
     if (imageData.length <= 0) return nil;
-    NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, MNFileHandle.fileName, (image.isAnimatedImage ? WXFilePathGifExtension : WXFilePathImageExtension)];
+    NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, NSString.identifier, (image.isAnimatedImage ? WXFilePathGifExtension : WXFilePathImageExtension)];
     [NSFileManager.defaultManager createDirectoryAtPath:filePath.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil];
     if (![imageData writeToFile:filePath atomically:YES]) return nil;
     WXFileModel *model = WXFileModel.new;
@@ -43,7 +43,7 @@
 
 + (instancetype)fileWithDictionary:(NSDictionary *)dictionary session:(NSString *)session {
     if (dictionary.allKeys <= 0 || session.length <= 0) return nil;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, identifier, WXFilePathDataExtension];
     if (![dictionary.JsonData writeToFile:filePath atomically:YES]) return nil;
     WXFileModel *model = WXFileModel.new;
@@ -57,7 +57,7 @@
 
 + (instancetype)fileWithObject:(NSObject *)obj session:(NSString *)session {
     if (!obj || session.length <= 0) return nil;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, identifier, WXFilePathDataExtension];
     if (![MNFileHandle writeData:obj.archivedData toFile:filePath error:nil]) return nil;
     WXFileModel *model = WXFileModel.new;
@@ -71,7 +71,7 @@
 
 + (instancetype)fileWithAudio:(NSString *)audioPath session:(NSString *)session {
     if (audioPath.length <= 0 || session.length <= 0) return nil;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, identifier, WXFilePathAudioExtension];
     if (![NSFileManager.defaultManager copyItemAtPath:audioPath toPath:filePath error:nil]) return nil;
     WXFileModel *model = WXFileModel.new;
@@ -84,7 +84,7 @@
 
 + (instancetype)fileWithVideo:(NSString *)videoPath session:(NSString *)session {
     if (videoPath.length <= 0 || session.length <= 0) return nil;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.sessionPath stringByAppendingFormat:@"/%@/%@.%@", session, identifier, WXFilePathVideoExtension];
     if (![NSFileManager.defaultManager copyItemAtPath:videoPath toPath:filePath error:nil]) return nil;
     UIImage *thumbnailImage = [MNAssetExporter exportThumbnailOfVideoAtPath:filePath];

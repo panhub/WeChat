@@ -18,14 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MNFileHandle : NSObject
 /**
- 生成唯一文件名
- */
-@property (nonatomic, class, readonly) NSString *fileName;
-
-/**
- 获取文件名(唯一)
+ 获取唯一文件名
  @param extension 文件类型后缀
- @return 唯一文件名
+ @return 唯一文件名.后缀
  */
 + (NSString *)fileNameWithExtension:(NSString *)extension;
 FOUNDATION_EXPORT NSString * MNFileNameWithExtension (NSString *extension);

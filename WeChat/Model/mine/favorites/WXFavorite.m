@@ -18,7 +18,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.identifier = MNFileHandle.fileName;
+        self.identifier = NSString.identifier;
         self.timestamp = NSDate.timestamps;
     }
     return self;
@@ -26,7 +26,7 @@
 
 + (instancetype)shareWithDictionary:(NSDictionary *)dic {
     if (!dic) return nil;
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];
     NSData *imageData = dic[WXShareFavoriteImageKey];
     if (!imageData) imageData = [UIImage imageNamed:@"favorite_link"].imageData;
@@ -45,7 +45,7 @@
 }
 
 + (WXFavorite *)favoriteWithImage:(UIImage *)image {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];
     if (![MNFileHandle writeImage:image toFile:filePath error:nil]) return nil;
     WXFavorite *favorite = WXFavorite.new;
@@ -57,7 +57,7 @@
 }
 
 + (WXFavorite *)favoriteWithImagePath:(NSString *)imagePath {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:imagePath.pathExtension]];
     if (![NSFileManager.defaultManager copyItemAtPath:imagePath toPath:filePath error:nil]) return nil;
     WXFavorite *favorite = WXFavorite.new;
@@ -76,7 +76,7 @@
 }
 
 + (WXFavorite *)favoriteWithVideoPath:(NSString *)video {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:video.pathExtension]];
     if (![NSFileManager.defaultManager copyItemAtPath:video toPath:filePath error:nil]) return nil;
     UIImage *image = [MNAssetExporter exportThumbnailOfVideoAtPath:video];
@@ -94,7 +94,7 @@
 }
 
 + (WXFavorite *)favoriteWithWebpage:(WXWebpage *)webpage {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath;
     if (webpage.image) {
         filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:webpage.identifier.pathExtension]];
@@ -111,7 +111,7 @@
 }
 
 + (WXFavorite *)favoriteWithLocation:(WXLocation *)location {
-    NSString *identifier = MNFileHandle.fileName;
+    NSString *identifier = NSString.identifier;
     NSString *filePath;
     if (location.snapshot) {
         filePath = [WechatHelper.helper.favoritePath stringByAppendingPathComponent:[identifier stringByAppendingPathExtension:@"jpg"]];

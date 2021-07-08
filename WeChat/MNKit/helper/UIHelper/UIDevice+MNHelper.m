@@ -7,7 +7,7 @@
 //
 
 #import "UIDevice+MNHelper.h"
-#import "MNFileHandle.h"
+#import "NSString+MNHelper.h"
 #import "MNKeychain.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
@@ -17,49 +17,39 @@
 #include <sys/param.h>
 #include <sys/mount.h>
 
-
 // 用于生成设备唯一标识, 生成后不要更改此标识
 #define kDeviceIdentifier   @"com.mn.kit.device.identifier"
 
 @implementation UIDevice (MNHelper)
-#pragma mark - DeviceModel
-NSString* UIDeviceModel (void) {
-    return [[UIDevice currentDevice] model];
-}
-
-#pragma mark - DeviceName
-NSString* UIDeviceName (void) {
-    return [[UIDevice currentDevice] name];
-}
 
 #pragma mark - 是否为iPhone
-BOOL UIInterfacePhoneModel (void) {
-    static BOOL isPhone;
+BOOL MN_IS_PHONE (void) {
+    static BOOL is_phone;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isPhone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
+        is_phone = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
     });
-    return isPhone;
+    return is_phone;
 }
 
 #pragma mark - 是否为iPad
-BOOL UIInterfacePadModel (void) {
-    static BOOL isPad;
+BOOL MN_IS_PAD (void) {
+    static BOOL is_pad;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+        is_pad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
     });
-    return isPad;
+    return is_pad;
 }
 
 #pragma mark - 是否是模拟器
-BOOL UIDeviceSimulator (void) {
-    static BOOL isSimulator;
+BOOL MN_IS_SIMULATOR (void) {
+    static BOOL is_simulator;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isSimulator = TARGET_IPHONE_SIMULATOR;
+        is_simulator = TARGET_IPHONE_SIMULATOR;
     });
-    return isSimulator;
+    return is_simulator;
 }
 
 #pragma mark - iOS系统版本号
@@ -72,23 +62,23 @@ NSString * IOS_VERSION (void) {
     return systemversion;
 }
 
-inline CGFloat IOS_VERSION_NUMBER (void) {
+inline CGFloat IOS_VERSION_NUM (void) {
     return [IOS_VERSION() floatValue];
 }
 
 #pragma mark - 判断当前系统版本是否是某个版本
 inline BOOL IOS_VERSION_EQUAL (CGFloat version) {
-    return IOS_VERSION_NUMBER() == version;
+    return IOS_VERSION_NUM() == version;
 }
 
 #pragma mark - 当前系统版本 >= 某个版本
 inline BOOL IOS_VERSION_LATER (CGFloat version) {
-    return IOS_VERSION_NUMBER() >= version;
+    return IOS_VERSION_NUM() > version;
 }
 
 #pragma mark - 当前系统版本 <= 某个版本
 inline BOOL IOS_VERSION_UNDER (CGFloat version) {
-    return IOS_VERSION_NUMBER() <= version;
+    return IOS_VERSION_NUM() < version;
 }
 
 #pragma mark - 唯一标识符
@@ -103,7 +93,7 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
                 [NSUserDefaults.standardUserDefaults setObject:device_identifier forKey:kDeviceIdentifier];
                 [NSUserDefaults.standardUserDefaults synchronize];
             } else {
-                device_identifier = MNFileHandle.fileName;
+                device_identifier = NSString.identifier;
                 [MNKeychain setString:device_identifier forKey:kDeviceIdentifier];
                 [NSUserDefaults.standardUserDefaults setObject:device_identifier forKey:kDeviceIdentifier];
                 [NSUserDefaults.standardUserDefaults synchronize];
@@ -168,7 +158,6 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
 
 #pragma mark - 获取设备型号
 + (NSString *)model {
-    //https://www.theiphonewiki.com/wiki/Models
     static NSString *device_model;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -244,23 +233,24 @@ inline BOOL IOS_VERSION_UNDER (CGFloat version) {
         else if ([model isEqualToString:@"iPad5,2"])      device_model = @"iPad Mini 4 (LTE)";
         else if ([model isEqualToString:@"iPad5,3"])      device_model = @"iPad Air 2";
         else if ([model isEqualToString:@"iPad5,4"])      device_model = @"iPad Air 2";
-        else if ([model isEqualToString:@"iPad6,3"])      device_model = @"iPad Pro 9.7";
-        else if ([model isEqualToString:@"iPad6,4"])      device_model = @"iPad Pro 9.7";
-        else if ([model isEqualToString:@"iPad6,7"])      device_model = @"iPad Pro 12.9";
-        else if ([model isEqualToString:@"iPad6,8"])      device_model = @"iPad Pro 12.9";
+        else if ([model isEqualToString:@"iPad6,3"])      device_model = @"iPad Pro 9.7 inch";
+        else if ([model isEqualToString:@"iPad6,4"])      device_model = @"iPad Pro 9.7 inch";
+        else if ([model isEqualToString:@"iPad6,7"])      device_model = @"iPad Pro 12.9 inch";
+        else if ([model isEqualToString:@"iPad6,8"])      device_model = @"iPad Pro 12.9 inch";
         else if ([model isEqualToString:@"iPad6,11"])      device_model = @"iPad 5 (WiFi)";
         else if ([model isEqualToString:@"iPad6,12"])      device_model = @"iPad 5 (Cellular)";
-        else if ([model isEqualToString:@"iPad7,1"])      device_model = @"iPad Pro 12.9 2nd gen (WiFi)";
-        else if ([model isEqualToString:@"iPad7,2"])      device_model = @"iPad Pro 12.9 2nd gen (Cellular)";
+        else if ([model isEqualToString:@"iPad7,1"])      device_model = @"iPad Pro 12.9 inch 2nd generation (WiFi)";
+        else if ([model isEqualToString:@"iPad7,2"])      device_model = @"iPad Pro 12.9 inch 2nd generation (Cellular)";
         else if ([model isEqualToString:@"iPad7,3"])      device_model = @"iPad Pro 10.5 inch (WiFi)";
         else if ([model isEqualToString:@"iPad7,4"])      device_model = @"iPad Pro 10.5 inch (Cellular)";
+        else if ([model isEqualToString:@"iPad11,1"])      device_model = @"iPad Mini (5th generation)";
+        else if ([model isEqualToString:@"iPad11,2"])      device_model = @"iPad Mini (5th generation)";
         else if ([model isEqualToString:@"AppleTV2,1"])      device_model = @"Apple TV 2";
         else if ([model isEqualToString:@"AppleTV3,1"])      device_model = @"Apple TV 3";
         else if ([model isEqualToString:@"AppleTV3,2"])      device_model = @"Apple TV 3";
         else if ([model isEqualToString:@"AppleTV5,3"])      device_model = @"Apple TV 4";
-        else if ([model isEqualToString:@"i386"])         device_model = @"Simulator";
-        else if ([model isEqualToString:@"x86_64"])       device_model = @"Simulator";
-        else device_model = @"iPhone 11 Series Later";
+        else if ([model isEqualToString:@"i386"] || [model isEqualToString:@"x86_64"]) device_model = @"Simulator";
+        else device_model = @"unknown";
     });
     return device_model;
 }

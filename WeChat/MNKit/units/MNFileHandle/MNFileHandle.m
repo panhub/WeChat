@@ -11,23 +11,12 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "MNFileManager.h"
 #import "UIImage+MNAnimated.h"
-#import "NSString+MNCoding.h"
+#import "NSString+MNHelper.h"
 
 @implementation MNFileHandle
-#pragma mark - 获取唯一文件名
-+ (NSString *)fileName {
-    //设备UUID
-    NSString *identifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    //当前时空UUID
-    NSString *uuidString = [[NSUUID UUID] UUIDString];
-    //拼接文件名
-    NSString *fileName = [NSString stringWithFormat:@"%@-%@-%@-%@", identifier, uuidString, [NSNumber numberWithLongLong:[[NSDate date] timeIntervalSince1970]*1000], @(__COUNTER__)];
-    return fileName.md5String32;
-}
-
 #pragma mark - 获取唯一文件名(类型)
 + (NSString *)fileNameWithExtension:(NSString *)extension {
-    NSString *fileName = [self fileName];
+    NSString *fileName = NSString.identifier;
     if (extension.length <= 0) return fileName;
     extension = [extension stringByReplacingOccurrencesOfString:@" " withString:@""];
     extension = [extension stringByReplacingOccurrencesOfString:@"." withString:@""];

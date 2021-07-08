@@ -15,7 +15,7 @@
 }
 
 + (WXProfile *)pictureWithImage:(UIImage *)image {
-    NSString *fileName = [MNFileHandle.fileName stringByAppendingPathExtension:@"jpg"];
+    NSString *fileName = [NSString.identifier stringByAppendingPathExtension:@"jpg"];
     NSString *filePath = [WechatHelper.helper.momentPath stringByAppendingPathComponent:fileName];
     if (![MNFileHandle writeImage:image toFile:filePath error:nil]) return nil;
     WXProfile *picture = WXProfile.new;
@@ -28,7 +28,7 @@
 }
 
 + (WXProfile *)pictureWithVideoPath:(NSString *)video {
-    NSString *fileName = [MNFileHandle.fileName stringByAppendingPathExtension:@"mp4"];
+    NSString *fileName = [NSString.identifier stringByAppendingPathExtension:@"mp4"];
     NSString *filePath = [WechatHelper.helper.momentPath stringByAppendingPathComponent:fileName];
     if (![NSFileManager.defaultManager copyItemAtPath:video toPath:filePath error:nil]) return nil;
     UIImage *image = [MNAssetExporter exportThumbnailOfVideoAtPath:video];

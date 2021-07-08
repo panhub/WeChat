@@ -546,7 +546,7 @@
         picker.configuration.requestGifUseingPhotoPolicy = YES;
         picker.configuration.requestLivePhotoUseingPhotoPolicy = YES;
         picker.configuration.allowsEditing = type == MNAssetPickerTypeNormal;
-        picker.configuration.exportURL = [NSURL fileURLWithPath:[WechatHelper.helper.momentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4", MNFileHandle.fileName]]];
+        picker.configuration.exportURL = [NSURL fileURLWithPath:[WechatHelper.helper.momentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4", NSString.identifier]]];
         [picker presentWithPickingHandler:^(MNAssetPicker * _Nonnull picker, NSArray<MNAsset *> * _Nullable assets) {
             WXNewMomentController *vc = [[WXNewMomentController alloc] initWithAssets:assets];
             [weakself.navigationController pushViewController:vc animated:YES];
