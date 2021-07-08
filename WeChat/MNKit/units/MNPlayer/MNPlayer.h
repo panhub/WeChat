@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #if __has_include(<AVFoundation/AVFoundation.h>)
 @class MNPlayer, AVPlayerItem;
-
+//
 typedef NS_ENUM(NSInteger, MNPlayerState) {
     MNPlayerStateUnknown = 0,
     MNPlayerStateFailed,
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeAllURLs;
 
 /**切换播放索引*/
-- (BOOL)replaceCurrentPlayIndexWithIndex:(NSInteger)playIndex;
+- (BOOL)replacePlayWithIndex:(NSInteger)playIndex;
 
 /**播放*/
 - (void)play;

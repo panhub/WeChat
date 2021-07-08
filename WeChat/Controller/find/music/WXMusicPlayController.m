@@ -168,7 +168,7 @@
     MNPlayer *player = [[MNPlayer alloc] initWithURLs:URLs];
     player.delegate = self;
     player.observeTime = CMTimeMake(1, 30);
-    [player replaceCurrentPlayIndexWithIndex:self.playIndex];
+    [player replacePlayWithIndex:self.playIndex];
     self.player = player;
 }
 

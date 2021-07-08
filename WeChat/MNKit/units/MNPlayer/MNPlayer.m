@@ -35,8 +35,6 @@
 #define AVPlayItemEmptyKeyPath             @"playbackBufferEmpty"
 #define AVPlayItemKeepUpKeyPath           @"playbackLikelyToKeepUp"
 
-const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
-
 @implementation MNPlayer
 - (instancetype)initWithURLs:(NSArray <NSURL *>*)URLs {
     if (self = [self init]) {
@@ -170,7 +168,7 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     self.state = MNPlayerStateUnknown;
 }
 
-- (BOOL)replaceCurrentPlayIndexWithIndex:(NSInteger)playIndex {
+- (BOOL)replacePlayWithIndex:(NSInteger)playIndex {
     if (playIndex >= self.URLs.count) return NO;
     [self replaceCurrentItemWithNil];
     self.playIndex = playIndex;
@@ -319,11 +317,13 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     progress = MIN(MAX(progress, 0.f), 1.f);
     CMTime time = playerItem.duration;
     time.value = time.value*progress;
+    /*
     if (self.state == MNPlayerStatePause && progress >= .99f) {
         _state = MNPlayerStateFinished;
     } else if (self.state == MNPlayerStateFinished && progress < .99f) {
         _state = MNPlayerStatePause;
     }
+    */
     [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completion];
 }
 
@@ -336,11 +336,13 @@ const NSTimeInterval MNPlayItemTimeErrorKey = -1.f;
     CMTime time = playerItem.duration;
     CMTimeValue value = time.value;
     time.value = MAX(1, MIN(value, (CMTimeValue)(time.timescale*seconds)));
+    /*
     if (self.state == MNPlayerStatePause && llabs(time.value - value) <= 5) {
         _state = MNPlayerStateFinished;
     } else if (self.state == MNPlayerStateFinished && llabs(time.value - value) > 5) {
         _state = MNPlayerStatePause;
     }
+    */
     [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completion];
 }
 
