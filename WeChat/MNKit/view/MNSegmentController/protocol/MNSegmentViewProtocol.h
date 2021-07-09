@@ -11,13 +11,16 @@
 
 @protocol MNSegmentViewDelegate <NSObject>
 @required
+/**选择了分段索引*/
 - (void)segmentView:(MNSegmentView *)segment didSelectItemAtIndex:(NSUInteger)index;
 @end
 
 @protocol MNSegmentViewDataSource <NSObject>
 @required
+/**获取分段标题*/
 - (NSArray <NSString *>*)segmentViewShouldLoadTitles;
 @optional
+/**获取右常驻视图*/
 - (UIView *)segmentViewShouldLoadRightView;
 @end
 

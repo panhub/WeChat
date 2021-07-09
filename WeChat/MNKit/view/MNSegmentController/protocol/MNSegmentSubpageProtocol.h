@@ -10,9 +10,12 @@
 
 @protocol MNSegmentSubpageDataSource <NSObject>
 @required
+/**获取滑动控件以监听偏移*/
 - (UIScrollView *)segmentSubpageScrollView;
 @optional
+/**猜想最小内容尺寸告知*/
 - (void)segmentSubpageGuessMinContentSize:(CGSize)minContentSize;
+/**向滑动控件嵌入偏移告知*/
 - (void)segmentSubpageScrollViewDidInsertInset:(CGFloat)inset ofIndex:(NSInteger)pageIndex;
 @end
 

@@ -4,7 +4,7 @@
 //
 //  Created by Vincent on 2018/4/14.
 //  Copyright © 2018年 小斯. All rights reserved.
-//
+//  添加子界面并提供滑动控制
 
 #import <UIKit/UIKit.h>
 

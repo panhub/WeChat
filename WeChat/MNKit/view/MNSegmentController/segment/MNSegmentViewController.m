@@ -49,7 +49,7 @@
 
 - (void)loadView {
     UIView *view = [[UIView alloc]initWithFrame:self.frame];
-    view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     view.backgroundColor = [UIColor clearColor];
     view.userInteractionEnabled = YES;
     self.view = view;

@@ -4,7 +4,7 @@
 //
 //  Created by Vincent on 2018/4/14.
 //  Copyright © 2018年 小斯. All rights reserved.
-//
+//  子界面容器
 
 #import "MNSegmentViewController.h"
 #import "MNSegmentPageProtocol.h"

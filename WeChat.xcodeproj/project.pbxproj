@@ -5473,13 +5473,13 @@
 		E869C6D22570EF630017025E /* MNLinkTableController */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6D32570EF630017025E /* page */,
+				E869C6E82570EF630017025E /* MNLinkTableConfiguration.h */,
 				E869C6DA2570EF630017025E /* MNLinkTableConfiguration.m */,
 				E869C6DB2570EF630017025E /* MNLinkTableController.h */,
+				E869C6E72570EF630017025E /* MNLinkTableController.m */,
+				E869C6D32570EF630017025E /* page */,
 				E869C6DC2570EF630017025E /* protocol */,
 				E869C6E02570EF630017025E /* table */,
-				E869C6E72570EF630017025E /* MNLinkTableController.m */,
-				E869C6E82570EF630017025E /* MNLinkTableConfiguration.h */,
 			);
 			path = MNLinkTableController;
 			sourceTree = "<group>";
@@ -5534,18 +5534,18 @@
 		E869C6EB2570EF630017025E /* normal */ = {
 			isa = PBXGroup;
 			children = (
-				E869C6EC2570EF630017025E /* MNSolubleTransitionAnimator.h */,
-				E869C6ED2570EF630017025E /* MNDistanceTransitionAnimator.m */,
-				E869C6EE2570EF630017025E /* MNPushModalTransitionAnimator.h */,
-				E869C6EF2570EF630017025E /* MNSlideTransitionAnimator.h */,
-				E869C6F02570EF630017025E /* MNFlipTransitionAnimator.h */,
-				E869C6F12570EF630017025E /* MNPortalTransitionAnimator.m */,
-				E869C6F22570EF630017025E /* MNSlideTransitionAnimator.m */,
-				E869C6F32570EF630017025E /* MNPushModalTransitionAnimator.m */,
 				E869C6F42570EF630017025E /* MNDistanceTransitionAnimator.h */,
-				E869C6F52570EF630017025E /* MNSolubleTransitionAnimator.m */,
-				E869C6F62570EF630017025E /* MNPortalTransitionAnimator.h */,
+				E869C6ED2570EF630017025E /* MNDistanceTransitionAnimator.m */,
+				E869C6F02570EF630017025E /* MNFlipTransitionAnimator.h */,
 				E869C6F72570EF630017025E /* MNFlipTransitionAnimator.m */,
+				E869C6F62570EF630017025E /* MNPortalTransitionAnimator.h */,
+				E869C6F12570EF630017025E /* MNPortalTransitionAnimator.m */,
+				E869C6EE2570EF630017025E /* MNPushModalTransitionAnimator.h */,
+				E869C6F32570EF630017025E /* MNPushModalTransitionAnimator.m */,
+				E869C6EF2570EF630017025E /* MNSlideTransitionAnimator.h */,
+				E869C6F22570EF630017025E /* MNSlideTransitionAnimator.m */,
+				E869C6EC2570EF630017025E /* MNSolubleTransitionAnimator.h */,
+				E869C6F52570EF630017025E /* MNSolubleTransitionAnimator.m */,
 			);
 			path = normal;
 			sourceTree = "<group>";
@@ -5616,10 +5616,10 @@
 		E869C71A2570EF630017025E /* MNTextField */ = {
 			isa = PBXGroup;
 			children = (
-				E869C71B2570EF630017025E /* MNSearchBar.m */,
-				E869C71C2570EF630017025E /* MNTextField.m */,
 				E869C71D2570EF630017025E /* MNSearchBar.h */,
+				E869C71B2570EF630017025E /* MNSearchBar.m */,
 				E869C71E2570EF630017025E /* MNTextField.h */,
+				E869C71C2570EF630017025E /* MNTextField.m */,
 			);
 			path = MNTextField;
 			sourceTree = "<group>";

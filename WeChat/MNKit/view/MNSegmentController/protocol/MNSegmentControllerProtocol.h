@@ -12,7 +12,9 @@
 
 @protocol MNSegmentControllerDataSource <NSObject>
 @required
+/**获取分段标题*/
 - (NSArray <NSString *>*)segmentControllerShouldLoadPageTitles:(MNSegmentController *)segmentController;
+/**获取子界面*/
 - (UIViewController *)segmentController:(MNSegmentController *)segmentController childControllerOfPageIndex:(NSUInteger)pageIndex;
 @optional
 /**初始页数*/

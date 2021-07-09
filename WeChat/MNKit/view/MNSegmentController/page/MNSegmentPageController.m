@@ -12,13 +12,20 @@
 #import "UIView+MNLayout.h"
 
 @interface MNSegmentPageController ()<UIScrollViewDelegate>
-@property (nonatomic) NSInteger currentPageIndex;/**当前page索引*/
-@property (nonatomic) NSInteger lastPageIndex; /**上一次页面索引*/
-@property (nonatomic) NSInteger guessToIndex; /**交互滑动时猜想page索引*/
-@property (nonatomic) CGFloat originOffsetX; /**交互滑动初始偏移*/
-@property (nonatomic) BOOL needDisplayCurrentPage; /**是否需要展示page(首次出现YES)*/
+/**当前page索引*/
+@property (nonatomic) NSInteger currentPageIndex;
+/**上一次页面索引*/
+@property (nonatomic) NSInteger lastPageIndex;
+/**交互滑动时猜想page索引*/
+@property (nonatomic) NSInteger guessToIndex;
+/**交互滑动初始偏移*/
+@property (nonatomic) CGFloat originOffsetX;
+/**是否需要展示page(首次出现YES)*/
+@property (nonatomic) BOOL needDisplayCurrentPage;
+/**滑动支持*/
 @property (nonatomic, strong) MNSegmentPageView *scrollView;
-@property (nonatomic, strong) NSMapTable<NSNumber *, UIViewController<MNSegmentSubpageDataSource>*> *pageCache; /**page缓存*/
+/**子界面缓存*/
+@property (nonatomic, strong) NSMapTable<NSNumber *, UIViewController<MNSegmentSubpageDataSource>*> *pageCache;
 @end
 
 static NSString *MNPageContentSizeObserveKey = @"contentSize";
