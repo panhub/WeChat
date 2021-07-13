@@ -228,49 +228,28 @@ static BOOL MNErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger co
 
 #pragma mark - 可接受数据类型
 - (NSSet <NSString *>*)acceptableContentTypes {
-    if (_acceptableContentTypes) return _acceptableContentTypes;
-    NSSet <NSString *>*contentTypes;
-    switch (self.serializationType) {
-        case MNURLSerializationTypeJSON:
-        {
-            static NSSet <NSString *>*set;
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                set = [NSSet setWithObjects:@"text/html", @"application/json", @"text/json", @"text/javascript", nil];
-            });
-            contentTypes = set;
-        } break;
-        case MNURLSerializationTypeString:
-        {
-            static NSSet <NSString *>*set;
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                set = [[NSSet alloc] initWithObjects:@"text/html", @"application/xml", @"text/plain", nil];
-            });
-            contentTypes = set;
-        } break;
-        case MNURLSerializationTypeXML:
-        {
-            static NSSet <NSString *>*set;
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                set = [[NSSet alloc] initWithObjects:@"application/xml", @"text/xml", nil];
-            });
-            contentTypes = set;
-        } break;
-        case MNURLSerializationTypePlist:
-        {
-            static NSSet <NSString *>*set;
-            static dispatch_once_t onceToken;
-            dispatch_once(&onceToken, ^{
-                set = [[NSSet alloc] initWithObjects:@"application/x-plist", nil];
-            });
-            contentTypes = set;
-        } break;
-        default:
-            break;
+    if (!_acceptableContentTypes || _acceptableContentTypes.count <= 0) {
+        switch (self.serializationType) {
+            case MNURLSerializationTypeJSON:
+            {
+                _acceptableContentTypes = [NSSet setWithObjects:@"text/html", @"application/json", @"text/json", @"text/javascript", nil];
+            } break;
+            case MNURLSerializationTypeString:
+            {
+                _acceptableContentTypes = [NSSet setWithObjects:@"text/html", @"application/xml", @"text/plain", nil];
+            } break;
+            case MNURLSerializationTypeXML:
+            {
+                _acceptableContentTypes = [NSSet setWithObjects:@"application/xml", @"text/xml", nil];
+            } break;
+            case MNURLSerializationTypePlist:
+            {
+                _acceptableContentTypes = [NSSet setWithObjects:@"application/x-plist", nil];
+            } break;
+            default:
+                break;
+        }
     }
-    _acceptableContentTypes = contentTypes;
     return _acceptableContentTypes;
 }
 
