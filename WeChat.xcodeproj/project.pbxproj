@@ -395,11 +395,11 @@
 		20FD7152227897A000EE1B5F /* TodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 20FD7151227897A000EE1B5F /* TodayViewController.m */; };
 		20FD7159227897A000EE1B5F /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 20FD714C227897A000EE1B5F /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		20FD715E22789CF200EE1B5F /* TodayAsset.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 20FD715D22789CF200EE1B5F /* TodayAsset.xcassets */; };
-		3B28A5AB2696A73300F6E1CF /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B28A5A72696A73300F6E1CF /* AMapFoundationKit.framework */; };
-		3B28A5AC2696A73300F6E1CF /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3B28A5A82696A73300F6E1CF /* AMap.bundle */; };
-		3B28A5AD2696A73300F6E1CF /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B28A5A92696A73300F6E1CF /* MAMapKit.framework */; };
-		3B28A5AE2696A73300F6E1CF /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B28A5AA2696A73300F6E1CF /* AMapSearchKit.framework */; };
-		3B28A5B02696A7E900F6E1CF /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B28A5AF2696A7E900F6E1CF /* AMapLocationKit.framework */; };
+		3B14876D26A19EF30096CF89 /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B14876826A19EF30096CF89 /* AMapLocationKit.framework */; };
+		3B14876E26A19EF30096CF89 /* AMapFoundationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B14876926A19EF30096CF89 /* AMapFoundationKit.framework */; };
+		3B14876F26A19EF30096CF89 /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3B14876A26A19EF30096CF89 /* AMap.bundle */; };
+		3B14877026A19EF30096CF89 /* MAMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B14876B26A19EF30096CF89 /* MAMapKit.framework */; };
+		3B14877126A19EF30096CF89 /* AMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B14876C26A19EF30096CF89 /* AMapSearchKit.framework */; };
 		BF12103A2392A23500121D07 /* WXCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF1210392392A23500121D07 /* WXCropViewController.m */; };
 		BF13A59623F198E90072E68A /* WXNearbyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF13A59523F198E90072E68A /* WXNearbyViewController.m */; };
 		BF1BFDC623DA9C3100C5DF34 /* SEMainView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF1BFDC523DA9C3100C5DF34 /* SEMainView.m */; };
@@ -1708,11 +1708,11 @@
 		20FD7151227897A000EE1B5F /* TodayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodayViewController.m; sourceTree = "<group>"; };
 		20FD7156227897A000EE1B5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		20FD715D22789CF200EE1B5F /* TodayAsset.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = TodayAsset.xcassets; sourceTree = "<group>"; };
-		3B28A5A72696A73300F6E1CF /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
-		3B28A5A82696A73300F6E1CF /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
-		3B28A5A92696A73300F6E1CF /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
-		3B28A5AA2696A73300F6E1CF /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
-		3B28A5AF2696A7E900F6E1CF /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
+		3B14876826A19EF30096CF89 /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapLocationKit.framework; sourceTree = "<group>"; };
+		3B14876926A19EF30096CF89 /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapFoundationKit.framework; sourceTree = "<group>"; };
+		3B14876A26A19EF30096CF89 /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
+		3B14876B26A19EF30096CF89 /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MAMapKit.framework; sourceTree = "<group>"; };
+		3B14876C26A19EF30096CF89 /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AMapSearchKit.framework; sourceTree = "<group>"; };
 		BF1210382392A23500121D07 /* WXCropViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXCropViewController.h; sourceTree = "<group>"; };
 		BF1210392392A23500121D07 /* WXCropViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXCropViewController.m; sourceTree = "<group>"; };
 		BF13A59423F198E90072E68A /* WXNearbyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXNearbyViewController.h; sourceTree = "<group>"; };
@@ -2728,6 +2728,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B14876D26A19EF30096CF89 /* AMapLocationKit.framework in Frameworks */,
 				E89522F92578945800F2513B /* twolame.framework in Frameworks */,
 				E8FD03502430CE1900841036 /* Accelerate.framework in Frameworks */,
 				BFAFFFAA23965BE000BB659E /* libiconv.tbd in Frameworks */,
@@ -2744,12 +2745,10 @@
 				200FC0D52221594A002B7763 /* ImageIO.framework in Frameworks */,
 				E89522CA2578945800F2513B /* libswresample.framework in Frameworks */,
 				E89522DE2578945800F2513B /* libsndfile.framework in Frameworks */,
-				3B28A5AD2696A73300F6E1CF /* MAMapKit.framework in Frameworks */,
 				E89522C82578945800F2513B /* libxml2.framework in Frameworks */,
 				E89522DB2578945800F2513B /* libwebpdecoder.framework in Frameworks */,
 				200FC0CF2221590D002B7763 /* CoreTelephony.framework in Frameworks */,
 				2077A6652286C788000EFB85 /* GLKit.framework in Frameworks */,
-				3B28A5B02696A7E900F6E1CF /* AMapLocationKit.framework in Frameworks */,
 				E89522CF2578945800F2513B /* libtheoradec.framework in Frameworks */,
 				E89522E82578945800F2513B /* fribidi.framework in Frameworks */,
 				200FC0D122215926002B7763 /* libc++.tbd in Frameworks */,
@@ -2762,6 +2761,7 @@
 				200FC0CD22215903002B7763 /* SystemConfiguration.framework in Frameworks */,
 				E89522D22578945800F2513B /* libavformat.framework in Frameworks */,
 				E89DA94A25D0CA76003ED10E /* libmp3lame.a in Frameworks */,
+				3B14876E26A19EF30096CF89 /* AMapFoundationKit.framework in Frameworks */,
 				E840D4AA240D4124001553B9 /* libc++.tbd in Frameworks */,
 				2004560C222D3FEE001E65D2 /* Intents.framework in Frameworks */,
 				2004560D222D3FEE001E65D2 /* IntentsUI.framework in Frameworks */,
@@ -2804,21 +2804,21 @@
 				200FC0DD222159DA002B7763 /* CoreLocation.framework in Frameworks */,
 				E89522E72578945800F2513B /* libavcodec.framework in Frameworks */,
 				200FC0D922215978002B7763 /* MessageUI.framework in Frameworks */,
-				3B28A5AE2696A73300F6E1CF /* AMapSearchKit.framework in Frameworks */,
 				E89522F42578945800F2513B /* shine.framework in Frameworks */,
 				E89522ED2578945800F2513B /* libuuid.framework in Frameworks */,
 				E89522D42578945800F2513B /* libavutil.framework in Frameworks */,
 				E89522E52578945800F2513B /* x264.framework in Frameworks */,
+				3B14877126A19EF30096CF89 /* AMapSearchKit.framework in Frameworks */,
 				E89522F52578945800F2513B /* speex.framework in Frameworks */,
 				E89522F22578945800F2513B /* libvpx.framework in Frameworks */,
 				E89522DF2578945800F2513B /* libswscale.framework in Frameworks */,
-				3B28A5AB2696A73300F6E1CF /* AMapFoundationKit.framework in Frameworks */,
 				E89522D92578945800F2513B /* libiconv.framework in Frameworks */,
 				E89522FA2578945800F2513B /* libilbc.framework in Frameworks */,
 				E89522C92578945800F2513B /* lame.framework in Frameworks */,
 				E89522D72578945800F2513B /* libvorbisenc.framework in Frameworks */,
 				200FC0D72221596C002B7763 /* Photos.framework in Frameworks */,
 				E89522F12578945800F2513B /* gmp.framework in Frameworks */,
+				3B14877026A19EF30096CF89 /* MAMapKit.framework in Frameworks */,
 				200FC0C9222158E9002B7763 /* libsqlite3.tbd in Frameworks */,
 				E89522EF2578945800F2513B /* expat.framework in Frameworks */,
 				E89522F62578945800F2513B /* x265.framework in Frameworks */,
@@ -2904,7 +2904,7 @@
 		200DEF8A221D7617006830B5 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
-				3B28A5A62696A73300F6E1CF /* AMap */,
+				3B14876726A19EF30096CF89 /* AMap */,
 				20A92A5B22F5C91300868FBE /* SDCycleScrollView */,
 				20805C7E22EDB99F00BD682B /* SDAutoLayout */,
 				2055D5BA22E007180012E43E /* YYKit */,
@@ -4473,14 +4473,14 @@
 			path = TodayExtension;
 			sourceTree = "<group>";
 		};
-		3B28A5A62696A73300F6E1CF /* AMap */ = {
+		3B14876726A19EF30096CF89 /* AMap */ = {
 			isa = PBXGroup;
 			children = (
-				3B28A5AF2696A7E900F6E1CF /* AMapLocationKit.framework */,
-				3B28A5A72696A73300F6E1CF /* AMapFoundationKit.framework */,
-				3B28A5A82696A73300F6E1CF /* AMap.bundle */,
-				3B28A5A92696A73300F6E1CF /* MAMapKit.framework */,
-				3B28A5AA2696A73300F6E1CF /* AMapSearchKit.framework */,
+				3B14876826A19EF30096CF89 /* AMapLocationKit.framework */,
+				3B14876926A19EF30096CF89 /* AMapFoundationKit.framework */,
+				3B14876A26A19EF30096CF89 /* AMap.bundle */,
+				3B14876B26A19EF30096CF89 /* MAMapKit.framework */,
+				3B14876C26A19EF30096CF89 /* AMapSearchKit.framework */,
 			);
 			path = AMap;
 			sourceTree = "<group>";
@@ -6536,11 +6536,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B14876F26A19EF30096CF89 /* AMap.bundle in Resources */,
 				E8F253AB257904DF00A05A13 /* band.band in Resources */,
 				200DEF74221D7181006830B5 /* Assets.xcassets in Resources */,
 				BF7B525523E5C815003DA959 /* WeChat.bundle in Resources */,
 				E8F253C42579105A00A05A13 /* LaunchScreen.storyboard in Resources */,
-				3B28A5AC2696A73300F6E1CF /* AMap.bundle in Resources */,
 				E869C8DF2570EF670017025E /* README.md in Resources */,
 				E869C9AB2570EF670017025E /* MNCityPicker.plist in Resources */,
 				BFD03FD4238C0EC30004EAB5 /* InfoPlist.strings in Resources */,
